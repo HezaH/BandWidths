@@ -1,29 +1,3 @@
-// {
-//     "version": "0.2.0",
-//     "configurations": [
-//         {
-//             "name": "Debug C++ (MinGW)",
-//             "type": "cppdbg",
-//             "request": "launch",
-//             "program": "${workspaceFolder}/main.exe",
-//             "args": [],
-//             "stopAtEntry": false,
-//             "cwd": "${workspaceFolder}",
-//             "environment": [],
-//             "externalConsole": true,
-//             "MIMode": "gdb",
-//             "setupCommands": [
-//                 {
-//                     "description": "Ativar impressão automática de variáveis",
-//                     "text": "-enable-pretty-printing",
-//                     "ignoreFailures": true
-//                 }
-//             ],
-//             "preLaunchTask": "Compilar",
-//             "miDebuggerPath": "C:/MinGW/bin/gdb.exe"
-//         }
-//     ]
-// }
 {
     "version": "0.2.0",
     "configurations": [
@@ -31,10 +5,10 @@
             "name": "Debug C++ (MinGW)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Temp/C##/examples/main.exe",
+            "program": "${workspaceFolder}/examples/main.exe", 
             "args": [],
             "stopAtEntry": false,
-            "cwd": "C:/Temp/C##/examples",  // <- Caminho exato onde estão os arquivos
+            "cwd": "${workspaceFolder}/examples/",  // <- Caminho exato onde estão os arquivos
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",

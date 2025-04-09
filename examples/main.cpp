@@ -26,7 +26,7 @@ int main() {
     Grafo g(M);  // Cria um objeto da classe Grafo com M vértices (assumindo matriz quadrada)
 
     // Loop para ler cada uma das nz entradas não nulas da matriz
-    for (int i = 0; i < nz; i++) {
+    for (int i = 0; i < nz + 2; i++) {
         int r, c;       // r: linha da entrada, c: coluna
         double val;     // val: valor da entrada (pode ser usado como peso da aresta)
 
@@ -38,9 +38,14 @@ int main() {
         }
 
         r--; c--;  // Ajusta os índices de 1-based (formato .mtx) para 0-based (índices em C++ começam do zero)
-
+        if (val == 0.0) {
+            val = val;
+            
+        }
+        
         if (val != 0.0) {
-            g.adicionarAresta(r, c);  // Adiciona uma aresta no grafo (de r para c, grafo direcionado)
+            std::cout << r + 1 << " " << c + 1 << " " << val << "\n";
+            g.adicionarAresta(c , r );  // Adiciona uma aresta no grafo (de r para c, grafo direcionado)
         }
     }
 
@@ -50,8 +55,8 @@ int main() {
     std::cout << "Total de arestas no grafo (direcionado): " << g.contarArestas() << std::endl;
 
     // Mostra a estrutura do grafo no console (geralmente com listas de adjacência)
-    std::cout << "Grafo carregado do arquivo ck400.mtx:\n";
-    g.mostrarGrafo();  // Chama o método que imprime os vértices e suas conexões
+    // std::cout << "Grafo carregado do arquivo ck400.mtx:\n";
+    // g.mostrarGrafo();  // Chama o método que imprime os vértices e suas conexões
 
     // Executa busca em largura (BFS) a partir do vértice 0
     g.buscaEmLargura(0);
@@ -61,6 +66,8 @@ int main() {
 
     // Chama a função que calcula e exibe as métricas da matriz de adjacência
     g.metricasMatriz();
+
+    g.calcularLarguraDeBanda();
 
 
     return 0;  // Retorna 0 indicando que o programa terminou com sucesso

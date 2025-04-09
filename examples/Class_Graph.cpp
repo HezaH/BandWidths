@@ -9,7 +9,7 @@ Grafo::Grafo(int vertices) : V(vertices), percorrido(vertices, false) {
 
 void Grafo::adicionarAresta(int v1, int v2) {
     adj[v1].push_back(v2);
-    fprintf(stderr, "Adicionando aresta de %d para %d\n", v1, v2);
+    // fprintf(stderr, "Adicionando aresta de %d para %d\n", v1, v2);
     // adj[v2].push_back(v1);
 }
 
@@ -32,12 +32,12 @@ void Grafo::buscaEmLargura(int inicio) {
     distancia[inicio] = 0;
     fila.push(inicio);
 
-    cout << "\nOrdem de visita dos vertices (BFS):\n";
+    // cout << "\nOrdem de visita dos vertices (BFS):\n";
 
     while (!fila.empty()) {
         int w = fila.front();
         fila.pop();
-        cout << "Visitando vertice " << w << " (distancia = " << distancia[w] << ")\n";
+        // cout << "Visitando vertice " << w << " (distancia = " << distancia[w] << ")\n";
 
         for (int u : adj[w]) {
             if (!percorrido[u]) {
@@ -83,7 +83,7 @@ void Grafo::exportarParaDot(const string& nomeArquivo) {
     }
     file << "}\n";
     file.close();
-    cout << "Arquivo DOT gerado: " << nomeArquivo << endl;
+    // cout << "Arquivo DOT gerado: " << nomeArquivo << endl;
 }
 
 void Grafo::metricasMatriz() {
@@ -124,8 +124,8 @@ void Grafo::metricasMatriz() {
     std::cout << "\nMétricas da matriz de adjacência:\n";
     std::cout << "Total de arestas: " << total << "\n";
     std::cout << "Arestas na diagonal (auto-laços): " << diagonal << "\n";
-    std::cout << "Arestas abaixo da diagonal: " << abaixoDiagonal << "\n";
-    std::cout << "Arestas acima da diagonal: " << acimaDiagonal << "\n";
+    std::cout << "Below diagonal: " << abaixoDiagonal << "\n";
+    std::cout << "Above diagonal: " << acimaDiagonal << "\n";
     std::cout << "A - A' (arestas assimétricas): " << assimetricas << "\n";
 }
 
