@@ -24,12 +24,21 @@ int main() {
     }
 
     Grafo g(M);  // Cria um objeto da classe Grafo com M vértices (assumindo matriz quadrada)
+    int total = 0;
+    int diagonal = 0;
+    int belowDiagonal = 0;
+    int aboveDiagonal = 0;
+    int assimetricas = 0;
 
     // Loop para ler cada uma das nz entradas não nulas da matriz
-    for (int i = 0; i < nz + 2; i++) {
+    for (int i = 0; i < nz; i++) {
         int r, c;       // r: linha da entrada, c: coluna
         double val;     // val: valor da entrada (pode ser usado como peso da aresta)
+   
+        total++;
+                
 
+        
         // Lê a próxima entrada do arquivo no formato "linha coluna valor"
         // Espera que cada linha tenha três valores: inteiros r, c e número val (real ou inteiro)
         if (fscanf(f, "%d %d %lg\n", &r, &c, &val) != 3) {
@@ -38,16 +47,26 @@ int main() {
         }
 
         r--; c--;  // Ajusta os índices de 1-based (formato .mtx) para 0-based (índices em C++ começam do zero)
-        if (val == 0.0) {
-            val = val;
             
+        if (r == c){
+            diagonal++;
+        }else if (c < r){
+            belowDiagonal++;
+        }else{
+            aboveDiagonal++;
         }
         
         if (val != 0.0) {
             std::cout << r + 1 << " " << c + 1 << " " << val << "\n";
-            g.adicionarAresta(c , r );  // Adiciona uma aresta no grafo (de r para c, grafo direcionado)
+            g.adicionarAresta(c , r);  // Adiciona uma aresta no grafo (de r para c, grafo direcionado)
         }
     }
+    // Exibe informações sobre a matriz lida
+    std::cout << "\n==== Informações da Matriz ====\n";
+    std::cout << "Total de arestas: " << total << "\n";
+    std::cout << "Arestas na diagonal (auto-laços): " << diagonal << "\n";
+    std::cout << "Below diagonal: " << belowDiagonal << "\n";
+    std::cout << "Above diagonal: " << aboveDiagonal << "\n";
 
     fclose(f);  // Fecha o arquivo após a leitura
 
