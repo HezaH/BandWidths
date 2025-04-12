@@ -2,11 +2,18 @@
 #include <cstdio>       // Biblioteca padrão do C para manipulação de arquivos (fopen, fscanf, etc.)
 #include "mmio.h"       // Biblioteca que permite ler arquivos no formato Matrix Market (.mtx)
 #include "grafo.h"      // Header personalizado que define a classe Grafo (estrutura de dados para o grafo)
+#include <cmath>        // Biblioteca para funções matemáticas como std::sqrt
 
 int main() {
     MM_typecode matcode;   // Estrutura que armazena o tipo da matriz (ex: real, simétrica, etc.)
     FILE *f;               // Ponteiro para o arquivo que será lido
     int M, N, nz;          // M: número de linhas (vértices), N: número de colunas, nz: número de entradas não-nulas
+    int total = 0;
+    int diagonal = 0;
+    int belowDiagonal = 0;
+    int aboveDiagonal = 0;
+    int assimetricas = 0;
+    double soma = 0.0;
 
     // Abre o arquivo Matrix Market "ck400.mtx" no modo leitura ("r")
     f = fopen("ck400.mtx", "r");
@@ -24,11 +31,10 @@ int main() {
     }
 
     Grafo g(M);  // Cria um objeto da classe Grafo com M vértices (assumindo matriz quadrada)
-    int total = 0;
-    int diagonal = 0;
-    int belowDiagonal = 0;
-    int aboveDiagonal = 0;
-    int assimetricas = 0;
+    Grafo gT(M);  // Cria um grafo transposto (não utilizado no código atual, mas pode ser útil para outras operações)
+    
+    std::vector<std::vector<double>> A(M, std::vector<double>(N, 0.0));
+    std::vector<std::vector<double>> AT(N, std::vector<double>(M, 0.0)); // Transposta deve ter dimensões invertidas
 
     // Loop para ler cada uma das nz entradas não nulas da matriz
     for (int i = 0; i < nz; i++) {
@@ -37,8 +43,6 @@ int main() {
    
         total++;
                 
-
-        
         // Lê a próxima entrada do arquivo no formato "linha coluna valor"
         // Espera que cada linha tenha três valores: inteiros r, c e número val (real ou inteiro)
         if (fscanf(f, "%d %d %lg\n", &r, &c, &val) != 3) {
@@ -48,19 +52,38 @@ int main() {
 
         r--; c--;  // Ajusta os índices de 1-based (formato .mtx) para 0-based (índices em C++ começam do zero)
             
-        if (r == c){
+        if (r == c) {
             diagonal++;
-        }else if (c < r){
+        } else if (r > c) {      // If the row index is greater than the column index: BELOW the diagonal.
             belowDiagonal++;
-        }else{
+        } else {                 // Otherwise (r < c): ABOVE the diagonal.
             aboveDiagonal++;
         }
         
+        
         if (val != 0.0) {
+            A[r][c] = val;
+            AT[c][r] = val;  
             std::cout << r + 1 << " " << c + 1 << " " << val << "\n";
-            g.adicionarAresta(c , r);  // Adiciona uma aresta no grafo (de r para c, grafo direcionado)
+            g.adicionarAresta(r, c);  // Adiciona uma aresta no grafo (de r para c, grafo direcionado)
+            gT.adicionarAresta(c, r);  // Adiciona a aresta no grafo transposto (de c para r)
         }
     }
+    
+    std::cout << "\n";
+    std::cout << "Matriz A - A^T:\n";
+    for (int i = 0; i < M; ++i) {
+        for (int j = 0; j < N; ++j) {
+            double val = A[i][j] - AT[i][j];
+            soma += val * val;
+        }
+    }
+    
+    std::cout << "\n";
+
+    double norma = std::sqrt(soma);
+    std::cout << "\nNorma de Frobenius de A - A^T: " << norma << "\n";
+
     // Exibe informações sobre a matriz lida
     std::cout << "\n==== Informações da Matriz ====\n";
     std::cout << "Total de arestas: " << total << "\n";
