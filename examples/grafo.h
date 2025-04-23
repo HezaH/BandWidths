@@ -20,7 +20,7 @@ public:
     void mostrarGrafo();
     void buscaEmLargura(int inicio);
     int contarArestas() const;
-    void exportarParaDot(const string& nomeArquivo);
+    void exportarParaDot(const std::string &nomeArquivo, bool direcionado);
     void metricasMatriz();
     void calcularLarguraDeBanda();
 };

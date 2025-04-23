@@ -2,6 +2,9 @@
 #include <cstdio>  // Necessário para usar fprintf
 #include <cmath>    // para sqrt
 #include <limits>   // para std::numeric_limits
+#include <fstream>
+#include <iostream>
+#include <string>
 
 Grafo::Grafo(int vertices) : V(vertices), percorrido(vertices, false) {
     adj.resize(V);
@@ -65,25 +68,43 @@ int Grafo::contarArestas() const {
     return total;
 }
 
-
-
-void Grafo::exportarParaDot(const string& nomeArquivo) {
-    ofstream file(nomeArquivo);
+void Grafo::exportarParaDot(const std::string& nomeArquivo, bool direcionado) {
+    std::ofstream file(nomeArquivo);
     if (!file.is_open()) {
-        cerr << "Erro ao criar arquivo DOT.\n";
+        std::cerr << "Erro ao criar arquivo DOT.\n";
         return;
     }
-
-    file << "graph G {\n";
-    for (int i = 0; i < V; ++i) {
-        for (int j : adj[i]) {
-            if (i < j)
-                file << "    " << i << " -- " << j << ";\n";
+    
+    // Se o grafo for direcionado, usamos 'digraph' e '->' para cada aresta.
+    if (direcionado) {
+        file << "digraph G {\n";
+        for (int i = 0; i < V; ++i) {
+            // Se um vértice não tiver conexões, ainda podemos declará-lo para visibilidade:
+            if (adj[i].empty())
+                file << "    " << i << ";\n";
+            for (int j : adj[i]) {
+                file << "    " << i << " -> " << j << ";\n";
+            }
+        }
+    } else {
+        // Se não direcionado, usamos 'graph' e '--'. Neste caso, para evitar duplicação,
+        // podemos optar por imprimir apenas arestas onde i < j ou gerenciar uma estrutura auxiliar.
+        file << "graph G {\n";
+        for (int i = 0; i < V; ++i) {
+            if (adj[i].empty())
+                file << "    " << i << ";\n";
+            for (int j : adj[i]) {
+                // Imprime apenas se i < j para não duplicar arestas\n
+                if (i < j) {
+                    file << "    " << i << " -- " << j << ";\n";
+                }
+            }
         }
     }
+    
     file << "}\n";
     file.close();
-    // cout << "Arquivo DOT gerado: " << nomeArquivo << endl;
+    std::cout << "Arquivo DOT gerado: " << nomeArquivo << std::endl;
 }
 
 void Grafo::metricasMatriz() {
