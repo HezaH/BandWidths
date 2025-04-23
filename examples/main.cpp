@@ -233,27 +233,11 @@ int main() {
     std::cout << "StdDev Lower Bandwidth: " << stddev_lower << "\n";
     std::cout << "StdDev Upper Bandwidth: " << stddev_upper << "\n";
 
-
     fclose(f);  // Fecha o arquivo após a leitura
 
-    // Exibe o número total de arestas no grafo
-    std::cout << "Total de arestas no grafo (direcionado): " << g.contarArestas() << std::endl;
+    g.exportarMatrizAdjComoJPEG("adj_matrix.jpg", 90);
 
-    // Mostra a estrutura do grafo no console (geralmente com listas de adjacência)
-    // std::cout << "Grafo carregado do arquivo ck400.mtx:\n";
-    // g.mostrarGrafo();  // Chama o metodo que imprime os vertices e suas conexões
-
-    // Executa busca em largura (BFS) a partir do vertice 0
-    g.buscaEmLargura(0);
-
-    // Exporta a estrutura do grafo para um arquivo .dot, para visualizacao com Graphviz
-    g.exportarParaDot("grafo.dot", false);
-
-    // Chama a funcao que calcula e exibe as metricas da matriz de adjacência
-    g.metricasMatriz();
-
-    g.calcularLarguraDeBanda();
-
+    std::cout << "Imagem PGM salva em 'adj_matrix.pgm'\n";
 
     return 0;  // Retorna 0 indicando que o programa terminou com sucesso
 }

@@ -17,12 +17,9 @@ private:
 public:
     Grafo(int vertices);
     void adicionarAresta(int v1, int v2);
-    void mostrarGrafo();
     void buscaEmLargura(int inicio);
-    int contarArestas() const;
-    void exportarParaDot(const std::string &nomeArquivo, bool direcionado);
-    void metricasMatriz();
-    void calcularLarguraDeBanda();
+    std::vector<std::vector<int>> gerarMatrizAdjacencia() const;
+    void exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const; // Adicione esta linha
 };
 
 #endif // GRAFO_H

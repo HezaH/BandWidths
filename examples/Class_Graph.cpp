@@ -5,6 +5,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <stdexcept>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 Grafo::Grafo(int vertices) : V(vertices), percorrido(vertices, false) {
     adj.resize(V);
@@ -14,16 +17,6 @@ void Grafo::adicionarAresta(int v1, int v2) {
     adj[v1].push_back(v2);
     // fprintf(stderr, "Adicionando aresta de %d para %d\n", v1, v2);
     // adj[v2].push_back(v1);
-}
-
-void Grafo::mostrarGrafo() {
-    for (int i = 0; i < V; ++i) {
-        // cout << "Vertice " << i << ": ";
-        for (int vizinho : adj[i]) {
-            cout << vizinho << " ";
-        }
-        cout << endl;
-    }
 }
 
 void Grafo::buscaEmLargura(int inicio) {
@@ -60,129 +53,33 @@ void Grafo::buscaEmLargura(int inicio) {
     //     cout << endl;
     // }
 }
-int Grafo::contarArestas() const {
-    int total = 0;
-    for (const auto& vizinhos : adj) {
-        total += vizinhos.size();
-    }
-    return total;
-}
 
-void Grafo::exportarParaDot(const std::string& nomeArquivo, bool direcionado) {
-    std::ofstream file(nomeArquivo);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao criar arquivo DOT.\n";
-        return;
-    }
-    
-    // Se o grafo for direcionado, usamos 'digraph' e '->' para cada aresta.
-    if (direcionado) {
-        file << "digraph G {\n";
-        for (int i = 0; i < V; ++i) {
-            // Se um vértice não tiver conexões, ainda podemos declará-lo para visibilidade:
-            if (adj[i].empty())
-                file << "    " << i << ";\n";
-            for (int j : adj[i]) {
-                file << "    " << i << " -> " << j << ";\n";
-            }
-        }
-    } else {
-        // Se não direcionado, usamos 'graph' e '--'. Neste caso, para evitar duplicação,
-        // podemos optar por imprimir apenas arestas onde i < j ou gerenciar uma estrutura auxiliar.
-        file << "graph G {\n";
-        for (int i = 0; i < V; ++i) {
-            if (adj[i].empty())
-                file << "    " << i << ";\n";
-            for (int j : adj[i]) {
-                // Imprime apenas se i < j para não duplicar arestas\n
-                if (i < j) {
-                    file << "    " << i << " -- " << j << ";\n";
-                }
-            }
-        }
-    }
-    
-    file << "}\n";
-    file.close();
-    std::cout << "Arquivo DOT gerado: " << nomeArquivo << std::endl;
-}
+std::vector<std::vector<int>> Grafo::gerarMatrizAdjacencia() const {
+    // Inicializa uma matriz V×V com zeros
+    std::vector<std::vector<int>> M(V, std::vector<int>(V, 0));
 
-void Grafo::metricasMatriz() {
-    int total = 0;
-    int diagonal = 0;
-    int abaixoDiagonal = 0;
-    int acimaDiagonal = 0;
-    int assimetricas = 0;
-
-    vector<vector<bool>> matriz(V, vector<bool>(V, false));
-
+    // Para cada vértice i, marca 1 nas colunas j adjacentes
     for (int i = 0; i < V; ++i) {
         for (int j : adj[i]) {
-            total++;
-            matriz[i][j] = true;
-
-            if (i == j)
-                diagonal++;
-            else if (i > j)
-                abaixoDiagonal++;
-            else
-                acimaDiagonal++;
+            M[i][j] = 1;
         }
     }
 
-    // Contando todas as arestas assimétricas
+    return M;
+}
+
+void Grafo::exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const {
+    auto M = gerarMatrizAdjacencia();
+    // Buffer de pixels em escala de cinza
+    std::vector<unsigned char> buffer(V * V);
     for (int i = 0; i < V; ++i) {
         for (int j = 0; j < V; ++j) {
-            bool valor1 = matriz[i][j];
-            bool valor2 = matriz[j][i];
-            
-            if (valor1 && !valor2) {
-                assimetricas++;
-            }
+            buffer[i * V + j] = M[i][j] ? 0 : 255;
         }
     }
 
-    std::cout << "\nMétricas da matriz de adjacência:\n";
-    std::cout << "Total de arestas: " << total << "\n";
-    std::cout << "Arestas na diagonal (auto-laços): " << diagonal << "\n";
-    std::cout << "Below diagonal: " << abaixoDiagonal << "\n";
-    std::cout << "Above diagonal: " << acimaDiagonal << "\n";
-    std::cout << "A - A' (arestas assimétricas): " << assimetricas << "\n";
-}
-
-
-
-void Grafo::calcularLarguraDeBanda() {
-    int menor = std::numeric_limits<int>::max();
-    int maior = 0;
-    double soma = 0.0;
-    std::vector<int> diferencas;
-
-    for (int i = 0; i < V; ++i) {
-        for (int j : adj[i]) {
-            if (i == j) continue;  // ignorar diagonal
-
-            int diff = std::abs(i - j);
-            diferencas.push_back(diff);
-            soma += diff;
-
-            if (diff < menor) menor = diff;
-            if (diff > maior) maior = diff;
-        }
+    // Escreve a imagem JPEG usando stb_image_write
+    if (!stbi_write_jpg(filename.c_str(), V, V, 1, buffer.data(), quality)) {
+        throw std::runtime_error("Falha ao escrever a imagem JPEG");
     }
-
-    double media = diferencas.empty() ? 0.0 : soma / diferencas.size();
-
-    double somaQuadrados = 0.0;
-    for (int d : diferencas) {
-        somaQuadrados += std::pow(d - media, 2);
-    }
-
-    double desvio = diferencas.empty() ? 0.0 : std::sqrt(somaQuadrados / diferencas.size());
-
-    std::cout << "\n==== Informações de Largura de Banda ====\n";
-    std::cout << "Lower: " << menor << "\n";
-    std::cout << "Upper: " << maior << "\n";
-    std::cout << "Average |i - j|: " << media << "\n";
-    std::cout << "Standard deviation: " << desvio << "\n";
 }
