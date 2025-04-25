@@ -11,15 +11,47 @@ using namespace std;
 class Grafo {
 private:
     int V;
-    vector<vector<int>> adj;
-    vector<bool> percorrido;
+    std::vector<std::vector<int>> adj;
+    std::vector<bool> percorrido;
 
 public:
-    Grafo(int vertices);
-    void adicionarAresta(int v1, int v2);
-    void buscaEmLargura(int inicio);
+    // Grafo(int vertices);
+    // void adicionarAresta(int v1, int v2);
+    // void buscaEmLargura(int inicio);
+    // std::vector<int> Cuthill_McKee(int start);
+    // std::vector<std::vector<int>> gerarMatrizAdjacencia() const;
+    // void exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const; // Adicione esta linha
+    // std::vector<std::vector<int>> reordenarGrafo(const std::vector<std::vector<int>>& adj, const std::vector<int>& S);
+    // Construtor: cria um grafo com V vértices
+    
+    Grafo(int V_);
+
+    // Métodos para manipulação do grafo
+    void adicionarAresta(int u, int v);
+
+    // Adicione a seguinte declaração para busca em largura:
+    void buscaEmLargura(int v);
+
+    // Algoritmo Cuthill-McKee (retorna nova numeração S; S[v] é 1-based)
+    std::vector<int> Cuthill_McKee(int start);
+
+    // Método para reordenar a lista de adjacência conforme a nova numeração S
+    // Esse método utiliza a estrutura interna 'adj'
+    std::vector<std::vector<int>> reordenarGrafo(const std::vector<int>& S) const;
+
+    // Se necessário, permite atualizar a lista de adjacência com a nova ordem
+    void setAdjacencias(const std::vector<std::vector<int>>& newAdj);
+
+    // Função para gerar a matriz de adjacência a partir da lista de adjacência
     std::vector<std::vector<int>> gerarMatrizAdjacencia() const;
-    void exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const; // Adicione esta linha
+
+    // Exporta a matriz de adjacência como uma imagem JPEG (usa stb_image_write)
+    void exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const;
+
+    // Getters públicos
+    int getNumVertices() const { return V; }
+    const std::vector<std::vector<int>>& getAdjacencias() const { return adj; }
+
 };
 
 #endif // GRAFO_H
