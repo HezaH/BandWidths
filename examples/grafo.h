@@ -6,6 +6,7 @@
 #include <queue>
 #include <fstream>
 #include <string>
+#include <stdexcept> // For runtime_error exceptions
 using namespace std;
 
 class Grafo {
@@ -15,22 +16,14 @@ private:
     std::vector<bool> percorrido;
 
 public:
-    // Grafo(int vertices);
-    // void adicionarAresta(int v1, int v2);
-    // void buscaEmLargura(int inicio);
-    // std::vector<int> Cuthill_McKee(int start);
-    // std::vector<std::vector<int>> gerarMatrizAdjacencia() const;
-    // void exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const; // Adicione esta linha
-    // std::vector<std::vector<int>> reordenarGrafo(const std::vector<std::vector<int>>& adj, const std::vector<int>& S);
-    // Construtor: cria um grafo com V vértices
-    
+
     Grafo(int V_);
 
     // Métodos para manipulação do grafo
     void adicionarAresta(int u, int v);
 
     // Adicione a seguinte declaração para busca em largura:
-    void buscaEmLargura(int v);
+    std::vector<std::vector<int>> buscaEmLarguraNivel(int v) const;
 
     // Algoritmo Cuthill-McKee (retorna nova numeração S; S[v] é 1-based)
     std::vector<int> Cuthill_McKee(int start);
@@ -48,10 +41,17 @@ public:
     // Exporta a matriz de adjacência como uma imagem JPEG (usa stb_image_write)
     void exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const;
 
+    // Método para calcular o grau de um vértice
+    int calcularGrau(int v) const;
+
+    // Método para encontrar o vértice de grau mínimo
+    int verticeGrauMinimo(const std::vector<int>& vertices) const;
+
     // Getters públicos
     int getNumVertices() const { return V; }
     const std::vector<std::vector<int>>& getAdjacencias() const { return adj; }
-
+    int GeorgeLiu(int v) const;
+    std::vector<int> filtrarVerticesGrauMinimo(const std::vector<int>& vertices) const;
 };
 
 #endif // GRAFO_H

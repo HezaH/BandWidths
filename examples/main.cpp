@@ -1,10 +1,12 @@
 #include <iostream>     // Biblioteca padrao do C++ para entrada e saida (std::cout, std::cerr, etc.)
 #include <cstdio>       // Biblioteca padrao do C para manipulacao de arquivos (fopen, fscanf, etc.)
+#include <cstring>      // Ensure compatibility for perror and other C functions
+#include <string>       // For std::string conversion
 #include "mmio.h"       // Biblioteca que permite ler arquivos no formato Matrix Market (.mtx)
 #include "grafo.h"      // Header personalizado que define a classe Grafo (estrutura de dados para o grafo)
 #include <cmath>        // Biblioteca para funcões matematicas como std::sqrt
-#include <algorithm>  // std::min_element, std::max_element
-#include <numeric>  // std::accumulate
+#include <algorithm>    // std::min_element, std::max_element
+#include <numeric>      // std::accumulate
 
 int main() {
     MM_typecode matcode;   // Estrutura que armazena o tipo da matriz (ex: real, simetrica, etc.)
@@ -48,7 +50,6 @@ int main() {
 
     fclose(f);  // Fecha o arquivo após a leitura
 
-    g.buscaEmLargura(0);
 
     // --- Etapa 1: Obter a nova numeração dos vertices com Cuthill-McKee ---
     std::vector<int> S = g.Cuthill_McKee(0);
@@ -73,6 +74,9 @@ int main() {
     // Atualiza a estrutura do grafo com a nova lista de adjacência
     g.setAdjacencias(newAdj);
     
+    
+    int GeoLiu = g.GeorgeLiu(0);
+
     // --- Etapa 3: Exportar a matriz de adjacência como JPEG ---
     try {
         g.exportarMatrizAdjComoJPEG("grafo_reordenado.jpg", 90);
@@ -81,7 +85,7 @@ int main() {
         std::cerr << "Erro: " << e.what() << std::endl;
         return 1;
     }
-    
+
     return 0;
 }
 
