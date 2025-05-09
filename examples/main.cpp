@@ -75,7 +75,7 @@ int main() {
     g.setAdjacencias(newAdj);
     
     
-    int GeoLiu = g.GeorgeLiu(0);
+    int GeoLiu = g.GeorgeLiu(23);
 
     // --- Etapa 3: Exportar a matriz de adjacência como JPEG ---
     try {

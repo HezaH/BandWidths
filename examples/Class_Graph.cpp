@@ -15,34 +15,27 @@ void Grafo::adicionarAresta(int v1, int v2) {
     adj[v1].push_back(v2);
 }
 
-std::vector<std::vector<int>> Grafo::buscaEmLarguraNivel(int v) const {
-    // Vetor para marcar os vertices visitados localmente.
+// 1. Estrutura de nivel enraizada via BFS.
+// Retorna um vetor de niveis: cada nivel e um vetor com os vertices daquela distância da raiz.
+std::vector<std::vector<int>> Grafo:: buscaEmLarguraNivel(int v) const {
     std::vector<bool> visitado(V, false);
-    // Vetor para armazenar a distância (ou nivel) de cada vertice a partir de v.
     std::vector<int> distancia(V, -1);
-    // Fila para implementar a busca em largura.
     std::queue<int> fila;
-    // Estrutura que armazenará os niveis; cada nivel e representado por um vetor de vertices.
     std::vector<std::vector<int>> niveis;
 
-    // Inicializando com o vertice de partida:
+    // Inicializa o vertice de partida
     visitado[v] = true;
     distancia[v] = 0;
     fila.push(v);
 
-    // Enquanto houver vertices para processar:
     while (!fila.empty()) {
-        // Determina a quantidade de vertices no nivel atual.
         int levelSize = fila.size();
         std::vector<int> nivelAtual;
-        
-        // Processa todos os vertices que pertencem ao nivel corrente.
         for (int i = 0; i < levelSize; i++) {
             int w = fila.front();
             fila.pop();
             nivelAtual.push_back(w);
-            
-            // Para cada vizinho de w, se nao visitado, marca-o e coloca-o na fila.
+            // Para cada vizinho de w, se não visitado, marca e enfileira
             for (int u : adj[w]) {
                 if (!visitado[u]) {
                     visitado[u] = true;
@@ -51,37 +44,35 @@ std::vector<std::vector<int>> Grafo::buscaEmLarguraNivel(int v) const {
                 }
             }
         }
-        
-        // Adiciona o nivel atual à estrutura de niveis.
         niveis.push_back(nivelAtual);
     }
-    
     return niveis;
 }
 
-// Implementaçao em Class_Graph.cpp
+// 2. Filtro para extrair, de um conjunto de vertices, aqueles com grau minimo.
 std::vector<int> Grafo::filtrarVerticesGrauMinimo(const std::vector<int>& vertices) const {
     std::vector<int> resultado;
     if (vertices.empty()) {
         return resultado;
     }
     
-    // Primeiro, determine o grau minimo entre os vertices
     int minGrau = calcularGrau(vertices[0]);
+    // Determina o grau minimo entre os vertices fornecidos
     for (int v : vertices) {
+        
         int grauAtual = calcularGrau(v);
+        std::cout << "Grau do vertice " << v << ": " << grauAtual << std::endl;
         if (grauAtual < minGrau) {
             minGrau = grauAtual;
         }
     }
-    
-    // Filtra os vertices cujo grau e igual ao grau minimo
+    // Filtra os vertices que possuem exatamente esse grau minimo
     for (int v : vertices) {
         if (calcularGrau(v) == minGrau) {
+            std::cout << "Vertice com grau minimo: " << v << std::endl;
             resultado.push_back(v);
         }
     }
-    
     return resultado;
 }
 
@@ -184,71 +175,57 @@ void Grafo::setAdjacencias(const std::vector<std::vector<int>>& newAdj) {
 }
 
 // Metodo para calcular o grau de um vertice
-int Grafo::calcularGrau(int v) const {
+int Grafo:: calcularGrau(int v) const {
     if (v < 0 || v >= V) {
         throw std::out_of_range("Vertice inválido");
     }
     return adj[v].size();
 }
 
-// Metodo para encontrar o vertice de grau minimo
-int Grafo::verticeGrauMinimo(const std::vector<int>& vertices) const {
-    if (vertices.empty()) {
-        throw std::invalid_argument("A lista de vertices está vazia");
-    }
-
-    int verticeMin = vertices[0];
-    int grauMin = calcularGrau(verticeMin);
-
-    for (int v : vertices) {
-        int grauAtual = calcularGrau(v);
-        if (grauAtual < grauMin) {
-            grauMin = grauAtual;
-            verticeMin = v;
-        }
-    }
-
-    return verticeMin;
-}
-
 int Grafo::GeorgeLiu(int v) const {
-    // Calcula a estrutura de niveis (BFS) a partir de v
-    std::vector<std::vector<int>> Lv = buscaEmLarguraNivel(v);
-
-    // Declara 'verticesMinimos' fora do if para que possa ser usado posteriormente
-    std::vector<int> verticesMinimos;
-    if (!Lv.empty()) {
-        // Filtra o último nivel para obter os vertices com o menor grau
-        verticesMinimos = filtrarVerticesGrauMinimo(Lv.back());
-        
-        // Exibe os vertices filtrados
-        std::cout << "Vertices do último nivel com grau minimo:" << std::endl;
-        for (int candidate : verticesMinimos) {
-            std::cout << "Vertice " << candidate << " (grau: " << calcularGrau(candidate) << ")" << std::endl;
-        }
-    }
-    
+    std::vector<std::vector<int>> Lv = buscaEmLarguraNivel(v); //Estrutura de nivel enraizada
+    int currentLevels = Lv.size();
     int u;
+   
+    // Enquanto houver candidatos que possam melhorar a profundidade da estrutura
     do {
-        // Escolhe o vertice com o menor grau dentre os candidatos filtrados
-        u = verticeGrauMinimo(verticesMinimos);
-        // Calcula a nova estrutura de niveis a partir do candidato u
+        // Pega o último nivel da estrutura
+        const std::vector<int>& lastLevel = Lv.back();
+        std::cout << "Ultimo nivel: ";
+        for (int l : lastLevel) {
+            std::cout << l << " ";
+        }
+        std::cout << std::endl;
+
+        // u = v;
+
+        // Filtra os vertices do último nivel com o menor grau
+        std::vector<int> candidatos = filtrarVerticesGrauMinimo(lastLevel);
+        std::cout << "Candidatos: ";
+        for (int c : candidatos) {
+            std::cout << c << " ";
+        }
+        std::cout << std::endl;
+
+        // Calcula a nova estrutura de niveis a partir de u
+        u = candidatos[0];
         std::vector<std::vector<int>> Lu = buscaEmLarguraNivel(u);
+        int newLevels = Lu.size();
+
+        // Debug: exibe a comparação entre estruturas
+        std::cout << "Comparando: candidato u = " << u
+                  << " (niveis = " << newLevels << ") vs. v = " << v
+                  << " (niveis = " << currentLevels << ")" << std::endl;
         
-        // Verifica se a nova estrutura possui mais niveis que a atual, usando (por exemplo) o tamanho do nivel u comparado com o de v.
-        // OBS.: Certifique-se de que a forma de indexar Lv com u e v está de acordo com o seu algoritmo,
-        // pois Lv e um vetor de niveis (cada nivel e um vetor) e nao necessariamente indexado pelo id do vertice.
-        if (Lv[u].size() > Lv[v].size()){
-            std::cout << "Nivel: " << u << " Size: " << Lv[u].size() << std::endl;
-            std::cout << "Nivel: " << v << " Size: " << Lv[v].size() << std::endl;
+        // Se a nova estrutura (a partir de u) for mais profunda, atualiza o candidato
+        if (newLevels > currentLevels) {
             v = u;
             Lv = Lu;
-            // Atualiza o conjunto de candidatos com base no novo Lv (por exemplo, filtrando o último nivel)
-            if (!Lv.empty()) {
-                verticesMinimos = filtrarVerticesGrauMinimo(Lv.back());
-            }
+            currentLevels = newLevels;
+        } else {
+            // Se não houver melhoria, encerra o loop
+            break;
         }
-    } while (u != v);  // Use '!=' para comparaçao, nao '='
-    
+    } while (u=v);
     return v;
 }
