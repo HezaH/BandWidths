@@ -73,9 +73,6 @@ int main() {
     
     // Atualiza a estrutura do grafo com a nova lista de adjacência
     g.setAdjacencias(newAdj);
-    
-    
-    int GeoLiu = g.GeorgeLiu(23);
 
     // --- Etapa 3: Exportar a matriz de adjacência como JPEG ---
     try {
@@ -85,6 +82,11 @@ int main() {
         std::cerr << "Erro: " << e.what() << std::endl;
         return 1;
     }
+
+    
+    int GeoLiu = g.GeorgeLiu(23);
+    int v = g.VerticePseudoPeriferico_GPS();
+    // int u = g.VerticeMenorLargura();
 
     return 0;
 }

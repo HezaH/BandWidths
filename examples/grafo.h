@@ -51,7 +51,14 @@ public:
     int getNumVertices() const { return V; }
     const std::vector<std::vector<int>>& getAdjacencias() const { return adj; }
     int GeorgeLiu(int v) const;
+
+    // Método para filtrar vértices com grau mínimo
     std::vector<int> filtrarVerticesGrauMinimo(const std::vector<int>& vertices) const;
+
+    // Altere a declaração para:
+    int VerticePseudoPeriferico_GPS() const;
+    
+    std::vector<int> ordenarVerticesPorGrau() const;
 };
 
 #endif // GRAFO_H
