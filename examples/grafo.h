@@ -48,7 +48,6 @@ public:
     int verticeGrauMinimo(const std::vector<int>& vertices) const;
 
     // Getters públicos
-    int getNumVertices() const { return V; }
     const std::vector<std::vector<int>>& getAdjacencias() const { return adj; }
     int GeorgeLiu(int v) const;
 
@@ -59,6 +58,12 @@ public:
     int VerticePseudoPeriferico_GPS() const;
     
     std::vector<int> ordenarVerticesPorGrau() const;
+
+    // Altere a assinatura para receber um vetor de inteiros:
+    int VerticeMenorLargura(const std::vector<int>& vertices) const;
+
+
+    int algo8(std::vector<std::vector<int>> & Lw) const;
 };
 
 #endif // GRAFO_H

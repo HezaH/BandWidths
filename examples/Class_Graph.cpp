@@ -6,6 +6,7 @@
 #include <string>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
+#include <climits>
 
 Grafo::Grafo(int vertices) : V(vertices), percorrido(vertices, false) {
     adj.resize(V);
@@ -22,6 +23,7 @@ std::vector<std::vector<int>> Grafo:: buscaEmLarguraNivel(int v) const {
     std::vector<int> distancia(V, -1);
     std::queue<int> fila;
     std::vector<std::vector<int>> niveis;
+    
 
     // Inicializa o vertice de partida
     visitado[v] = true;
@@ -35,7 +37,7 @@ std::vector<std::vector<int>> Grafo:: buscaEmLarguraNivel(int v) const {
             int w = fila.front();
             fila.pop();
             nivelAtual.push_back(w);
-            // Para cada vizinho de w, se não visitado, marca e enfileira
+            // Para cada vizinho de w, se nao visitado, marca e enfileira
             for (int u : adj[w]) {
                 if (!visitado[u]) {
                     visitado[u] = true;
@@ -45,6 +47,13 @@ std::vector<std::vector<int>> Grafo:: buscaEmLarguraNivel(int v) const {
             }
         }
         niveis.push_back(nivelAtual);
+    }
+    for (size_t i = 0; i < niveis.size(); ++i) {
+        std::cout << "Nivel " << i << ": ";
+        for (int v : niveis[i]) {
+            std::cout << v << " ";
+        }
+        std::cout << std::endl;
     }
     return niveis;
 }
@@ -101,13 +110,13 @@ void Grafo::exportarMatrizAdjComoJPEG(const std::string &filename, int quality) 
 std::vector<int> Grafo::Cuthill_McKee(int start) {
     std::vector<int> S(V, 0); // Vetor para armazenar a nova ordem dos vertices (inicia com zeros)
     std::vector<int> order; // Vetor para manter a ordem de visita dos vertices
-    std::vector<bool> percorrido(V, false); // Vetor para marcar os vertices já visitados
+    std::vector<bool> percorrido(V, false); // Vetor para marcar os vertices ja visitados
 
-    S[start] = 1; // Define a posiçao do vertice inicial 'start' como 1 na nova ordem
+    S[start] = 1; // Define a posicao do vertice inicial 'start' como 1 na nova ordem
     order.push_back(start); // Adiciona o vertice inicial à ordem de visita
     percorrido[start] = true; // Marca o vertice inicial como visitado
 
-    int i = 1, j = 0; // 'i' rastreia a próxima posiçao disponivel em 'S', 'j' rastreia o próximo vertice a ser processado em 'order'
+    int i = 1, j = 0; // 'i' rastreia a próxima posicao disponivel em 'S', 'j' rastreia o próximo vertice a ser processado em 'order'
 
     while (i < V && j < static_cast<int>(order.size())) { // Enquanto houver vertices nao ordenados e vertices a serem processados
         int u = order[j++]; // Obtem o próximo vertice a ser processado e incrementa 'j'
@@ -123,7 +132,7 @@ std::vector<int> Grafo::Cuthill_McKee(int start) {
 
         std::sort(vizinhosNaoRotulados.begin(), vizinhosNaoRotulados.end(),
         [this](int a, int b) -> bool {
-            // Imprime os valores do tamanho das listas de adjacência dos vertices a e b.
+            // Imprime os valores do tamanho das listas de adjacencia dos vertices a e b.
             std::cout << "Comparando vertice " << a << " (tamanho: " 
                       << adj[a].size() << ") com vertice " << b 
                       << " (tamanho: " << adj[b].size() << ")" << std::endl;
@@ -140,7 +149,7 @@ std::vector<int> Grafo::Cuthill_McKee(int start) {
         for (int w : vizinhosNaoRotulados) { // Para cada vizinho nao visitado 'w'
             if (!percorrido[w]) { // Se 'w' ainda nao foi visitado
                 percorrido[w] = true; // Marca 'w' como visitado
-                S[w] = ++i; // Define a posiçao de 'w' na nova ordem e incrementa 'i'
+                S[w] = ++i; // Define a posicao de 'w' na nova ordem e incrementa 'i'
                 order.push_back(w); // Adiciona 'w' à ordem de visita
             }
         }
@@ -168,7 +177,7 @@ std::vector<std::vector<int>> Grafo::reordenarGrafo(const std::vector<int>& S) c
 
 void Grafo::setAdjacencias(const std::vector<std::vector<int>>& newAdj) {
     if (newAdj.size() != static_cast<size_t>(V)) {
-        throw std::runtime_error("Tamanho inadequado para as adjacências");
+        throw std::runtime_error("Tamanho inadequado para as adjacencias");
     }
     adj = newAdj;
 }
@@ -176,14 +185,15 @@ void Grafo::setAdjacencias(const std::vector<std::vector<int>>& newAdj) {
 // Metodo para calcular o grau de um vertice
 int Grafo:: calcularGrau(int v) const {
     if (v < 0 || v >= V) {
-        throw std::out_of_range("Vertice inválido");
+        throw std::out_of_range("Vertice invalido");
     }
     return adj[v].size();
 }
 
 int Grafo::GeorgeLiu(int v) const {
     std::vector<std::vector<int>> Lv = buscaEmLarguraNivel(v); //Estrutura de nivel enraizada
-    int currentLevels = Lv.size();
+    size_t n1 = 1;
+    int currentLevels = Lv[n1].size();
     int u;
    
     // Enquanto houver candidatos que possam melhorar a profundidade da estrutura
@@ -195,23 +205,26 @@ int Grafo::GeorgeLiu(int v) const {
             std::cout << l << " ";
         }
         std::cout << std::endl;
-        
-        // u = v;
 
         // Filtra os vertices do último nivel com o menor grau
-        std::vector<int> candidatos = filtrarVerticesGrauMinimo(lastLevel);
-        std::cout << "Candidatos: ";
-        for (int c : candidatos) {
-            std::cout << c << " ";
+        int minGrau = INT_MAX;
+        int minVer = -1;
+        // Determina o grau minimo entre os vertices fornecidos
+        for (int l :lastLevel) {
+            int grauAtual = adj[l].size();
+            std::cout << "Grau do vertice " << l << ": " << grauAtual << std::endl;
+            if (grauAtual < minGrau) {
+                minGrau = grauAtual;
+                minVer = l;
+            }
         }
-        std::cout << std::endl;
 
         // Calcula a nova estrutura de niveis a partir de u
-        u = candidatos[0];
+        u = minVer;
         std::vector<std::vector<int>> Lu = buscaEmLarguraNivel(u);
-        int newLevels = Lu.size();
+        int newLevels = Lu[n1].size();
 
-        // Debug: exibe a comparação entre estruturas
+        // Debug: exibe a comparacao entre estruturas
         std::cout << "Comparando: candidato u = " << u
                   << " (niveis = " << newLevels << ") vs. v = " << v
                   << " (niveis = " << currentLevels << ")" << std::endl;
@@ -221,8 +234,9 @@ int Grafo::GeorgeLiu(int v) const {
             v = u;
             Lv = Lu;
             currentLevels = newLevels;
-        } else {
-            // Se não houver melhoria, encerra o loop
+        } 
+        else {
+            // Se nao houver melhoria, encerra o loop
             break;
         }
     } while (u=v);
@@ -274,7 +288,7 @@ int Grafo::VerticePseudoPeriferico_GPS() const {
             std::vector<std::vector<int>> Lw = buscaEmLarguraNivel(w);
             int newLevels = Lw.size();
 
-            // Debug: exibe a comparação entre estruturas
+            // Debug: exibe a comparacao entre estruturas
                 std::cout << "Comparando: candidato w = " << w
                 << " (niveis = " << newLevels << ") vs. v = " << v
                 << " (niveis = " << currentLevels << ")" << std::endl;
@@ -284,7 +298,7 @@ int Grafo::VerticePseudoPeriferico_GPS() const {
                 Lv = Lw;
                 currentLevels = newLevels;
             } else {
-                // Se não houver melhoria, encerra o loop
+                // Se nao houver melhoria, encerra o loop
                 break;
             }
 
@@ -298,15 +312,15 @@ int Grafo::VerticePseudoPeriferico_GPS() const {
 
 int Grafo::verticeGrauMinimo(const std::vector<int>& vertices) const {
     if (vertices.empty()) {
-        throw std::invalid_argument("A lista de vertices está vazia");
+        throw std::invalid_argument("A lista de vertices esta vazia");
     }
     
     int verticeMin = vertices[0];
-    int grauMin = calcularGrau(vertices[0]);
+    int grauMin = adj[vertices[0]].size();
     
     for (int v = 0; v < V; ++v) {
         
-        int grauAtual = calcularGrau(v);
+        int grauAtual = adj[v].size();
         std::cout << "Vertice " << v << " Grau " << grauAtual << ::endl;
         if (grauAtual < grauMin) {
             grauMin = grauAtual;
@@ -315,4 +329,33 @@ int Grafo::verticeGrauMinimo(const std::vector<int>& vertices) const {
     }
     
     return verticeMin;
+}
+
+int Grafo::VerticeMenorLargura(const std::vector<int>& vertices) const {
+    int u = -1;
+    int largura = INT_MAX;
+    // Itera pelos vértices do vetor 'vertices' (por exemplo, o último nível da BFS)
+    for (int w : vertices) {
+        std::cout << "Verificando vertice: " << w << std::endl;
+        std::vector<std::vector<int>> Lw = buscaEmLarguraNivel(w);
+        int b_lw = algo8(Lw);
+        if (b_lw < largura) {
+            u = w;
+            largura = b_lw;
+            std::cout << "Vertice u: " << u << std::endl;
+        }
+    }
+    return u;
+}
+
+int Grafo::algo8(std::vector<std::vector<int>> & Lw) const {
+    int l = 1;
+    // Aqui a funcao parece retornar o número de níveis.
+    // (A lógica pode ser simplificada, mas manteremos o exemplo.)
+    for (size_t i = 1; i < Lw.size(); ++i) {
+        if (Lw.size() > static_cast<size_t>(l)) {
+            l = Lw.size();
+        }
+    }
+    return l;
 }
