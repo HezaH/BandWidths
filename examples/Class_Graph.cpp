@@ -35,16 +35,18 @@ std::vector<std::vector<int>> Grafo:: buscaEmLarguraNivel(int v) const {
         std::vector<int> nivelAtual;
         for (int i = 0; i < levelSize; i++) {
             int w = fila.front();
-            fila.pop();
             nivelAtual.push_back(w);
-            // Para cada vizinho de w, se nao visitado, marca e enfileira
-            for (int u : adj[w]) {
-                if (!visitado[u]) {
-                    visitado[u] = true;
-                    distancia[u] = distancia[w] + 1;
-                    fila.push(u);
+            fila.pop();
+            if (!visitado[u]) {
+                visitado[u] = true;
+                // Para cada vizinho de w, se nao visitado, marca e enfileira
+                for (int u : adj[w]) {
+                    if (!visitado[u]) {
+                        distancia[u] = distancia[w] + 1;
+                        fila.push(u);
+                    }
                 }
-            }
+        }
         }
         niveis.push_back(nivelAtual);
     }
@@ -239,7 +241,7 @@ int Grafo::GeorgeLiu(int v) const {
             // Se nao houver melhoria, encerra o loop
             break;
         }
-    } while (u=v);
+    } while (u == v);
     return v;
 }
 
