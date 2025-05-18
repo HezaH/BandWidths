@@ -19,42 +19,42 @@ public:
 
     Grafo(int V_);
 
-    // Métodos para manipulação do grafo
+    // Metodos para manipulaçao do grafo
     void adicionarAresta(int u, int v);
 
-    // Adicione a seguinte declaração para busca em largura:
+    // Adicione a seguinte declaraçao para busca em largura:
     std::vector<std::vector<int>> buscaEmLarguraNivel(int v) const;
 
-    // Algoritmo Cuthill-McKee (retorna nova numeração S; S[v] é 1-based)
+    // Algoritmo Cuthill-McKee (retorna nova numeraçao S; S[v] e 1-based)
     std::vector<int> Cuthill_McKee(int start);
 
-    // Método para reordenar a lista de adjacência conforme a nova numeração S
-    // Esse método utiliza a estrutura interna 'adj'
+    // Metodo para reordenar a lista de adjacência conforme a nova numeraçao S
+    // Esse metodo utiliza a estrutura interna 'adj'
     std::vector<std::vector<int>> reordenarGrafo(const std::vector<int>& S) const;
 
     // Se necessário, permite atualizar a lista de adjacência com a nova ordem
     void setAdjacencias(const std::vector<std::vector<int>>& newAdj);
 
-    // Função para gerar a matriz de adjacência a partir da lista de adjacência
+    // Funçao para gerar a matriz de adjacência a partir da lista de adjacência
     std::vector<std::vector<int>> gerarMatrizAdjacencia() const;
 
     // Exporta a matriz de adjacência como uma imagem JPEG (usa stb_image_write)
     void exportarMatrizAdjComoJPEG(const std::string &filename, int quality) const;
 
-    // Método para calcular o grau de um vértice
+    // Metodo para calcular o grau de um vertice
     int calcularGrau(int v) const;
 
-    // Método para encontrar o vértice de grau mínimo
+    // Metodo para encontrar o vertice de grau minimo
     int verticeGrauMinimo(const std::vector<int>& vertices) const;
 
     // Getters públicos
     const std::vector<std::vector<int>>& getAdjacencias() const { return adj; }
     int GeorgeLiu(int v) const;
 
-    // Método para filtrar vértices com grau mínimo
+    // Metodo para filtrar vertices com grau minimo
     std::vector<int> filtrarVerticesGrauMinimo(const std::vector<int>& vertices) const;
 
-    // Altere a declaração para:
+    // Altere a declaraçao para:
     int VerticePseudoPeriferico_GPS() const;
     
     std::vector<int> ordenarVerticesPorGrau() const;

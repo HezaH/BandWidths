@@ -16,45 +16,52 @@ void Grafo::adicionarAresta(int v1, int v2) {
     adj[v1].push_back(v2);
 }
 
-// 1. Estrutura de nivel enraizada via BFS.
-// Retorna um vetor de niveis: cada nivel e um vetor com os vertices daquela distância da raiz.
-std::vector<std::vector<int>> Grafo:: buscaEmLarguraNivel(int v) const {
-    std::vector<bool> visitado(V, false);
-    std::vector<int> distancia(V, -1);
-    std::queue<int> fila;
-    std::vector<std::vector<int>> niveis;
-    
-
-    // Inicializa o vertice de partida
+std::vector<std::vector<int>> Grafo::buscaEmLarguraNivel(int v) const {
+    vector<bool> visitado(V, false);              // Marca os vertices visitados
+    queue<int> fila;                              // Fila para a BFS
+    vector<vector<int>> niveis;                     // Armazena os niveis
+     
+    // Inicializa com o vertice de partida
     visitado[v] = true;
-    distancia[v] = 0;
     fila.push(v);
-
+    
+    // Enquanto houver vertices na fila...
     while (!fila.empty()) {
-        int levelSize = fila.size();
-        std::vector<int> nivelAtual;
+        int levelSize = fila.size();              // Número de vertices para o nivel atual
+        vector<int> nivelAtual;                   // Vetor para armazenar os vertices deste nivel
+        
+        // Processa exatamente os vertices do nivel atual
         for (int i = 0; i < levelSize; i++) {
-            int w = fila.front();
+            int atual = fila.front();
             fila.pop();
-            nivelAtual.push_back(w);
-            // Para cada vizinho de w, se nao visitado, marca e enfileira
-            for (int u : adj[w]) {
-                if (!visitado[u]) {
-                    visitado[u] = true;
-                    distancia[u] = distancia[w] + 1;
-                    fila.push(u);
+            nivelAtual.push_back(atual);
+            
+            // cout << "Percurso pelo vertice: " << atual << endl;
+            
+            // Enfileira os vizinhos não visitados deste vertice
+            for (int vizinho : adj[atual]) {
+                if (!visitado[vizinho]) {
+                    visitado[vizinho] = true;
+                    fila.push(vizinho);
+                    // cout << vizinho << " ";
                 }
             }
+            // cout << endl;
         }
+        
+        // Armazena o nivel atual na estrutura de niveis
         niveis.push_back(nivelAtual);
+        // cout << endl;
     }
-    for (size_t i = 0; i < niveis.size(); ++i) {
-        std::cout << "Nivel " << i << ": ";
-        for (int v : niveis[i]) {
-            std::cout << v << " ";
+    
+    for (size_t i = 0; i < niveis.size(); i++) {
+        cout << "Nivel " << i << ": ";
+        for (int vert : niveis[i]) {
+            cout << vert << " ";
         }
-        std::cout << std::endl;
+        cout << endl;
     }
+    
     return niveis;
 }
 
@@ -239,7 +246,7 @@ int Grafo::GeorgeLiu(int v) const {
             // Se nao houver melhoria, encerra o loop
             break;
         }
-    } while (u=v);
+    } while (u==v);
     return v;
 }
 
@@ -334,7 +341,7 @@ int Grafo::verticeGrauMinimo(const std::vector<int>& vertices) const {
 int Grafo::VerticeMenorLargura(const std::vector<int>& vertices) const {
     int u = -1;
     int largura = INT_MAX;
-    // Itera pelos vértices do vetor 'vertices' (por exemplo, o último nível da BFS)
+    // Itera pelos vertices do vetor 'vertices' (por exemplo, o último nivel da BFS)
     for (int w : vertices) {
         std::cout << "Verificando vertice: " << w << std::endl;
         std::vector<std::vector<int>> Lw = buscaEmLarguraNivel(w);
@@ -350,7 +357,7 @@ int Grafo::VerticeMenorLargura(const std::vector<int>& vertices) const {
 
 int Grafo::algo8(std::vector<std::vector<int>> & Lw) const {
     int l = 1;
-    // Aqui a funcao parece retornar o número de níveis.
+    // Aqui a funcao parece retornar o número de niveis.
     // (A lógica pode ser simplificada, mas manteremos o exemplo.)
     for (size_t i = 1; i < Lw.size(); ++i) {
         if (Lw.size() > static_cast<size_t>(l)) {

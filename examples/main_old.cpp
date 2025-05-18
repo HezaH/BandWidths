@@ -132,12 +132,12 @@ int main() {
         }
     }
 
-    // Para cada linha i, encontre os índices mínimo e máximo de coluna com elemento não nulo.
+    // Para cada linha i, encontre os indices minimo e máximo de coluna com elemento nao nulo.
     for (int i = 0; i < M; ++i) {
-    int j_min = N;  // inicializa com um valor maior que qualquer coluna possível
-    int j_max = -1; // inicializa com um valor menor que qualquer coluna possível
+    int j_min = N;  // inicializa com um valor maior que qualquer coluna possivel
+    int j_max = -1; // inicializa com um valor menor que qualquer coluna possivel
     for (int j = 0; j < N; ++j) {
-        if (A[i][j] != 0.0) {  // se o elemento for não nulo
+        if (A[i][j] != 0.0) {  // se o elemento for nao nulo
             if (j < j_min) {
                 j_min = j;
             }
@@ -151,7 +151,7 @@ int main() {
         lowerbandwidth[i] = i - j_min;
         upperbandwidth[i] = j_max - i;
     } else {
-        // Se não existem nonzeros na linha, a bandwidth pode ser considerada zero.
+        // Se nao existem nonzeros na linha, a bandwidth pode ser considerada zero.
         lowerbandwidth[i] = 0;
         upperbandwidth[i] = 0;
     }

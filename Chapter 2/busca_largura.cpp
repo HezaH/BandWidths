@@ -1,9 +1,9 @@
 
 
 // Algoritmo 2: Busca em largura.
-// Entrada: grafo G =(V,E) não direcionado e conexo; vertice v ∈ V inicial;
+// Entrada: grafo G =(V,E) nao direcionado e conexo; vertice v ∈ V inicial;
 
-// Saída: determina a distancia de todos os vertices a partir do vertice v ∈V;
+// Saida: determina a distancia de todos os vertices a partir do vertice v ∈V;
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -26,7 +26,7 @@ public:
 
     void adicionarAresta(int v1, int v2) {
         adj[v1].push_back(v2);
-        adj[v2].push_back(v1); // Grafo não direcionado
+        adj[v2].push_back(v1); // Grafo nao direcionado
     }
 
     void mostrarGrafo() {
@@ -41,8 +41,8 @@ public:
 
     // Busca em Largura (BFS)
     void buscaEmLargura(int inicio) {
-        vector<int> distancia(V, -1); // Inicializa distancias como -1 (não alcançados)
-        vector<int> predecessor(V, -1); // -1 significa que ainda não foi rotulado
+        vector<int> distancia(V, -1); // Inicializa distancias como -1 (nao alcançados)
+        vector<int> predecessor(V, -1); // -1 significa que ainda nao foi rotulado
         queue<int> fila;
 
         // Marca o vertice inicial como percorrido
@@ -57,7 +57,7 @@ public:
             // Visita os vizinhos do vertice atual
             for (int u : adj[w]) {
 
-                if (!percorrido[u]) {//se o vertice u não foi percorrido
+                if (!percorrido[u]) {//se o vertice u nao foi percorrido
                     distancia[u] = distancia[w] + 1;
                     fila.push(u);
                     predecessor[u] = w;  // Rótulo: quem descobriu u
@@ -79,7 +79,7 @@ Grafo gerarGrafoConexo(int numVertices) {
     Grafo g(numVertices);
     srand(time(0));
 
-    // Garante a conexão mínima entre os vertices formando uma cadeia
+    // Garante a conexao minima entre os vertices formando uma cadeia
     for (int i = 0; i < numVertices - 1; ++i) {
         g.adicionarAresta(i, i + 1);
     }

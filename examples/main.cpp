@@ -51,18 +51,27 @@ int main() {
     fclose(f);  // Fecha o arquivo após a leitura
 
 
-    // --- Etapa 1: Obter a nova numeração dos vertices com Cuthill-McKee ---
+    int GeoLiu = g.GeorgeLiu(23);
+    int v = g.VerticePseudoPeriferico_GPS();
+    std::vector<std::vector<int>> Lv = g.buscaEmLarguraNivel(v);
+    if (!Lv.empty()) {
+        // Se, por exemplo, você deseja usar o último nivel na funçao VerticeMenorLargura:
+        int u = g.VerticeMenorLargura(Lv.back());
+        std::cout << "Vertice com menor largura do ultimo nivel: " << u << std::endl;
+    }
+
+        // --- Etapa 1: Obter a nova numeraçao dos vertices com Cuthill-McKee ---
     std::vector<int> S = g.Cuthill_McKee(0);
-    std::cout << "Nova numeração (S):" << std::endl;
+    std::cout << "Nova numeraçao (S):" << std::endl;
     for (int i = 0; i < M; ++i) {
         std::cout << "Vertice " << i << " -> " << S[i] << std::endl;
     }
     
-    // --- Etapa 2: Reordenar a lista de adjacência conforme a nova numeração ---
+    // --- Etapa 2: Reordenar a lista de adjacência conforme a nova numeraçao ---
     std::vector<std::vector<int>> newAdj = g.reordenarGrafo(S);
     
-    // Opcional: imprimir a nova lista de adjacência para verificação
-    std::cout << "\nNova lista de adjacência (após reordenação):" << std::endl;
+    // Opcional: imprimir a nova lista de adjacência para verificaçao
+    std::cout << "\nNova lista de adjacência (após reordenaçao):" << std::endl;
     for (int i = 0; i < M; ++i) {
         std::cout << "Vertice (novo indice) " << i << ": ";
         for (int viz : newAdj[i]) {
@@ -83,14 +92,6 @@ int main() {
         return 1;
     }
 
-    
-    int GeoLiu = g.GeorgeLiu(23);
-    int v = g.VerticePseudoPeriferico_GPS();
-    std::vector<std::vector<int>> Lv = g.buscaEmLarguraNivel(v);
-    if (!Lv.empty()) {
-        int u = g.VerticeMenorLargura(Lv.back());
-        std::cout << "Vértice com menor largura do ultimo nivel: " << u << std::endl;
-    }
 
     return 0;
 }

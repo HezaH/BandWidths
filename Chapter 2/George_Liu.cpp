@@ -23,7 +23,7 @@ public:
         adj.resize(V); // Ajusta o tamanho da lista de adjacência
     }
 
-    // Metodo para adicionar uma aresta entre dois vertices (grafo não direcionado)
+    // Metodo para adicionar uma aresta entre dois vertices (grafo nao direcionado)
     void adicionarAresta(int v1, int v2) {
         adj[v1].push_back(v2);
         adj[v2].push_back(v1);
@@ -42,8 +42,8 @@ public:
 
     // Busca em Largura (BFS)
     vector<int> buscaEmLargura(int inicio) {
-        vector<int> distancia(V, -1); // Inicializa distancias como -1 (não alcançados)
-        vector<int> predecessor(V, -1); // -1 significa que ainda não foi rotulado
+        vector<int> distancia(V, -1); // Inicializa distancias como -1 (nao alcançados)
+        vector<int> predecessor(V, -1); // -1 significa que ainda nao foi rotulado
         queue<int> fila;
 
         // Marca o vertice inicial como percorrido
@@ -58,7 +58,7 @@ public:
             // Visita os vizinhos do vertice atual
             for (int u : adj[w]) {
 
-                if (!percorrido[u]) {//se o vertice u não foi percorrido
+                if (!percorrido[u]) {//se o vertice u nao foi percorrido
                     distancia[u] = distancia[w] + 1;
                     fila.push(u);
                     predecessor[u] = w;  // Rótulo: quem descobriu u
@@ -81,7 +81,7 @@ public:
 
     // Funcao para calcular o vertice de grau minimo.
     int VerticeGrauMin() {
-        // Se não houver vertices, pode retornar um valor indicativo (como -1).
+        // Se nao houver vertices, pode retornar um valor indicativo (como -1).
         if (V == 0)
             return -1;
 
@@ -103,7 +103,7 @@ public:
     // A estrutura de niveis e representada como um vetor de vetores, onde
     // o i-esimo vetor contem todos os vertices cujo nivel (distância ate o "inicio") e i.
     vector<vector<int>> estruturaDeNiveis(int inicio) {
-        // Inicializa vetor de distâncias; -1 indica vertice não alcançado
+        // Inicializa vetor de distâncias; -1 indica vertice nao alcançado
         vector<int> distancia(V, -1);
         // Vetor local para controle de visitacao
         vector<bool> visitado(V, false);
@@ -119,7 +119,7 @@ public:
             int atual = fila.front();
             fila.pop();
 
-            // Para cada vizinho não visitado, atualiza a distância e o coloca na fila
+            // Para cada vizinho nao visitado, atualiza a distância e o coloca na fila
             for (int vizinho : adj[atual]) {
                 if (!visitado[vizinho]) {
                     visitado[vizinho] = true;
@@ -171,7 +171,7 @@ public:
         
     // Implementa o algoritmo Cuthill-McKee para reordenar os vertices
     int GeorgeLiu(int start) {
-        vector<int> S(V, 0); // Vetor S: guarda a nova numeracao dos vertices (inicialmente 0, não numerado)
+        vector<int> S(V, 0); // Vetor S: guarda a nova numeracao dos vertices (inicialmente 0, nao numerado)
         vector<int> order; // Vetor "order": guarda a sequência de vertices conforme a numeracao atribuida
 
         int v = start; // Define o vertice inicial arbitrario
