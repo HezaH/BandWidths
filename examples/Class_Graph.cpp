@@ -146,7 +146,7 @@ std::vector<int> Grafo::Cuthill_McKee(int start) {
             return adj[a].size() < adj[b].size();
         });
     
-                  // Para exibir a lista completa no terminal:
+        // Para exibir a lista completa no terminal:
         std::cout << "Vizinhos nao rotulados ordenados: ";
         for (int viz : vizinhosNaoRotulados) {
             std::cout << viz << " ";

@@ -17,15 +17,15 @@ int main() {
     f = fopen("ck400.mtx", "r");
     if (f == NULL) {
         perror("Erro ao abrir o arquivo");  // Exibe mensagem de erro do sistema se nao conseguir abrir
-        return 1;  // Encerra o programa com código de erro
+        return 1;  // Encerra o programa com codigo de erro
     }
 
-    // Lê o cabecalho do arquivo e as dimensões da matriz
-    // mm_read_banner: lê o tipo da matriz (ex: simetrica, real, etc.)
-    // mm_read_mtx_crd_size: lê o numero de linhas, colunas e elementos nao nulos
+    // Le o cabecalho do arquivo e as dimensões da matriz
+    // mm_read_banner: le o tipo da matriz (ex: simetrica, real, etc.)
+    // mm_read_mtx_crd_size: le o numero de linhas, colunas e elementos nao nulos
     if (mm_read_banner(f, &matcode) != 0 || mm_read_mtx_crd_size(f, &M, &N, &nz) != 0) {
         std::cerr << "Erro ao ler arquivo Matrix Market.\n";  // Mensagem de erro personalizada
-        return 2;  // Encerra com outro código de erro
+        return 2;  // Encerra com outro codigo de erro
     }
 
     Grafo g(M);  // Cria um objeto da classe Grafo com M vertices (assumindo matriz quadrada)
@@ -35,11 +35,11 @@ int main() {
         int r, c;       // r: linha da entrada, c: coluna
         double val;     // val: valor da entrada (pode ser usado como peso da aresta)
                 
-        // Lê a próxima entrada do arquivo no formato "linha coluna valor"
-        // Espera que cada linha tenha três valores: inteiros r, c e numero val (real ou inteiro)
+        // Le a proxima entrada do arquivo no formato "linha coluna valor"
+        // Espera que cada linha tenha tres valores: inteiros r, c e numero val (real ou inteiro)
         if (fscanf(f, "%d %d %lg\n", &r, &c, &val) != 3) {
             std::cerr << "Erro ao ler linha " << i + 1 << " do arquivo.\n";  // Mensagem de erro detalhada
-            return 3;  // Código de erro especifico para erro de leitura
+            return 3;  // Codigo de erro especifico para erro de leitura
         }
 
         r--; c--;  // Ajusta os indices de 1-based (formato .mtx) para 0-based (indices em C++ comecam do zero)
@@ -48,30 +48,30 @@ int main() {
         }
     }
 
-    fclose(f);  // Fecha o arquivo após a leitura
+    fclose(f);  // Fecha o arquivo apos a leitura
 
 
     int GeoLiu = g.GeorgeLiu(23);
     int v = g.VerticePseudoPeriferico_GPS();
     std::vector<std::vector<int>> Lv = g.buscaEmLarguraNivel(v);
     if (!Lv.empty()) {
-        // Se, por exemplo, você deseja usar o último nivel na funçao VerticeMenorLargura:
+        // Se, por exemplo, voce deseja usar o último nivel na funcao VerticeMenorLargura:
         int u = g.VerticeMenorLargura(Lv.back());
         std::cout << "Vertice com menor largura do ultimo nivel: " << u << std::endl;
     }
 
-        // --- Etapa 1: Obter a nova numeraçao dos vertices com Cuthill-McKee ---
+        // --- Etapa 1: Obter a nova numeracao dos vertices com Cuthill-McKee ---
     std::vector<int> S = g.Cuthill_McKee(0);
-    std::cout << "Nova numeraçao (S):" << std::endl;
+    std::cout << "Nova numeracao (S):" << std::endl;
     for (int i = 0; i < M; ++i) {
         std::cout << "Vertice " << i << " -> " << S[i] << std::endl;
     }
     
-    // --- Etapa 2: Reordenar a lista de adjacência conforme a nova numeraçao ---
+    // --- Etapa 2: Reordenar a lista de adjacencia conforme a nova numeracao ---
     std::vector<std::vector<int>> newAdj = g.reordenarGrafo(S);
     
-    // Opcional: imprimir a nova lista de adjacência para verificaçao
-    std::cout << "\nNova lista de adjacência (após reordenaçao):" << std::endl;
+    // Opcional: imprimir a nova lista de adjacencia para verificacao
+    std::cout << "\nNova lista de adjacencia (apos reordenacao):" << std::endl;
     for (int i = 0; i < M; ++i) {
         std::cout << "Vertice (novo indice) " << i << ": ";
         for (int viz : newAdj[i]) {
@@ -80,10 +80,10 @@ int main() {
         std::cout << std::endl;
     }
     
-    // Atualiza a estrutura do grafo com a nova lista de adjacência
+    // Atualiza a estrutura do grafo com a nova lista de adjacencia
     g.setAdjacencias(newAdj);
 
-    // --- Etapa 3: Exportar a matriz de adjacência como JPEG ---
+    // --- Etapa 3: Exportar a matriz de adjacencia como JPEG ---
     try {
         g.exportarMatrizAdjComoJPEG("grafo_reordenado.jpg", 90);
         std::cout << "\nA imagem 'grafo_reordenado.jpg' foi gerada com sucesso." << std::endl;
