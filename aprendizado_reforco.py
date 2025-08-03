@@ -91,10 +91,10 @@ def multi_centralities_multi_inicios(A, centrality_array, max_iter):
                         print(f"Vértice {j} não marcado, adicionando a s")
                         r += 1
                         s.append(j)
-                        mark[j] = True
+                        # mark[j] = True
 
             # elimina duplicatas mantendo ordem de descoberta
-            # s = list(OrderedDict.fromkeys(s))
+            s = list(OrderedDict.fromkeys(s))
 
             # 5.2) Seleciona subconjunto via LCR
             q = _getLCR(s, centrality, alpha)
@@ -110,7 +110,7 @@ def multi_centralities_multi_inicios(A, centrality_array, max_iter):
                 # if not mark[j]:
                 #     l      += 1
                 #     f[j]    = l
-                #     mark[j] = True
+                mark[j] = True
 
             # 5.4) Atualiza fronteira para próxima iteração
             q = s
