@@ -3,7 +3,7 @@ import random
 from collections import OrderedDict
 from scipy.io import mmread
 import numpy as np
-
+from copy import deepcopy
 
 def multi_centralities_multi_inicios(A, centrality_array, max_iter):
     def _getLCR(C, centrality, alpha):
@@ -22,11 +22,31 @@ def multi_centralities_multi_inicios(A, centrality_array, max_iter):
         print(f"Scores: {scores}"
               f"\nH_min: {h_min}, H_max: {h_max}, Threshold: {threshold}")
         
-        L = [i for i, c in zip(C, scores) if h_min <= c <= threshold]
-        # random.shuffle(L)  # Desempate aleatório
-        return L
+        L = [(i, c) for i, c in zip(C, scores) if h_min <= c <= threshold]
+        
+        return sorted(L, key=lambda t: t[1], reverse=True)
 
+    def _is_connected(A):
+        """
+        Verifica se o grafo é totalmente conectado (conexo) usando BFS.
+        Entrada: adj -> lista de adjacência.
+        Saída: True se for conexo, False caso contrário.
+        """
+        adj = [A.indices[A.indptr[i]:A.indptr[i+1]].tolist() for i in range(A.shape[0])]
 
+        n = len(adj)
+        visited = [False] * n
+        queue = [0]  # começa do vértice 0
+        visited[0] = True
+
+        while queue:
+            u = queue.pop(0)
+            for v in adj[u]:
+                if not visited[v]:
+                    visited[v] = True
+                    queue.append(v)
+
+        return all(visited)
 
     def _multi_centralities_LCR(A, centralities, alpha):
         """
@@ -54,7 +74,7 @@ def multi_centralities_multi_inicios(A, centrality_array, max_iter):
         ql = 1
         f[k] = 1
         l = 1
-        
+
         # 5) Loop principal até ordenar todos os vértices
         while l < n:
             # 5.1) Constrói candidatos s = vizinhos não marcados de q
@@ -62,24 +82,31 @@ def multi_centralities_multi_inicios(A, centrality_array, max_iter):
             s = []
             for il in range(ql):
                 i = q[il]
-                for jl in range(len(adj[i])):
-                    j = adj[i][jl]
+                print(f"Vertice {i}, contido na lista ql")
+                for jl in adj[i]:
+                    # Varre os vizinhos de i
+                    j = jl
+                    print(f"Verificando vizinho {j} do vertice {i}")
                     if not mark[j]:
+                        print(f"Vértice {j} não marcado, adicionando a s")
                         r += 1
                         s.append(j)
+                        mark[j] = True
 
             # elimina duplicatas mantendo ordem de descoberta
-            s = list(OrderedDict.fromkeys(s))
+            # s = list(OrderedDict.fromkeys(s))
 
             # 5.2) Seleciona subconjunto via LCR
             q = _getLCR(s, centrality, alpha)
+            ql =  [ql[0] for ql in q]
             j_star = 0
+            
             # 5.3) Marca e rotula cada vértice selecionado
-            for jl in range(ql):
-                j = q[j_star]
-                j_star += 1
+            for jl in ql: #range(ql):
+                j = q[j_star][0]
                 l += 1
                 f[j] = l
+                j_star += 1
                 # if not mark[j]:
                 #     l      += 1
                 #     f[j]    = l
@@ -90,37 +117,33 @@ def multi_centralities_multi_inicios(A, centrality_array, max_iter):
             ql = r
 
         return f
+   
+    # verifica conectividade
+    if _is_connected(A):
+        print("O grafo é totalmente conectado.")
+        
+        # #! Cabe essa tratativa?
+        # copy_A = deepcopy(A)
+        # adj = [copy_A.indices[copy_A.indptr[i]:copy_A.indptr[i+1]].tolist() for i in range(copy_A.shape[0])]
+        # copy_adj = deepcopy(adj)
+        # for i, v in enumerate(copy_adj):
+        #     if i in v:
+        #         copy_adj[i].remove(i)
 
-    f_sol = np.inf
+        f_sol = np.inf
 
-    for i in range(max_iter):
-        f = _multi_centralities_LCR(A, centrality_array, alpha)
+        for i in range(max_iter):
+            f = _multi_centralities_LCR(A, centrality_array, alpha)
 
-        if sum(f) < f_sol:
-            f_sol = sum(f)
-        print(f"Iteração {i + 1}: Ordem de seleção f = {f}")
+            if sum(f) < f_sol:
+                f_sol = sum(f)
+            print(f"Iteração {i + 1}: Ordem de seleção f = {f}")
 
-    return f_sol
+        return f_sol
 
-def is_connected(adj):
-    """
-    Verifica se o grafo é totalmente conectado (conexo) usando BFS.
-    Entrada: adj -> lista de adjacência.
-    Saída: True se for conexo, False caso contrário.
-    """
-    n = len(adj)
-    visited = [False] * n
-    queue = [0]  # começa do vértice 0
-    visited[0] = True
-
-    while queue:
-        u = queue.pop(0)
-        for v in adj[u]:
-            if not visited[v]:
-                visited[v] = True
-                queue.append(v)
-
-    return all(visited)
+    else:
+        print("O grafo NÃO é totalmente conectado.")
+        return None
 
 if __name__ == "__main__":
     # Caminho da pasta 'matrix' relativa a este script
@@ -147,15 +170,6 @@ if __name__ == "__main__":
 
         # Alpha aleatório
         alpha = random.uniform(0, 1)
-
-        # depois de construir a lista de adjacência:
-        adj = [A.indices[A.indptr[i]:A.indptr[i+1]].tolist() for i in range(A.shape[0])]
-
-        # verifica conectividade
-        if is_connected(adj):
-            print("O grafo é totalmente conectado.")
-        else:
-            print("O grafo NÃO é totalmente conectado.")
 
         # Executa o algoritmo
         f = multi_centralities_multi_inicios(A, centrality_array, max_iter=10)
