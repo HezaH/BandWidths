@@ -1,3 +1,6 @@
+import random
+from collections import deque
+import networkx as nx
 import os
 import random
 from collections import OrderedDict
@@ -6,29 +9,107 @@ import numpy as np
 from copy import deepcopy
 import time
 import math
+import matplotlib.pyplot as plt
+import networkx as nx
+from scipy.sparse import csr_matrix
 
-def multi_centralities_multi_inicios(A, centrality_array, max_iter):
-    def _getLCR(C, centrality, alpha):
-        """
-        Seleciona elementos i de C tal que:
-        h_min <= c_i <= h_max + alpha * (h_min - h_max)
-        """
-        if not C:
-            return []
+def plot_graph(A, arquivo):
+    # ===== Visualização da matriz como imagem =====
+    plt.figure(figsize=(6, 6))
+    plt.spy(A, markersize=1)  # Visualiza padrão de conexões
+    plt.title(f"Matriz de Adjacência {arquivo}")
 
-        scores = [centrality(i) for i in C]
-        h_min = min(scores)
-        h_max = max(scores)
-        threshold = h_max + alpha * (h_min - h_max) 
+    return plt
 
-        print(f"Scores: {scores}"
-              f"\nH_min: {h_min}, H_max: {h_max}, Threshold: {threshold}")
+def calc_bandwidth(A, order):
+    """
+    Calcula a largura de banda de uma matriz de adjacência A.
+    A largura de banda é definida como a maior diferença absoluta entre os índices
+    das linhas e colunas de cada aresta.
+    """
+    value = max(abs(order.index(u) - order.index(v)) for u, v in A.edges)
+    return value
+
+def get_LCR(candidates, centrality_vector, alpha):
+    """Constrói Lista de Candidatos Restrita (LCR) a partir dos candidatos do nível atual"""
+    if not candidates:
+        return []
+    # Ordena candidatos pela centralidade (menor -> maior)
+    sorted_candidates = sorted(candidates, key=lambda x: centrality_vector[x])
+    h_min = centrality_vector[sorted_candidates[0]]
+    h_max = centrality_vector[sorted_candidates[-1]]
+
+    # Limite para inclusão na LCR
+    threshold = h_max + alpha * (h_min - h_max) 
+    print(f"Scores: {sorted_candidates}"
+        f"\nH_min: {h_min}, H_max: {h_max}, Threshold: {threshold}")
         
-        L = [(i, c) for i, c in zip(C, scores) if h_min <= c <= threshold]
-        
-        return sorted(L, key=lambda t: t[1], reverse=True)
+    lcr = [v for v in sorted_candidates if centrality_vector[v] <= threshold]
 
-    def _is_connected(A):
+    # Retorna LCR embaralhada (para aleatoriedade)
+    random.shuffle(lcr)
+    return lcr
+
+def bfs_LCR(A, centralities_list, alpha, maxiter=10):
+    """
+    Implementa BFS com LCR nível a nível, variando centralidades e multi-start
+    Retorna a melhor ordem de vértices encontrada
+    """
+
+    best_order = None
+    best_bandwidth = float('inf')
+
+    for _ in range(maxiter):
+
+        start = time.perf_counter()
+        visited = set()
+        order = []
+
+        # Enquanto houver vértices não visitados
+        while len(visited) < len(A):
+            # Escolhe aleatoriamente um vértice inicial não visitado
+            start = random.choice([v for v in A.nodes if v not in visited])
+            visited.add(start)
+            order.append(start)
+
+            # BFS estruturada por níveis
+            queue = deque([start])
+            while queue:
+                current_level = list(queue)
+                queue.clear()
+
+                # Escolhe aleatoriamente uma centralidade para este nível
+                centrality_vector = random.choice(centralities_list)
+
+                # Coleta vizinhos não visitados deste nível
+                neighbors = set()
+                for node in current_level:
+                    for nb in A.neighbors(node):
+                        if nb not in visited:
+                            neighbors.add(nb)
+
+                # Aplica LCR neste conjunto
+                lcr = get_LCR(list(neighbors), centrality_vector, alpha)
+
+                # Rotula na ordem definida pela LCR
+                for v in lcr:
+                    visited.add(v)
+                    order.append(v)
+                    queue.append(v)
+
+        # Calcula largura de banda (menor é melhor)
+        bandwidth = calc_bandwidth(A, order)
+        end = time.perf_counter()
+        elapsed = end - start
+
+        if bandwidth < best_bandwidth:
+            best_bandwidth = bandwidth
+            best_order = order
+            best_elapsed = elapsed
+
+    return best_order, best_bandwidth, best_elapsed
+
+def is_connected(A):
         """
         Verifica se o grafo é totalmente conectado (conexo) usando BFS.
         Entrada: adj -> lista de adjacência.
@@ -50,115 +131,14 @@ def multi_centralities_multi_inicios(A, centrality_array, max_iter):
 
         return all(visited)
 
-    def _multi_centralities_LCR(A, centralities, alpha):
-        """
-        Implementa o Algoritmo Construtivo de Multi-Centralidades LCR.
-        
-        A            : scipy.sparse CSR matrix de adjacência (n×n)
-        centralities : lista de vetores de centralidade ou único vetor
-        alpha        : float em [0,1], parâmetro de aleatorização do LCR
+def reorder_graph(A, order):
+    """Retorna novo grafo com nós reordenados"""
+    mapping = {old: new for new, old in enumerate(order)}
+    return nx.relabel_nodes(A, mapping, copy=True)
 
-        Retorna f: lista de tamanho n, onde f[i] é a ordem em que i foi selecionado.
-        """
-        n = A.shape[0]
-
-        # 1) Constrói lista de adjacência
-        adj = [A.indices[A.indptr[i]:A.indptr[i+1]].tolist() for i in range(n)]
-        
-        # 2) Define função de centralidade
-        centrality = lambda x: centralities[x]
-
-        # 3) Inicializações
-        mark = [False] * n   # vértices já inseridos em f
-        f = [0] * n       # vetor de ordem final
-        l = 0             # contador de vértices ordenados
-
-        # 4) Vértice inicial
-        k = random.randrange(n)
-        mark[k] = True
-        l = 1
-        f[k] = 1
-        q = [k]        # fronteira atual
-
-        # 5) Loop principal
-        while l < n:
-            # 5.1) Coleta vizinhos não marcados de todos os vértices em q
-            s = []
-            for i in q:
-                for j in adj[i]:
-                    if not mark[j]:
-                        s.append(j)
-
-            # elimina duplicatas preservando a ordem de descoberta
-            s = list(OrderedDict.fromkeys(s))
-            if not s:
-                break
-
-            # 5.2) Seleciona via LCR
-            q_new = _getLCR(s, centrality, alpha)
-            ql =  [ql[0] for ql in q_new]
-
-            # 5.3) Marca e rotula cada vértice selecionado
-            for j in ql:
-                if not mark[j]:
-                    l += 1
-                    f[j] = l
-                    mark[j] = True
-
-            # 5.4) Atualiza fronteira
-            q = s
-
-        return f
-    
-    def _dcg_score(f, centrality_vector):
-        ordered_centralities = [0] * len(f)
-        for node, order in enumerate(f):
-            ordered_centralities[order - 1] = centrality_vector[node]
-
-        return sum(rel / np.log2(i + 2) for i, rel in enumerate(ordered_centralities))
-
-    # verifica conectividade
-    if _is_connected(A):
-        print("O grafo é totalmente conectado.")
-        
-        # #! Cabe essa tratativa?
-        # copy_A = deepcopy(A)
-        # adj = [copy_A.indices[copy_A.indptr[i]:copy_A.indptr[i+1]].tolist() for i in range(copy_A.shape[0])]
-        # copy_adj = deepcopy(adj)
-        # for i, v in enumerate(copy_adj):
-        #     if i in v:
-        #         copy_adj[i].remove(i)
-
-        best_f     = None
-        best_score = np.inf
-        timings    = []
-
-        for i in range(max_iter):
-            # central_vec = centrality_array[i % len(centrality_array)]
-
-            start = time.time()
-            f = _multi_centralities_LCR(A, centrality_array, alpha)
-            elapsed = time.time() - start
-            timings.append(elapsed)
-            
-            if len(set(f)) != A.shape[0]:
-                raise ValueError("f contém elementos duplicados ou está incompleto!")
-
-            # avalia com DCG
-            score = _dcg_score(f, centrality_array)
-
-            if score < best_score:
-                best_score = score
-                best_f = f.copy()
-            print(f"Iteração {i + 1}: Ordem de seleção f = {f}")
-        
-        print(f"\nMelhor DCG geral: {best_score:.4f}")
-        return best_f, timings
-
-    else:
-        print("O grafo NÃO é totalmente conectado.")
-        return None
-
+# ============================
+# Exemplo de uso
+# ============================
 if __name__ == "__main__":
     # Caminho da pasta 'matrix' relativa a este script
     log_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matrix')
@@ -169,24 +149,43 @@ if __name__ == "__main__":
 
     # Percorre e exibe cada arquivo .mtx
     for arquivo in mtx_files:
-        print("Arquivo .mtx encontrado:", arquivo)
+        try:
+            print("Arquivo .mtx encontrado:", arquivo)
 
-        file_path = os.path.join(log_folder, arquivo)
+            file_path = os.path.join(log_folder, arquivo)
 
-        # Leitura e conversão da matriz
-        A = mmread(file_path).tocsr()
-        print("Dimensões:", A.shape)
-        print("Número de elementos não-zero:", A.nnz)
+            # Leitura e conversão da matriz
+            A = mmread(file_path).tocsr()
+            
+            if is_connected(A):
+                print("O grafo é totalmente conectado.")
 
-        # Centralidade de exemplo: grau (retorna os graus dos vértices)
-        centrality_array = A.getnnz(axis=1).astype(float)
-        dict_grau = {i: centrality_array[i] for i in range(A.shape[0])}
+                A = nx.from_scipy_sparse_array(A)
+                # Lista de centralidades (uma por métrica)
+                centralities_list = [
+                    nx.degree_centrality(A),
+                    nx.closeness_centrality(A),
+                    nx.betweenness_centrality(A)
+                ]
 
-        # Alpha aleatório
-        alpha = random.uniform(0, 1)
+                # Converte dicionários para listas indexadas por vértice
+                centralities_list = [
+                    [centrality[v] for v in A.nodes] for centrality in centralities_list
+                ]
 
-        # Executa o algoritmo
-        f = multi_centralities_multi_inicios(A, centrality_array, max_iter=10)
-        print("Ordem de seleção f:\n", f)
+                # Alpha aleatório
+                alpha = random.uniform(0, 1)
 
-    a  = 1
+                order, bw, bt = bfs_LCR(A, centralities_list, alpha=alpha, maxiter=20)
+                print("Melhor ordem encontrada:", order)
+                print("Largura de banda:", bw)
+                minutes, seconds = divmod(int(bt), 60)
+                print("Tempo decorrido:", minutes, "minutos e", seconds, "segundos.")
+
+                A_new = nx.to_numpy_array(reorder_graph(A, order), dtype=int)
+                plot = plot_graph(A_new, arquivo)
+            else:
+                print("O grafo não é totalmente conectado.")
+                raise ValueError("Grafo não é conexo.")
+        except:
+            continue
