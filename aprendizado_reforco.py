@@ -18,7 +18,7 @@ def plot_graph(A, arquivo):
     plt.figure(figsize=(6, 6))
     plt.spy(A, markersize=1)  # Visualiza padrão de conexões
     plt.title(f"Matriz de Adjacência {arquivo}")
-
+    plt.savefig(f"figures/{arquivo}.png", format="png")
     return plt
 
 def calc_bandwidth(A, order):
@@ -131,10 +131,33 @@ def is_connected(A):
 
         return all(visited)
 
+def read_unweighted_graph(file_path):
+    # Lê matriz esparsa
+    A = mmread(file_path).tocsr()
+
+    # Remove pesos (torna todas as arestas = 1)
+    A.data[:] = 1
+
+    # Converte para grafo não ponderado
+    A = nx.from_scipy_sparse_array(A)  # padrão: sem peso
+    A = nx.to_scipy_sparse_array(A, dtype=np.int8)
+    return A
+
 def reorder_graph(A, order):
-    """Retorna novo grafo com nós reordenados"""
-    mapping = {old: new for new, old in enumerate(order)}
-    return nx.relabel_nodes(A, mapping, copy=True)
+    """Reordena grafo/matriz esparsa ignorando pesos"""
+    # Se A for grafo NetworkX, converte para matriz esparsa sem pesos
+    if isinstance(A, nx.Graph):
+        A = nx.to_scipy_sparse_array(A, dtype=np.int8, weight=None)  # ignora pesos
+
+    # Garante CSR para indexação eficiente
+    A = csr_matrix(A)
+
+    # Força todas as arestas a valerem 1
+    A.data[:] = 1
+
+    # Aplica a reordenação
+    order = np.array(order)
+    return A[order, :][:, order]
 
 # ============================
 # Exemplo de uso
@@ -149,23 +172,38 @@ if __name__ == "__main__":
 
     # Percorre e exibe cada arquivo .mtx
     for arquivo in mtx_files:
-        try:
+        # try:
             print("Arquivo .mtx encontrado:", arquivo)
 
             file_path = os.path.join(log_folder, arquivo)
 
             # Leitura e conversão da matriz
-            A = mmread(file_path).tocsr()
+            A = read_unweighted_graph(file_path=file_path)
             
             if is_connected(A):
-                print("O grafo é totalmente conectado.")
+                print(f"O grafo {arquivo} é totalmente conectado.")
 
-                A = nx.from_scipy_sparse_array(A)
+                A = nx.from_scipy_sparse_array(A, parallel_edges=False, create_using=nx.Graph())
                 # Lista de centralidades (uma por métrica)
+                start = time.perf_counter()
+                degree_centrality = nx.degree_centrality(A)
+                end = time.perf_counter()
+                print(f"Cálculo da centralidade de grau levou {end - start:.4f} segundos.")
+
+                start = time.perf_counter()
+                closeness_centrality = nx.closeness_centrality(A)
+                end = time.perf_counter()
+                print(f"Cálculo da centralidade de proximidade levou {end - start:.4f} segundos.")
+                
+                start = time.perf_counter()
+                betweenness_centrality = nx.betweenness_centrality(A)
+                end = time.perf_counter()
+                print(f"Cálculo da centralidade de intermediação levou {end - start:.4f} segundos.")
+
                 centralities_list = [
-                    nx.degree_centrality(A),
-                    nx.closeness_centrality(A),
-                    nx.betweenness_centrality(A)
+                   degree_centrality,
+                   closeness_centrality,
+                   betweenness_centrality
                 ]
 
                 # Converte dicionários para listas indexadas por vértice
@@ -181,11 +219,11 @@ if __name__ == "__main__":
                 print("Largura de banda:", bw)
                 minutes, seconds = divmod(int(bt), 60)
                 print("Tempo decorrido:", minutes, "minutos e", seconds, "segundos.")
+                A_new = reorder_graph(A, order)
 
-                A_new = nx.to_numpy_array(reorder_graph(A, order), dtype=int)
                 plot = plot_graph(A_new, arquivo)
             else:
-                print("O grafo não é totalmente conectado.")
-                raise ValueError("Grafo não é conexo.")
-        except:
-            continue
+                print(f"O grafo {arquivo} não é totalmente conectado.")
+                raise ValueError(f"Grafo {arquivo} não é conexo.")
+        # except:
+        #     continue
