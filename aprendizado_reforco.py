@@ -15,6 +15,9 @@ from scipy.sparse import csr_matrix
 # -------------------------------
 def plot_graph(A, arquivo):
     """Plota padrão de conexões de uma matriz esparsa."""
+    if isinstance(A, nx.Graph):
+        A = nx.to_scipy_sparse_array(A, dtype=int)
+        
     plt.figure(figsize=(6, 6))
     plt.spy(A, markersize=1)
     plt.title(f"Matriz de Adjacência {arquivo}")
@@ -32,13 +35,14 @@ def get_LCR(candidates, centrality_vector, alpha):
     """Constrói Lista de Candidatos Restrita (LCR) para um nível da BFS."""
     if not candidates:
         return []
-
+    # Ordena os vizinhos com base na centralidade escolhida
     sorted_candidates = sorted(candidates, key=lambda x: centrality_vector[x])
     h_min = centrality_vector[sorted_candidates[0]]
     h_max = centrality_vector[sorted_candidates[-1]]
 
     threshold = h_max + alpha * (h_min - h_max)
     lcr = [v for v in sorted_candidates if centrality_vector[v] <= threshold]
+    # Embaralha a LCR para introduzir aleatoriedade
     random.shuffle(lcr)
     return lcr
 

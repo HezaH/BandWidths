@@ -4,16 +4,18 @@ import random
 import numpy as np
 import networkx as nx
 from collections import deque, defaultdict
+import os
+from scipy.io import mmread
+
 # Importa funções auxiliares de outro arquivo no projeto
 from aprendizado_reforco import (
+    get_LCR,
     read_unweighted_graph,
     calc_bandwidth,
     reorder_graph,
     plot_graph
                                  )
                                  
-import os
-from scipy.io import mmread
 # ---------------------------
 # Limite dual (lower bound) e utilitários de recompensa
 # ---------------------------
@@ -62,7 +64,6 @@ def reward_from_bandwidth(bw, n, m):
     denom = max(1.0, n) 
     return -gap / denom, lb
 
-
 # ---------------------------
 # Discretização de estado (leve, tabular)
 # ---------------------------
@@ -100,7 +101,6 @@ def make_state(level_size, unvisited_frac, last_action, num_actions):
         return 4
     # O estado é a combinação dos valores discretizados e da última ação.
     return (bin_level(level_size), bin_frac(unvisited_frac), last_action if last_action is not None else num_actions)
-
 
 # ---------------------------
 # Política ε-greedy sobre Q-table
@@ -168,7 +168,6 @@ class QPolicy:
         """
         self.eps = max(self.eps_min, self.eps * self.eps_decay)
 
-
 # ---------------------------
 # BFS-LCR dirigido por política (ação = qual centralidade usar no nível)
 # ---------------------------
@@ -220,18 +219,9 @@ def bfs_LCR_with_policy(G, centralities_list, policy):
             cent_vec = centralities_list[a]
 
             # Constrói a Lista de Candidatos Restrita (LCR)
-            if neighbors:
-                # Ordena os vizinhos com base na centralidade escolhida
-                sorted_candidates = sorted(neighbors, key=lambda x: cent_vec[x])
-                h_min = cent_vec[sorted_candidates[0]]
-                h_max = cent_vec[sorted_candidates[-1]]
-                # O limiar alpha é adaptativo, influenciado por epsilon, para controlar a ganância
-                alpha = policy.eps
-                threshold = h_max + alpha * (h_min - h_max)
-                lcr = [v for v in sorted_candidates if cent_vec[v] <= threshold]
-                random.shuffle(lcr) # Embaralha a LCR para introduzir aleatoriedade
-            else:
-                lcr = []
+            # O limiar alpha é adaptativo, influenciado por epsilon, para controlar a ganância
+            alpha = policy.eps
+            lcr = get_LCR(neighbors, cent_vec, alpha)
 
             # Adiciona os nós da LCR à ordem e à fila para o próximo nível
             for v in lcr:
@@ -322,17 +312,8 @@ def q_mch_solve(G, centralities_list, policy):
     policy.eps = old_eps # Restaura o valor original de epsilon
     return order, bw, lb
 
-# Exemplo simples usando o mesmo grafo para treino e teste (apenas para demonstrar)
-# Ideal: agrupar instâncias por classe, como você descreveu, e treinar por classe.
-
 # 1) Pré-cálculo de centralidades indexadas por nó:
 #    (mantive degree/closeness/betweenness como no seu código — se estiver lento, troque por versões aproximadas)
-
-
-
-import random
-import os
-import networkx as nx
 
 def fast_centralities(G, k_bet=50, k_clo=50, seed=42):
     """
@@ -384,7 +365,8 @@ if __name__ == "__main__":
         
         # 1. Leitura do grafo a partir do arquivo .mtx
         A = read_unweighted_graph(file_path)
-
+        plot_graph(A, arquivo)
+        
         # 2. Cálculo das centralidades (de forma aproximada para ser mais rápido)
         centralities_list = fast_centralities(A, k_bet=50, k_clo=50)
 
@@ -407,5 +389,5 @@ if __name__ == "__main__":
 
         # 6. Gera uma visualização da matriz de adjacência reordenada
         A_new = reorder_graph(A, order)
-        plot_graph(A_new, "q_learning_" + arquivo)
+        plot_graph(A_new, arquivo + "_q_learning")
 
