@@ -6,6 +6,8 @@ import networkx as nx
 from collections import deque, defaultdict
 import os
 from scipy.io import mmread
+import itertools
+from multiprocessing import Pool, cpu_count
 
 # Importa funções auxiliares de outro arquivo no projeto
 from aprendizado_reforco import (
@@ -350,7 +352,21 @@ def fast_centralities(G, k_bet=50, k_clo=50, seed=42):
 
     return [deg, clo, bet]
 
-# Bloco principal de execução
+# ==== Função de treino + avaliação para grid search ====
+def run_case(args):
+    A_local, centralities_local, params = args
+    episodes, lr, gamma, eps, eps_decay = params
+    
+    policy = q_mch_train(
+        graphs=[A_local],
+        centralities_by_graph=[centralities_local],
+        episodes=episodes, lr=lr, gamma=gamma, eps=eps_decay
+    )
+
+    order, bw, lb = q_mch_solve(A_local, centralities_local, policy)
+    return (params, bw, lb, order)  # <<< apenas dados simples
+
+# ==== Bloco principal ====
 if __name__ == "__main__":
     log_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matrix')
     mtx_files = [f for f in os.listdir(log_folder) if f.endswith('.mtx')]
@@ -363,26 +379,52 @@ if __name__ == "__main__":
         A = read_unweighted_graph(file_path)
         centralities_list = fast_centralities(A, k_bet=50, k_clo=50)
 
-        # 3. Treinamento do agente de Q-learning (Q-MCH)
-        #    Neste exemplo, o treino é feito em uma única instância, mas o ideal
-        #    seria treinar em um conjunto de instâncias similares.
-        policy = q_mch_train(
-            graphs=[A], 
+        # Grid de parâmetros
+        episodes_vals   = [20, 30, 40]
+        lr_vals         = [0.001, 0.005]
+        gamma_vals      = [0.8, 0.9]
+        eps_vals        = [1.0]
+        eps_decay_vals  = [0.99, 0.995]
+        grid_params     = list(itertools.product(episodes_vals, lr_vals, gamma_vals, eps_vals, eps_decay_vals))
+        grid_args       = [(A, centralities_list, params) for params in grid_params]
+
+        # Execução em paralelo
+        with Pool(processes=cpu_count()) as pool:
+            results = pool.map(run_case, grid_args)
+
+        # Ordena pela melhor largura de banda
+        results_sorted = sorted(results, key=lambda x: x[1])
+
+        print("\nTop 3 parâmetros:")
+        for params, bw, lb, _ in results_sorted[:3]:
+            print(f"Params: {params} | BW: {bw} | LB: {lb} | GAP: {bw - lb:.2f}")
+
+        # Pega melhor configuração
+        best_params, _, _, best_order = results_sorted[0]
+
+        # Re-treina no main process para ter o policy
+        best_policy = q_mch_train(
+            graphs=[A],
             centralities_by_graph=[centralities_list],
-            episodes=30,
-            lr=0.001, gamma=0.9, eps=1.0, eps_min=0.1, eps_decay=0.995
+            episodes=best_params[0],
+            lr=best_params[1],
+            gamma=best_params[2],
+            eps=best_params[3],
+            eps_decay=best_params[4]
         )
 
-        # 4. Resolução: usa a política treinada para obter a ordenação final
-        order, bw, lb = q_mch_solve(A, centralities_list, policy)
+        # Aplica política
+        best_order, best_bw, best_lb = q_mch_solve(A, centralities_list, best_policy)
 
-        # 5. Exibição dos resultados
-        print("Ordem (Q-MCH):", order)
-        print(f"Largura de banda: {bw} | Limite dual (LB): {lb:.2f} | Gap: {bw - lb:.2f}")
+        # Resultados finais
+        print("\n=== Resultado com melhor configuração ===")
+        print(f"Melhores parâmetros: {best_params}")
+        print("Ordem (Q-MCH):", best_order)
+        print(f"Largura de banda: {best_bw} | LB: {best_lb:.2f} | GAP: {best_bw - best_lb:.2f}")
 
         # Plots (apenas no main thread)
         plot_graph(A, arquivo)
         plot_graph_as_matrix(A, arquivo + "_matrix")
-        A_new = reorder_graph(A, order)
+        A_new = reorder_graph(A, best_order)
         plot_graph(A_new, arquivo + "_q_learning")
         plot_graph_as_matrix(A_new, arquivo + "_q_learning_matrix")

@@ -9,7 +9,6 @@ import numpy as np
 from scipy.io import mmread
 from scipy.sparse import csr_matrix
 
-
 # -------------------------------
 # Funções utilitárias
 # -------------------------------
@@ -17,11 +16,37 @@ def plot_graph(A, arquivo):
     """Plota padrão de conexões de uma matriz esparsa."""
     if isinstance(A, nx.Graph):
         A = nx.to_scipy_sparse_array(A, dtype=int)
-        
+
     plt.figure(figsize=(6, 6))
     plt.spy(A, markersize=1)
     plt.title(f"Matriz de Adjacência {arquivo}")
     plt.savefig(f"figures/{arquivo}.png", format="png")
+    plt.close()
+
+def plot_graph_as_matrix(G, title="Matriz de Adjacência"):
+    # Gera matriz de adjacência como array NumPy (ordem natural dos nós no G)
+    if not isinstance(G, nx.Graph):
+        G = nx.from_scipy_sparse_array(G)  # ou from_numpy_array se já for denso
+    A = nx.to_numpy_array(G, dtype=int)
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    cax = ax.matshow(A, cmap="Greys")  # tons de cinza: 1 = aresta, 0 = sem aresta
+
+    # Ajustes de eixo
+    ax.set_title(title, pad=15)
+    ax.set_xlabel("Nó j")
+    ax.set_ylabel("Nó i")
+
+    # Opcional: ticks para alguns nós apenas (evita poluição visual)
+    n = A.shape[0]
+    step = max(1, n // 10)
+    ax.set_xticks(range(0, n, step))
+    ax.set_yticks(range(0, n, step))
+
+    # Barra de cor
+    fig.colorbar(cax, fraction=0.046, pad=0.04)
+
+    plt.show()
     plt.close()
 
 
