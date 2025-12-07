@@ -71,7 +71,7 @@ def reward_from_bandwidth(bw, n, m):
 # ---------------------------
 # Discretização de estado (leve, tabular)
 # ---------------------------
-def make_state(level_size, unvisited_frac, last_action, num_actions):
+def make_state(n, level_size, unvisited_frac, last_action, num_actions):
     """
     Cria uma representação de estado discreta para a Q-table.
     O estado é uma tupla que captura informações sobre o processo de busca:
@@ -88,23 +88,43 @@ def make_state(level_size, unvisited_frac, last_action, num_actions):
     Returns:
         tuple: O estado discreto.
     """
-    def bin_level(sz):
-        """Discretiza o tamanho do nível em até 5 bins."""
-        if sz == 0:   return 0
-        if sz <= 2:   return 1
-        if sz <= 5:   return 2
-        if sz <= 10:  return 3
-        if sz <= 20:  return 4
-        return 5
-    def bin_frac(f):
-        """Discretiza a fração de nós não visitados em 5 bins."""
-        if f <= 0.1:  return 0
-        if f <= 0.25: return 1
-        if f <= 0.5:  return 2
-        if f <= 0.75: return 3
-        return 4
+    def bin_level(sz, n, bins=5):
+        """
+        Discretize the level size into bins proportional to graph size n.
+        
+        Args:
+            sz (int): size of the level (number of nodes).
+            n (int): total number of nodes in the graph.
+            bins (int): number of bins (default=5).
+        """
+        if sz == 0:
+            return 0
+        
+        # tamanho de cada faixa
+        step = n / bins
+        
+        # calcula bin dinamicamente
+        for i in range(1, bins+1):
+            if sz <= i * step:
+                return i
+        return bins
+
+    def bin_frac(f, bins=5):
+        """
+        Discretize the fraction of unvisited nodes into bins.
+        
+        Args:
+            f (float): fraction of unvisited nodes (0 <= f <= 1).
+            bins (int): number of bins (default=5).
+        """
+        step = 1.0 / bins
+        for i in range(bins):
+            if f <= (i+1) * step:
+                return i
+        return bins-1
+
     # O estado é a combinação dos valores discretizados e da última ação.
-    return (bin_level(level_size), bin_frac(unvisited_frac), last_action if last_action is not None else num_actions)
+    return (bin_level(level_size, n), bin_frac(unvisited_frac), last_action if last_action is not None else num_actions)
 
 # ---------------------------
 # Política ε-greedy sobre Q-table
@@ -216,10 +236,10 @@ def bfs_LCR_with_policy(G, centralities_list, policy):
             # Cria o estado atual para a política de RL
             level_size = len(current_level)
             unvisited_frac = (n - len(visited)) / n
-            s = make_state(level_size, unvisited_frac, last_action, len(centralities_list))
+            s = make_state(n, level_size, unvisited_frac, last_action, len(centralities_list))
 
             # A política seleciona uma ação (qual centralidade usar)
-            a = 0 #policy.select_action(s)
+            a = policy.select_action(s)
             cent_vec = centralities_list[a]
 
             # Constrói a Lista de Candidatos Restrita (LCR)
@@ -237,7 +257,7 @@ def bfs_LCR_with_policy(G, centralities_list, policy):
             # Prepara o próximo estado
             level_size_next = len(queue)
             unvisited_frac_next = (n - len(visited)) / n
-            s_next = make_state(level_size_next, unvisited_frac_next, a, len(centralities_list))
+            s_next = make_state(n, level_size_next, unvisited_frac_next, a, len(centralities_list))
 
             # A recompensa intermediária é 0. A recompensa real é dada apenas no final do episódio.
             r = 0.0
@@ -250,7 +270,7 @@ def bfs_LCR_with_policy(G, centralities_list, policy):
     r_final, lb = reward_from_bandwidth(bw, n, m)
 
     # Faz a atualização final da Q-table com a recompensa do episódio completo
-    terminal_state = make_state(0, 0.0, last_action, len(centralities_list))
+    terminal_state = make_state(n, 0, 0.0, last_action, len(centralities_list))
     policy.update(terminal_state, last_action, r_final, terminal_state, done=True)
 
     return order, bw, lb, r_final
@@ -317,41 +337,26 @@ def q_mch_solve(G, centralities_list, policy):
 # 1) Pré-cálculo de centralidades indexadas por nó:
 #    (mantive degree/closeness/betweenness como no seu código — se estiver lento, troque por versões aproximadas)
 
-def fast_centralities(G, k_bet=50, k_clo=50, seed=42):
-    """
-    Calcula aproximações para as métricas de centralidade para acelerar o processo.
-    - Degree: cálculo exato e rápido.
-    - Closeness: calculada de forma exata apenas para uma amostra de nós.
-    - Betweenness: calculada usando uma amostra de nós para estimar os valores.
-    
-    Args:
-        G (nx.Graph): O grafo.
-        k_bet (int): Número de nós na amostra para betweenness.
-        k_clo (int): Número de nós na amostra para closeness.
-        seed (int): Semente para reprodutibilidade.
-        
-    Returns:
-        list: Uma lista de listas, onde cada sublista contém os valores de uma centralidade.
-    """
-    random.seed(seed)
-    n = len(G)
+def fast_centralities(G, centralities: dict):
+    centralities_list = []
 
-    # Degree centrality é rápido e exato
-    deg = [deg_val / (n - 1) for _, deg_val in G.degree()]
+    for name, func in centralities.items():
+        if name in ["Eigenvector"]:
+            result = func(G, max_iter=1000)
+        # Some functions require parameters (like Katz centrality)
+        elif name == "Katz Centrality":
+            result = func(G, alpha=0.005, beta=1.0, max_iter=2000)
+        elif name == "PageRank":
+            result = func(G, alpha=0.85)
+        else:
+            result = func(G)
+        print(f"Calculing for: {name}")
+        cent_dict = result
+        # Convert the dict to a vector aligned with node ordering
+        cent_vector = np.array([cent_dict[v] for v in G.nodes()], dtype=float)
+        centralities_list.append(cent_vector)
 
-    # Closeness centrality com amostragem para acelerar
-    sample_nodes_clo = random.sample(list(G.nodes()), min(k_clo, n))
-    clo_dict = {}
-    for v in G.nodes():
-        # Calcula closeness exata para a amostra, 0 para os outros
-        clo_dict[v] = nx.closeness_centrality(G, u=v) if v in sample_nodes_clo else 0
-    clo = [clo_dict[v] for v in G.nodes()]
-
-    # Betweenness centrality aproximada
-    bet_dict = nx.betweenness_centrality(G, k=min(k_bet, n), normalized=True, seed=seed)
-    bet = [bet_dict[v] for v in G.nodes()]
-
-    return [deg, clo, bet]
+    return centralities_list
 
 # ==== Função de treino + avaliação para grid search ====
 def run_case(args):
@@ -381,7 +386,20 @@ if __name__ == "__main__":
 
         # Leitura e cálculo de centralidades
         A = read_unweighted_graph(file_path)
-        centralities_list = fast_centralities(A, k_bet=50, k_clo=50)
+        dict_centralities = {
+        #Standard centrality measures
+        "Degree": nx.degree_centrality,
+        "Closeness": nx.closeness_centrality,
+        "Betweenness": nx.betweenness_centrality,
+        "Eigenvector": nx.eigenvector_centrality,
+        
+        # Additional centrality measures
+        "Katz Centrality": nx.katz_centrality,
+        "PageRank": nx.pagerank,
+        "Harmonic Centrality": nx.harmonic_centrality,
+        "Current-flow Betweenness": nx.current_flow_betweenness_centrality
+        }
+        centralities_list = fast_centralities(A, dict_centralities)
 
         # Largura de banda do grafo original
         bw_original = calc_bandwidth(A, list(A.nodes()))
@@ -390,7 +408,7 @@ if __name__ == "__main__":
         episodes_vals   = [20, 30, 40]
         lr_vals         = [0.001, 0.005]
         gamma_vals      = [0.8, 0.9]
-        eps_vals        = [1.0]
+        eps_vals        = [1.0, 0.5]
         eps_decay_vals  = [0.99, 0.995]
         grid_params     = list(itertools.product(episodes_vals, lr_vals, gamma_vals, eps_vals, eps_decay_vals))
         grid_args       = [(A, centralities_list, params) for params in grid_params]
@@ -437,11 +455,12 @@ if __name__ == "__main__":
         })
 
         # Plots (apenas no main thread)
-        plot_graph(A, arquivo)
-        plot_graph_as_matrix(A, arquivo + "_matrix")
+        file_name = os.path.splitext(arquivo)[0]
+        plot_graph(A, file_name)
+        plot_graph_as_matrix(A, file_name + "_matrix")
         A_new = reorder_graph(A, best_order)
-        plot_graph(A_new, arquivo + "_q_learning")
-        plot_graph_as_matrix(A_new, arquivo + "_q_learning_matrix")
+        plot_graph(A_new, file_name + "_q_learning")
+        plot_graph_as_matrix(A_new, file_name + "_q_learning_matrix")
         A_new = A_new
 
     # Cria e exibe o DataFrame comparativo
