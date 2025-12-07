@@ -8,6 +8,7 @@ import os
 from scipy.io import mmread
 import itertools
 from multiprocessing import Pool, cpu_count
+import pandas as pd
 
 # Importa funções auxiliares de outro arquivo no projeto
 from aprendizado_reforco import (
@@ -218,7 +219,7 @@ def bfs_LCR_with_policy(G, centralities_list, policy):
             s = make_state(level_size, unvisited_frac, last_action, len(centralities_list))
 
             # A política seleciona uma ação (qual centralidade usar)
-            a = policy.select_action(s)
+            a = 0 #policy.select_action(s)
             cent_vec = centralities_list[a]
 
             # Constrói a Lista de Candidatos Restrita (LCR)
@@ -371,6 +372,9 @@ if __name__ == "__main__":
     log_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matrix')
     mtx_files = [f for f in os.listdir(log_folder) if f.endswith('.mtx')]
 
+    # Lista para armazenar resultados
+    resultados = []
+
     for arquivo in mtx_files:
         print(f"\n=== Processando {arquivo} ===")
         file_path = os.path.join(log_folder, arquivo)
@@ -378,6 +382,9 @@ if __name__ == "__main__":
         # Leitura e cálculo de centralidades
         A = read_unweighted_graph(file_path)
         centralities_list = fast_centralities(A, k_bet=50, k_clo=50)
+
+        # Largura de banda do grafo original
+        bw_original = calc_bandwidth(A, list(A.nodes()))
 
         # Grid de parâmetros
         episodes_vals   = [20, 30, 40]
@@ -419,8 +426,15 @@ if __name__ == "__main__":
         # Resultados finais
         print("\n=== Resultado com melhor configuração ===")
         print(f"Melhores parâmetros: {best_params}")
-        print("Ordem (Q-MCH):", best_order)
         print(f"Largura de banda: {best_bw} | LB: {best_lb:.2f} | GAP: {best_bw - best_lb:.2f}")
+
+        # Adiciona ao comparativo
+        resultados.append({
+            'arquivo': arquivo,
+            'bw_original': bw_original,
+            'bw_qlearning': best_bw,
+            'gap': bw_original - best_bw
+        })
 
         # Plots (apenas no main thread)
         plot_graph(A, arquivo)
@@ -428,3 +442,9 @@ if __name__ == "__main__":
         A_new = reorder_graph(A, best_order)
         plot_graph(A_new, arquivo + "_q_learning")
         plot_graph_as_matrix(A_new, arquivo + "_q_learning_matrix")
+        A_new = A_new
+
+    # Cria e exibe o DataFrame comparativo
+    df_resultados = pd.DataFrame(resultados)
+    print("\nComparativo de larguras de banda:")
+    print(df_resultados)

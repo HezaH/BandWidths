@@ -377,7 +377,7 @@ if __name__ == "__main__":
         order, bw, lb = q_mch_solve(A, centralities_list, policy)
 
         # 5. Exibição dos resultados
-        print("Ordem (Q-MCH):", order)
+        # print("Ordem (Q-MCH):", order)
         print(f"Largura de banda: {bw} | Limite dual (LB): {lb:.2f} | Gap: {bw - lb:.2f}")
 
         # Plots (apenas no main thread)
