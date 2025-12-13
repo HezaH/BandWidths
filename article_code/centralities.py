@@ -21,9 +21,15 @@ from modules.graph.Grafo import Grafo, GrafoListaAdj
 from modules.centralities.heuristics import *
 from modules.components import constructive
 
-def get_centrality_node(graph: nx.Graph, centrality: str) -> dict:
+def get_centrality_node(graph: nx.Graph, 
+                        centrality: str, 
+                        dict_centralities: dict = {
+                            "eigenvector": nx.eigenvector_centrality_numpy, 
+                            "degree": nx.degree_centrality, 
+                            "closeness": nx.closeness_centrality }
+                            ) -> dict:
 
-    dict_centralities = {"eigenvector":nx.eigenvector_centrality_numpy, "degree":nx.degree_centrality, "closeness":nx.closeness_centrality }
+    
     resp_centrality = dict_centralities[centrality](graph)
     
     nodes_centrality = {}

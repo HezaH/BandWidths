@@ -15,21 +15,15 @@ from modules.utils import read_Instances
 from modules.centralities.heuristics import biggest_eigenvector, reverse_cuthill
 from modules.components import constructive
 import matplotlib.pyplot as plt
-from modules.VNS import local_search, shakes, init_solution
-from modules.utils.handle_labels import Bf_graph
+from modules.VNS import init_solution
+from modules.utils.handle_labels import Bf_graph, set_bandwidth
 
 def init_graph(edges):
     G = nx.Graph()
     G.add_edges_from(edges)
     return G
 
-#FUNCTION TO GET BANDWIDTH  by networkx
-def bandwidth(G):
-    '''Calculate the bandwidth'''
-    A = nx.adjacency_matrix(G)
-    x, y = np.nonzero(A)
-    w = (y - x).max() + (x - y).max() + 1
-    return w
+
 
 def listar_instancias(path):
     instancias = []
@@ -54,8 +48,10 @@ for loop in range(1,2):
     list_time = []
 
     for kind in dir_list:
-        main_path = f'./newdata/{kind}'
-        list_path = readFilesInDict(main_path, ".mtx")
+        # main_path = f'./data/newdata/{kind}'
+        base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
+        path = os.path.join(base_dir, "data", "newdata", kind)
+        list_path = readFilesInDict(path, ".mtx")
 
         for instancia in list_path:
 
@@ -94,7 +90,7 @@ for loop in range(1,2):
                         n_states=4,
                         deep=True)
 
-            env = Env(7990)
+            env = Env(np.inf)
 
             state = env.get_initial_state()
             agent_movements = agent.get_movements()
@@ -129,7 +125,7 @@ for loop in range(1,2):
             torch.save(agent.Q.state_dict(), 'trained_model_{}.pth')
 
 
-            band = bandwidth(G)
+            band = set_bandwidth(G)
             band_after = reverse_cuthill(G, biggest_eigenvector)
             print("##### Biggest Eigenvector ########")
             print("Banda original: ", band)
@@ -147,16 +143,10 @@ nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_insta
 G = nx.Graph()
 G.add_edges_from(edges)
 
-def bandwidth(graph):
-    bw = 0
-    for u, v in graph.edges():
-        bw = max(bw, abs(u - v))
-    return bw 
-
-original_bandwidth = bandwidth(G)
+original_bandwidth = set_bandwidth(G)
 
 
-import networkx as nx
+
 nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance("./newdata/structural/bcsstk02/bcsstk02.mtx")
 
 # Exemplo de criação de um grafo
@@ -179,16 +169,9 @@ print(rcm_order)
 print("\nGrafo reordenado:")
 print(G_reordered.edges())
 
-# Função para calcular a largura de banda do grafo
-def bandwidth(graph):
-    bw = 0
-    for u, v in graph.edges():
-        bw = max(bw, abs(u - v))
-    return bw
-
 # Calcular a largura de banda dos grafos
-original_bandwidth = bandwidth(G)
-reordered_bandwidth = bandwidth(G_reordered)
+original_bandwidth = set_bandwidth(G)
+reordered_bandwidth = set_bandwidth(G_reordered)
 
 print(f"\nLargura de banda original: {original_bandwidth}")
 print(f"Largura de banda reordenada: {reordered_bandwidth}")

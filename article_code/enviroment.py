@@ -35,7 +35,11 @@ class Env:
         self.previous_cost = melhor_custo
         
 
-        return {"n_steps": self.n_steps, "gap": self.gap, "reward": reward, "centrality":cent_str , "bandwidth":melhor_custo}
+        return {"n_steps": self.n_steps, 
+                "gap": self.gap, 
+                "reward": reward, 
+                "centrality":cent_str , 
+                "bandwidth":melhor_custo}
 
 
     def reward(self, current_cost: float):

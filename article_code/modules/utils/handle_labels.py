@@ -4,7 +4,15 @@ import random
 from collections import defaultdict
 
 import numpy as np
+import networkx as nx
 
+#FUNCTION TO GET BANDWIDTH  by networkx
+def set_bandwidth(G: GrafoListaAdj) -> int:
+    '''Calculate the bandwidth'''
+    A = nx.adjacency_matrix(G)
+    x, y = np.nonzero(A)
+    w = (y - x).max() + (x - y).max() + 1
+    return w
 
 def simples_init_sol(graph):
     ''''

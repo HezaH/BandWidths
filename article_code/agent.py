@@ -10,11 +10,44 @@ from torch.optim import Adam
 
 @dataclass
 class Agent:
+    """
+    Agent class for Q-Learning and Deep Q-Network reinforcement learning.
+    This class implements an agent capable of learning through both tabular Q-Learning
+    and Deep Q-Networks (DQN). It manages the exploration-exploitation trade-off through
+    an epsilon-greedy policy and handles both shallow and deep learning approaches.
+    Attributes:
+        learning_rate (float): The learning rate for Q-value updates. Controls how much
+            new information overrides old Q-values in tabular Q-Learning or the optimizer
+            step size in Deep Q-Networks.
+        gamma (float): The discount factor (0 to 1) that determines how much the agent
+            values future rewards compared to immediate rewards. Higher values prioritize
+            long-term rewards.
+        n_movements (int): The total number of available movement actions the agent can
+            take in the environment.
+        n_actions (int): The total number of available actions (including non-movement
+            actions). This is calculated based on the action space size.
+        n_states (int): The total number of possible states in the environment. Used to
+            initialize the Q-table in tabular Q-Learning.
+        epsilon (float): The exploration rate for the epsilon-greedy policy. Determines
+            the probability of taking a random action (range 0 to 1).
+        eps_min (float): The minimum threshold for epsilon. Prevents epsilon from
+            decreasing below this value during training.
+        eps_dec (float): The decay rate for epsilon (typically between 0.9 and 0.999).
+            Multiplied with epsilon at each learning step to reduce exploration over time.
+        Q (dict): The Q-table storing Q-values for state-action pairs in tabular
+            Q-Learning. For Deep Q-Networks, this stores the neural network model.
+            Defaults to an empty dictionary.
+        deep (bool): Flag indicating whether to use Deep Q-Network (True) or tabular
+            Q-Learning (False). Defaults to True.
+        model_path (str): Path to a pre-trained model file for Deep Q-Networks.
+            If provided, the model weights will be loaded upon initialization.
+            Defaults to None.
+    """
     learning_rate: float
     gamma: float
     n_movements: int
     n_actions: int
-    n_states: int
+    n_states: int 
     epsilon: float
     eps_min: float
     eps_dec: float
@@ -22,13 +55,14 @@ class Agent:
     deep: bool = True
     model_path: str = None
 
-
     def __post_init__(self):
+        """Initializes the agent after dataclass instantiation."""
         self.init_Q()
         self.action_space = list(range(self.n_movements))
         self.n_actions = len(self.action_space)
 
     def init_Q(self):
+        """Initializes Q-values based on the learning approach."""
         if self.deep:
             self.Q = LinearQNet(self.learning_rate, self.n_states, self.n_actions)
             if self.model_path is not None:
@@ -40,6 +74,7 @@ class Agent:
                     self.Q[(state, action)] = 0.0
 
     def choose_action(self, state, deep=True):
+        """Selects an action using epsilon-greedy policy."""
         action = None
         if deep:
             if np.random.random() > self.epsilon:
@@ -58,9 +93,11 @@ class Agent:
         return action
 
     def decrement_epsilon(self):
+        """Reduces the exploration rate over time."""
         self.epsilon = self.epsilon * self.eps_dec if self.epsilon > self.eps_min else self.eps_min
 
     def learn(self, state, action, reward, next_state):
+        """Updates agent's Q-values based on experience."""
         if self.deep:
             self.Q.optimizer.zero_grad()
             states = torch.tensor(state, dtype=torch.float).to(self.Q.device)
@@ -87,6 +124,7 @@ class Agent:
         self.decrement_epsilon()
 
     def get_movements(self):
+        """Returns the list of available actions."""
         return self.action_space
 
 
@@ -101,8 +139,13 @@ class LinearQNet(Module):
         self.optimizer = Adam(self.parameters(), lr=learning_rate)
         self.loss = MSELoss()
 
-        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.device = torch.device("mps")
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+        elif torch.backends.mps.is_available():
+            device = torch.device("mps")
+        else:
+            device = torch.device("cpu")
+        self.device = device
         self.to(self.device)
 
     def forward(self, x):
