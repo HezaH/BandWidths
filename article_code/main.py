@@ -17,22 +17,8 @@ from modules.components import constructive
 import matplotlib.pyplot as plt
 from modules.VNS import init_solution
 from modules.utils.handle_labels import Bf_graph, set_bandwidth
+import sys
 
-def init_graph(edges):
-    G = nx.Graph()
-    G.add_edges_from(edges)
-    return G
-
-
-
-def listar_instancias(path):
-    instancias = []
-    for pasta_atual, subpastas, arquivos in os.walk(path):
-        for arquivo in arquivos:
-            # Aqui você pode adicionar lógica para filtrar os arquivos, se necessário
-            caminho_completo = os.path.join(pasta_atual, arquivo)
-            instancias.append(caminho_completo)
-    return instancias
 
 dir_list = ["computational_fluid_dynamics", "electromagnetics", "optimization", "structural"]
 for loop in range(1,2):
@@ -90,7 +76,7 @@ for loop in range(1,2):
                         n_states=4,
                         deep=True)
 
-            env = Env(np.inf)
+            env = Env(100000)
 
             state = env.get_initial_state()
             agent_movements = agent.get_movements()

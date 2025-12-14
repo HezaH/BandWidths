@@ -30,7 +30,11 @@ class Env:
             self.best_sol = melhor_custo
         
         self.n_steps+=1
-        self.gap = (self.opt - melhor_custo) / float(self.opt)
+        if self.opt in [0, None]:
+            self.opt = melhor_custo
+            self.gap = 0
+        else:
+            self.gap = (self.opt - melhor_custo) / float(self.opt)
         reward = self.reward(melhor_custo)
         self.previous_cost = melhor_custo
         

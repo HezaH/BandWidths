@@ -10,7 +10,7 @@ from modules.graph.Grafo import Grafo, GrafoListaAdj
 
 def get_LCR(queue:list, chosen_centrality:list, random_centrality:str, alpha:float):
     
-    reverse_centralities = { "eigenvector": True, "degree": False, "closeness": False }
+    reverse_centralities = {"eigenvector": True, "degree": False, "closeness": False }
 
     vertices_ordenados = sorted(queue, key=lambda x: chosen_centrality[x], reverse=reverse_centralities[random_centrality])
     qtd_elem = int(len(vertices_ordenados) * alpha)
