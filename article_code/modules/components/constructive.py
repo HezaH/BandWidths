@@ -9,6 +9,25 @@ from modules.utils import handle_labels
 from modules.graph.Grafo import Grafo, GrafoListaAdj
 
 def get_LCR(queue:list, chosen_centrality:dict, random_centrality:str, alpha:float, centralities:dict):
+    """
+    Constructs a Restricted Candidate List (RCL) by sorting vertices based on centrality 
+    and partitioning them into restricted and complementary sets.
+    This function implements the RCL creation step commonly used in GRASP (Greedy Randomized 
+    Adaptive Search Procedure) algorithms. It sorts vertices according to a chosen centrality 
+    metric, selects the top alpha% as restricted candidates, and randomly shuffles both 
+    the restricted and complementary sets before combining them.
+    Args:
+        queue (list): List of vertex identifiers to be processed.
+        chosen_centrality (dict): Dictionary mapping each vertex to its centrality value.
+        random_centrality (str): Key identifying which centrality metric is being used.
+        alpha (float): Parameter between 0 and 1 that determines the proportion of top-ranked 
+                      vertices to include in the restricted candidate list (0.0 to 1.0).
+        centralities (dict): Dictionary containing centrality metric configurations, including 
+                           a "reverse" boolean flag indicating sort order for the chosen metric.
+    Returns:
+        list: A shuffled list of vertices starting with randomized high-centrality vertices 
+              (restricted set) followed by randomized remaining vertices (complementary set).
+    """
     reverse_flag = centralities[random_centrality]["reverse"]
 
     vertices_ordenados = sorted(
@@ -216,8 +235,6 @@ def init_Solution_Centrality_lcr(graph: GrafoListaAdj,  nodes_centrality:dict, r
     # Sortear um item baseado nas probabilidades
     k = random.choices(list(nodes_centrality.keys()), probs)[0] 
     
-    # k = random.choice(list(graph.V()))
-
     mark[k] = True #visita o vertice assinado nno v_zero
     
     queue.append(k)
@@ -238,7 +255,6 @@ def init_Solution_Centrality_lcr(graph: GrafoListaAdj,  nodes_centrality:dict, r
                     stack.append(vert)
                     mark[vert] = True
         
-
         array_LCR = get_LCR(queue=queue, chosen_centrality=nodes_centrality, random_centrality=random_centrality, alpha=alpha, centralities=centralities)
         
         h = 0

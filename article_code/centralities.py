@@ -22,8 +22,8 @@ from modules.centralities.heuristics import *
 from modules.components import constructive
 
 def get_centrality_node(graph: nx.Graph, 
-                        centrality: dict,
-                            ) -> dict:
+                        centrality: dict,) -> dict:
+                            
 
     resp_centrality = centrality["func"](graph, **centrality["args"])
     
@@ -40,11 +40,13 @@ def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:s
 
     for _ in range(iter_max):
         solution = constructive.init_Solution_Centrality_lcr(graph=graph, nodes_centrality=centrality_values, random_centrality=cent_str, alpha=alpha, centralities=centralities)
-        band_solution= Bf_graph(graph=graph,F_labels=solution) 
+        
+        band_solution= Bf_graph(graph=graph, F_labels=solution) 
 
         if bandwidth > band_solution:
             solution = solution 
             bandwidth = band_solution
+            graph_rebuilt = reconstruct_graph_by_labels(graph, solution)
 
-    return bandwidth
+    return bandwidth, graph_rebuilt
 

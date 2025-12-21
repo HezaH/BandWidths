@@ -19,7 +19,7 @@ class Env:
         melhor_custo = float('inf')
         k = 0
         for _ in range(5):
-            custo_s = centrality_heuristic(graph=graph, centrality_values=centrality_values, cent_str=cent_str, alpha=0.3, iter_max=3, centralities=centralities)
+            custo_s, graph_rebuilt = centrality_heuristic(graph=graph, centrality_values=centrality_values, cent_str=cent_str, alpha=0.3, iter_max=3, centralities=centralities)
             if custo_s < melhor_custo:
                 melhor_custo = custo_s
                 k = 0
@@ -28,6 +28,7 @@ class Env:
         
         if melhor_custo < self.best_sol:
             self.best_sol = melhor_custo
+            self.best_graph = graph_rebuilt
         
         self.n_steps+=1
         if self.opt in [0, None]:
@@ -43,7 +44,9 @@ class Env:
                 "gap": self.gap, 
                 "reward": reward, 
                 "centrality":cent_str , 
-                "bandwidth":melhor_custo}
+                "bandwidth":melhor_custo,
+                "graph": self.best_graph
+                }
 
 
     def reward(self, current_cost: float):

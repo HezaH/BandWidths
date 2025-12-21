@@ -186,3 +186,29 @@ def move(graph: GrafoListaAdj, solution_f1:dict, solution_f2:dict, alpha:int)->b
 
     if (Band_f1>Band_f2) or ((Band_f2==Band_f1) and (abs(n_critical_f1)>abs(n_critical_f2))) or ((Band_f2==Band_f1) and distance_rho>alpha):
         return True
+
+def reconstruct_graph_by_labels(graph: GrafoListaAdj, F_labels: dict) -> GrafoListaAdj:
+    """
+    Rebuilds a new graph where each original vertex `v` is relabeled to `F_labels[v]`.
+    All edges are mapped accordingly: an original edge (u, v) becomes (F_labels[u], F_labels[v]).
+
+    Args:
+        graph (GrafoListaAdj): Original graph with vertices 1..n.
+        F_labels (dict): Mapping from original vertex to new label (typically 1..n),
+                         e.g., the solution returned by `constructive.init_Solution_Centrality_lcr`.
+
+    Returns:
+        GrafoListaAdj: New graph with vertices 1..n ordered by labels and edges remapped.
+    """
+    # Preserve orientation setting
+    new_g = GrafoListaAdj(graph.orientado)
+    new_g.DefinirN(graph.n)
+
+    # Iterate unique edges in the original graph and remap to new labels
+    for u, v in graph.E():
+        # `graph.E()` yields (u, v) with `u < v` for undirected graphs, avoiding duplicates
+        new_u = F_labels[u]
+        new_v = F_labels[v]
+        new_g.AdicionarAresta(new_u, new_v)
+
+    return new_g

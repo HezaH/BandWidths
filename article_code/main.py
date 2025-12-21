@@ -46,8 +46,7 @@ for loop in range(1,2):
             
             #parametros
             max_iter = 100
-            # centralities = {0:"eigenvector", 1:"degree", 2:"closeness"}
-            # centralities = {0:"eigenvector", 1:"degree"}
+
             centralities = {
                     #Standard centrality measures
                     "Degree": {"func": nx.degree_centrality, "args": {}, "reverse": False},
@@ -62,11 +61,15 @@ for loop in range(1,2):
                     # "Current-flow Betweenness": {"func": nx.current_flow_betweenness_centrality, "args": {}},
                     # "Approx Current-flow Betweenness": { "func": nx.approximate_current_flow_betweenness_centrality, "args": {"epsilon": 0.1, "kmax": 5000, "normalized": True} }
                     }
+            
             todos_movimentos = list(range(len(centralities)))
             centralities_list = list(centralities.keys())
             #instancia os graficos networkx
             G = nx.Graph()
             G.add_edges_from(edges)
+
+            temp_bandwidth = set_bandwidth(G)
+            print("Bandwidth original: ", temp_bandwidth)
 
             #instancia os graficos own-lib
             grafo_adj = GrafoListaAdj()
@@ -122,21 +125,19 @@ for loop in range(1,2):
 
                 print(f">> Episode {i+1} Gap: {gap} Reward: {reward} Score: {score} Centrality: {centrality} Bandwidth: {bandwidth}")
                 state = new_state
+
+                if temp_bandwidth > bandwidth:
+                    temp_bandwidth = bandwidth
+                    grafo_adj = info["graph"]
+                    # print(f"*** New best bandwidth found: {temp_bandwidth} at iteration {i+1} using {centrality} centrality ***")
+
             
             torch.save(agent.Q.state_dict(), 'trained_model_{}.pth')
 
+            # todos_movimentos = list(range(len(centralities)))
 
-            band = set_bandwidth(G)
-            band_after = reverse_cuthill(G, biggest_eigenvector)
-            print("##### Biggest Eigenvector ########")
-            print("Banda original: ", band)
-            print("Banda Final: ", band_after)
-
-            centralities = {0:"eigenvector", 1:"degree"}
-            todos_movimentos = list(range(len(centralities)))
-
-            custo_s = centrality_heuristic(graph=grafo_adj, centrality_values=centralities_maps[centralities[0]], cent_str=centralities[0], alpha=0.3, iter_max=50)
-            print("Banda Final multicetrality: ", custo_s)
+            # custo_s = centrality_heuristic(graph=grafo_adj, centrality_values=centralities_maps[centralities[0]], cent_str=centralities[0], alpha=0.3, iter_max=50, centralities=centralities)
+            # print("Banda Final multicetrality: ", custo_s)
 
 nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance("./newdata/structural/bcsstk05/bcsstk05.mtx")
 
@@ -145,8 +146,6 @@ G = nx.Graph()
 G.add_edges_from(edges)
 
 original_bandwidth = set_bandwidth(G)
-
-
 
 nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance("./newdata/structural/bcsstk02/bcsstk02.mtx")
 
