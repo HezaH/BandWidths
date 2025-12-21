@@ -22,15 +22,10 @@ from modules.centralities.heuristics import *
 from modules.components import constructive
 
 def get_centrality_node(graph: nx.Graph, 
-                        centrality: str, 
-                        dict_centralities: dict = {
-                            "eigenvector": nx.eigenvector_centrality_numpy, 
-                            "degree": nx.degree_centrality, 
-                            "closeness": nx.closeness_centrality }
+                        centrality: dict,
                             ) -> dict:
 
-    
-    resp_centrality = dict_centralities[centrality](graph)
+    resp_centrality = centrality["func"](graph, **centrality["args"])
     
     nodes_centrality = {}
     for node, cent_value in resp_centrality.items():
@@ -38,13 +33,13 @@ def get_centrality_node(graph: nx.Graph,
 
     return nodes_centrality
 
-def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:str,  alpha:float,  iter_max:int )->int:
+def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:str,  alpha:float,  iter_max:int, centralities:dict )->int:
 
     bandwidth = float("inf")
     solution = None
 
     for _ in range(iter_max):
-        solution = constructive.init_Solution_Centrality_lcr(graph=graph, nodes_centrality=centrality_values, random_centrality=cent_str, alpha=alpha)
+        solution = constructive.init_Solution_Centrality_lcr(graph=graph, nodes_centrality=centrality_values, random_centrality=cent_str, alpha=alpha, centralities=centralities)
         band_solution= Bf_graph(graph=graph,F_labels=solution) 
 
         if bandwidth > band_solution:

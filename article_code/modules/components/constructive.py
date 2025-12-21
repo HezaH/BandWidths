@@ -8,19 +8,20 @@ import networkx as nx
 from modules.utils import handle_labels
 from modules.graph.Grafo import Grafo, GrafoListaAdj
 
-def get_LCR(queue:list, chosen_centrality:list, random_centrality:str, alpha:float):
-    
-    reverse_centralities = {"eigenvector": True, "degree": False, "closeness": False }
+def get_LCR(queue:list, chosen_centrality:dict, random_centrality:str, alpha:float, centralities:dict):
+    reverse_flag = centralities[random_centrality]["reverse"]
 
-    vertices_ordenados = sorted(queue, key=lambda x: chosen_centrality[x], reverse=reverse_centralities[random_centrality])
+    vertices_ordenados = sorted(
+        queue,
+        key=lambda x: chosen_centrality[x],
+        reverse=reverse_flag
+    )
     qtd_elem = int(len(vertices_ordenados) * alpha)
     LCR = vertices_ordenados[:qtd_elem]
     LCR_comp = vertices_ordenados[qtd_elem:]
     random.shuffle(LCR)
     random.shuffle(LCR_comp)
-    vertices_orden_rotulagem = LCR + LCR_comp
-
-    return vertices_orden_rotulagem
+    return LCR + LCR_comp
 
 def init_Solution(graph: GrafoListaAdj)->dict:
     ''''FUNCIONANDO PROFUNDAMENTE'''
@@ -192,7 +193,7 @@ def init_Solution_Centrality_otm(graph: GrafoListaAdj, nodes_centrality:dict)->d
         
     return f
 
-def init_Solution_Centrality_lcr(graph: GrafoListaAdj,  nodes_centrality:dict, random_centrality:str, alpha=float)->dict:
+def init_Solution_Centrality_lcr(graph: GrafoListaAdj,  nodes_centrality:dict, random_centrality:str, alpha:float, centralities:dict)->dict:
     
     # calculando a centralidade de cada vertice
 
@@ -238,7 +239,7 @@ def init_Solution_Centrality_lcr(graph: GrafoListaAdj,  nodes_centrality:dict, r
                     mark[vert] = True
         
 
-        array_LCR = get_LCR(queue=queue, chosen_centrality=nodes_centrality, random_centrality=random_centrality, alpha=alpha)
+        array_LCR = get_LCR(queue=queue, chosen_centrality=nodes_centrality, random_centrality=random_centrality, alpha=alpha, centralities=centralities)
         
         h = 0
         for j1 in range(ql):

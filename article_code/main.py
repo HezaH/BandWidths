@@ -47,9 +47,23 @@ for loop in range(1,2):
             #parametros
             max_iter = 100
             # centralities = {0:"eigenvector", 1:"degree", 2:"closeness"}
-            centralities = {0:"eigenvector", 1:"degree"}
+            # centralities = {0:"eigenvector", 1:"degree"}
+            centralities = {
+                    #Standard centrality measures
+                    "Degree": {"func": nx.degree_centrality, "args": {}, "reverse": False},
+                    "Closeness": {"func": nx.closeness_centrality, "args": {}, "reverse": False},
+                    "Betweenness": {"func": nx.betweenness_centrality, "args": {}, "reverse": False},
+                    "Eigenvector": {"func": nx.eigenvector_centrality, "args": {"max_iter": 1000, 'tol': 1e-06}, "reverse": True},
+                    
+                    # Additional centrality measures
+                    "Katz Centrality": {"func": nx.katz_centrality, "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 1000, "tol": 1e-06}, "reverse": True},
+                    "PageRank": {"func": nx.pagerank, "args": {"alpha": 0.85}, "reverse": True},
+                    "Harmonic Centrality": {"func": nx.harmonic_centrality, "args": {}, "reverse": False},
+                    # "Current-flow Betweenness": {"func": nx.current_flow_betweenness_centrality, "args": {}},
+                    # "Approx Current-flow Betweenness": { "func": nx.approximate_current_flow_betweenness_centrality, "args": {"epsilon": 0.1, "kmax": 5000, "normalized": True} }
+                    }
             todos_movimentos = list(range(len(centralities)))
-
+            centralities_list = list(centralities.keys())
             #instancia os graficos networkx
             G = nx.Graph()
             G.add_edges_from(edges)
@@ -62,8 +76,9 @@ for loop in range(1,2):
 
             #dict of centralities values for each centrality
             centralities_maps={}
-            for centrality in centralities.values():
-                centralities_maps[centrality] = get_centrality_node(G,  centrality)
+            for centrality_key, centrality in centralities.items():
+                print("Calculating centrality: ", centrality_key)
+                centralities_maps[centrality_key] = get_centrality_node(G,  centrality)
             
             #Agent to learning and trainning
             agent = Agent(learning_rate=0.001,
@@ -88,11 +103,11 @@ for loop in range(1,2):
                 t = i+2
                 #Escolha da centralidade e da lista
                 action = agent.choose_action(state)
-                centrality = centralities[action]
+                centrality = centralities_list[action]
 
                 centrality_dict_values = centralities_maps[centrality]
                 
-                info = env.step(graph=grafo_adj, centrality_values=centrality_dict_values, cent_str=centrality)
+                info = env.step(graph=grafo_adj, centrality_values=centrality_dict_values, cent_str=centrality, centralities=centralities)
                 new_state = [info["n_steps"], info["gap"], info["reward"], info["bandwidth"]]
 
                 reward = info["reward"]

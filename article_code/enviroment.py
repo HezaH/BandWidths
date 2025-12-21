@@ -15,11 +15,11 @@ class Env:
     def reset(self):
         pass
 
-    def step(self, graph, centrality_values, cent_str):
+    def step(self, graph, centrality_values, cent_str, centralities):
         melhor_custo = float('inf')
         k = 0
         for _ in range(5):
-            custo_s = centrality_heuristic(graph=graph, centrality_values=centrality_values, cent_str=cent_str, alpha=0.3, iter_max=3)
+            custo_s = centrality_heuristic(graph=graph, centrality_values=centrality_values, cent_str=cent_str, alpha=0.3, iter_max=3, centralities=centralities)
             if custo_s < melhor_custo:
                 melhor_custo = custo_s
                 k = 0
