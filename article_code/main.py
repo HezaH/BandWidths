@@ -27,7 +27,7 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
     plt.savefig(file_name)   # salva em arquivo
     plt.close()              # fecha a figura para não abrir
 
-dir_list = ["computational_fluid_dynamics", "electromagnetics", "optimization", "structural"]
+dir_list = [ "optimization", "thermal", "structural", "computational_fluid_dynamics", "electromagnetics", ]
 for loop in range(1,2):
 
     filename = './result_output_cuthill_autovetor_maior.csv'
@@ -47,8 +47,16 @@ for loop in range(1,2):
         list_path = readFilesInDict(path, ".mtx")
 
         for instancia in list_path:
+            instance_path = os.path.basename(instancia).replace(".mtx", "")
+            path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}")
+            # criar o diretório se não existir
+            os.makedirs(path_name, exist_ok=True)
+            torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}", f'trained_model_{instance_path}.pth')
             
-            
+            if os.path.exists(torch_save_path):
+                print(f"Modelo já treinado para a instância {instance_path}, pulando...")
+                continue
+
             print( "####### instancia", instancia )
             nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance(instancia)
             
@@ -138,13 +146,9 @@ for loop in range(1,2):
                 state = new_state
 
                 if temp_bandwidth > bandwidth:
-                    instance_path = os.path.basename(instancia).replace(".mtx", "")
-                    path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}")
                     name_matrix = f"bandwidth_{bandwidth}_{centrality}"
                     file_name = os.path.basename(instancia).replace(".mtx", f"_{name_matrix}.png")
-                    # criar o diretório se não existir
-                    os.makedirs(path_name, exist_ok=True)
-
+                    
                     # salvar a melhor solução
                     temp_bandwidth = bandwidth
                     grafo = grafo_solution
@@ -154,13 +158,13 @@ for loop in range(1,2):
                     plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
 
             
-            torch.save(agent.Q.state_dict(), 'trained_model_{}.pth')
+            torch.save(agent.Q.state_dict(), torch_save_path )
 
             # todos_movimentos = list(range(len(centralities)))
 
             # custo_s = centrality_heuristic(graph=grafo_adj, centrality_values=centralities_maps[centralities[0]], cent_str=centralities[0], alpha=0.3, iter_max=50, centralities=centralities)
             # print("Banda Final multicetrality: ", custo_s)
-
+print(1)
 # nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance("./newdata/structural/bcsstk05/bcsstk05.mtx")
 
 # # Exemplo de criação de um grafo
