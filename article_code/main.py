@@ -19,6 +19,13 @@ from modules.VNS import init_solution
 from modules.utils.handle_labels import Bf_graph, set_bandwidth
 import sys
 
+# Função para plotar uma matriz esparsa
+def plot_sparse_matrix(matrix, title, file_name="saida.png"):
+    plt.figure(figsize=(8, 8))
+    plt.spy(matrix, markersize=1)
+    plt.title(title)
+    plt.savefig(file_name)   # salva em arquivo
+    plt.close()              # fecha a figura para não abrir
 
 dir_list = ["computational_fluid_dynamics", "electromagnetics", "optimization", "structural"]
 for loop in range(1,2):
@@ -40,7 +47,8 @@ for loop in range(1,2):
         list_path = readFilesInDict(path, ".mtx")
 
         for instancia in list_path:
-
+            
+            
             print( "####### instancia", instancia )
             nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance(instancia)
             
@@ -58,8 +66,8 @@ for loop in range(1,2):
                     "Katz Centrality": {"func": nx.katz_centrality, "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 1000, "tol": 1e-06}, "reverse": True},
                     "PageRank": {"func": nx.pagerank, "args": {"alpha": 0.85}, "reverse": True},
                     "Harmonic Centrality": {"func": nx.harmonic_centrality, "args": {}, "reverse": False},
-                    # "Current-flow Betweenness": {"func": nx.current_flow_betweenness_centrality, "args": {}},
-                    # "Approx Current-flow Betweenness": { "func": nx.approximate_current_flow_betweenness_centrality, "args": {"epsilon": 0.1, "kmax": 5000, "normalized": True} }
+                    "Current-flow Betweenness": {"func": nx.current_flow_betweenness_centrality, "args": {}},
+                    "Approx Current-flow Betweenness": { "func": nx.approximate_current_flow_betweenness_centrality, "args": {"epsilon": 0.1, "kmax": 5000, "normalized": True} }
                     }
             
             todos_movimentos = list(range(len(centralities)))
@@ -111,12 +119,15 @@ for loop in range(1,2):
                 centrality_dict_values = centralities_maps[centrality]
                 
                 info = env.step(graph=grafo_adj, centrality_values=centrality_dict_values, cent_str=centrality, centralities=centralities)
-                new_state = [info["n_steps"], info["gap"], info["reward"], info["bandwidth"]]
-
+                n_step = info["n_steps"]
+                grafo = info["graph"]
+                solution = info["solution"]
                 reward = info["reward"]
                 gap = info["gap"]
                 bandwidth = info["bandwidth"]
-
+                
+                new_state = [n_step, gap, reward, bandwidth]
+                
                 #Treinamento do novo estado
                 agent.learn(state, action, reward, new_state)
 
@@ -127,9 +138,16 @@ for loop in range(1,2):
                 state = new_state
 
                 if temp_bandwidth > bandwidth:
+                    instance_path = os.path.basename(instancia).replace(".mtx", "")
+                    path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}")
+                    os.makedirs(path_name, exist_ok=True)
+                    name_matrix = f"bandwidth_{bandwidth}_{centrality}"
+                    file_name = os.path.basename(instancia).replace(".mtx", f"_{name_matrix}.png")
                     temp_bandwidth = bandwidth
-                    grafo_adj = info["graph"]
-                    # print(f"*** New best bandwidth found: {temp_bandwidth} at iteration {i+1} using {centrality} centrality ***")
+
+                    G_reordered = nx.relabel_nodes(G, solution)
+                    adj_matrix_reordered = nx.to_numpy_array(G_reordered) 
+                    plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
 
             
             torch.save(agent.Q.state_dict(), 'trained_model_{}.pth')
@@ -193,16 +211,6 @@ solution = constructive.init_Solution_Centrality_lcr(graph=grafo_adj, nodes_cent
 
 G_reordered = nx.relabel_nodes(G, solution)
 
-adj_matrix_reordered = nx.to_scipy_sparse_matrix(G_reordered, format='csr')
-
-# Função para plotar uma matriz esparsa
-def plot_sparse_matrix(matrix, title):
-    plt.figure(figsize=(8, 8))
-    plt.spy(matrix, markersize=1)
-    plt.title(title)
-    plt.show()
-
-plot_sparse_matrix(adj_matrix_reordered, "matrix")
 
 main_path = "/Users/jvmaues/Documents/OTIMIZACAO/TCC-OFICIAL/CODIGOS/REFAZENDO/data"
     
