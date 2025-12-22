@@ -228,13 +228,18 @@ def init_Solution_Centrality_lcr(graph: GrafoListaAdj,  nodes_centrality:dict, r
     for i in range(len(list(graph.V()))+1): #popula a lista mark de False
         mark.append(False)
     
-    # Calcular as probabilidades de cada vértice
-    sum_values = sum(nodes_centrality.values())
-    probs = [valor/sum_values for valor in nodes_centrality.values()]
+    # Escolher vértice inicial baseado em centralidade
 
-    # Sortear um item baseado nas probabilidades
-    k = random.choices(list(nodes_centrality.keys()), probs)[0] 
-    
+    # Calcular as probabilidades de cada vértice
+    #! old
+    # sum_values = sum(nodes_centrality.values())
+    # probs = [valor/sum_values for valor in nodes_centrality.values()]
+
+    # # # Sortear um item baseado nas probabilidades
+    # k = random.choices(list(nodes_centrality.keys()), probs)[0] 
+    # Opção: vértice com maior centralidade
+    k = max(nodes_centrality.keys(), key=lambda v: nodes_centrality[v])
+
     mark[k] = True #visita o vertice assinado nno v_zero
     
     queue.append(k)

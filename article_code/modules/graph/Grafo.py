@@ -148,6 +148,3 @@ class GrafoListaAdj(Grafo):
 			if Tipo == "*" or w.Tipo == Tipo:
 				yield w if IterarSobreNo else w.Viz
 			w = w.Prox
-	
-
-
