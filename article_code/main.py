@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 from modules.VNS import init_solution
 from modules.utils.handle_labels import Bf_graph, set_bandwidth
 import sys
+import json
 
 # Função para plotar uma matriz esparsa
 def plot_sparse_matrix(matrix, title, file_name="saida.png"):
@@ -28,6 +29,7 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
     plt.close()              # fecha a figura para não abrir
 
 dir_list = [ "optimization", "thermal", "structural", "computational_fluid_dynamics", "electromagnetics", ]
+
 for loop in range(1,2):
 
     filename = './result_output_cuthill_autovetor_maior.csv'
@@ -40,18 +42,23 @@ for loop in range(1,2):
     list_band = []
     list_time = []
 
+    global_iteration = []
+    base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
+    json_global = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
+    
     for kind in dir_list:
-        # main_path = f'./data/newdata/{kind}'
-        base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
         path = os.path.join(base_dir, "data", "newdata", kind)
         list_path = readFilesInDict(path, ".mtx")
 
         for instancia in list_path:
+            results = {}
+
             instance_path = os.path.basename(instancia).replace(".mtx", "")
             path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}")
             # criar o diretório se não existir
             os.makedirs(path_name, exist_ok=True)
-            torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}", f'trained_model_{instance_path}.pth')
+            torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
+            json_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'analysis_inputs_{instance_path}.json')
             
             if os.path.exists(torch_save_path):
                 print(f"Modelo já treinado para a instância {instance_path}, pulando...")
@@ -78,6 +85,19 @@ for loop in range(1,2):
                     # "Approx Current-flow Betweenness": { "func": nx.approximate_current_flow_betweenness_centrality, "args": {"epsilon": 0.1, "kmax": 5000, "normalized": True}, "reverse": True}
                     }
             
+            dict_connectivity = {
+                #Standard connectivity measures
+                "Node Connectivity": nx.node_connectivity,
+                "Edge Connectivity": nx.edge_connectivity,
+                "Algebraic Connectivity": nx.algebraic_connectivity,
+
+                # Additional connectivity measures
+                # "Average Node Connectivity": nx.average_node_connectivity, # média do número de caminhos independentes entre todos os pares de nós
+                "Graph Density": nx.density,  # razão entre arestas existentes e possíveis
+                "Average Shortest Path Length": nx.average_shortest_path_length,  # eficiência global
+                # "Global Clustering Coefficient": nx.transitivity,  # tendência de formar triângulos
+            }
+            
             todos_movimentos = list(range(len(centralities)))
             centralities_list = list(centralities.keys())
             #instancia os graficos networkx
@@ -86,6 +106,33 @@ for loop in range(1,2):
 
             temp_bandwidth = set_bandwidth(G)
             print("Bandwidth original: ", temp_bandwidth)
+            
+            # Number of connected components
+            num_components = nx.number_connected_components(G)
+            
+            # Largest connected component
+            components = list(nx.connected_components(G))
+            largest_component = max(components, key=len)
+            largest_size = len(largest_component)
+            
+            # Subgraph induced by the largest component
+            largest_subgraph = G.subgraph(largest_component)
+            
+            # Diameter of the largest component
+            diameter = nx.diameter(largest_subgraph)
+
+
+            print(f"Number of connected components: {num_components}")
+            print(f"Size of the largest connected component: {largest_size}")
+            print(f"Diameter of the largest connected component: {diameter}")
+            
+            for name, func in dict_connectivity.items():
+                try:
+                    result = func(G)
+                    print(f"{name}: {result}")
+                    results[name] = result
+                except Exception as e:
+                    print(f"Could not compute {func.__name__}: {e}")
 
             #instancia os graficos own-lib
             grafo = GrafoListaAdj()
@@ -117,6 +164,9 @@ for loop in range(1,2):
             score = 0
             t=0
 
+            local_iteration = []
+            start_time = time.time()
+
             for i in range(max_iter):
                 env.reset()
                 t = i+2
@@ -133,6 +183,7 @@ for loop in range(1,2):
                 reward = info["reward"]
                 gap = info["gap"]
                 bandwidth = info["bandwidth"]
+                local_iteration.extend(info["iterations"])
                 
                 new_state = [n_step, gap, reward, bandwidth]
                 
@@ -157,161 +208,32 @@ for loop in range(1,2):
                     adj_matrix_reordered = nx.to_numpy_array(G_reordered) 
                     plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
 
-            
-            torch.save(agent.Q.state_dict(), torch_save_path )
+            df_iteration = pd.DataFrame(local_iteration)
+            df_iteration["Instance"] = instance_path
+            df_iteration["Edges"] = nedges
+            df_iteration["Nodes"] = nnodes
+            df_iteration["NumOfComp"] = num_components
+            df_iteration["LargestCompSize"] = largest_size
+            df_iteration["Diameter"] = diameter
+            df_iteration["Node Connectivity"] = results.get("Node Connectivity", None)
+            df_iteration["Edge Connectivity"] = results.get("Edge Connectivity", None)
+            df_iteration["Algebraic Connectivity"] = results.get("Algebraic Connectivity", None)
+            # df_iteration["Average Node Connectivity"] = results.get("Average Node Connectivity", None)
+            df_iteration["Graph Density"] = results.get("Graph Density", None)
+            df_iteration["Average Shortest Path Length"] = results.get("Average Shortest Path Length", None)
 
+            df_iteration_dict = df_iteration.to_dict(orient='records')
+
+            with open(json_save_path, 'w') as f:
+                json.dump(df_iteration_dict, f, indent=4)
+              
+            torch.save(agent.Q.state_dict(), torch_save_path)
+
+            global_iteration.extend(df_iteration_dict)
             # todos_movimentos = list(range(len(centralities)))
 
             # custo_s = centrality_heuristic(graph=grafo_adj, centrality_values=centralities_maps[centralities[0]], cent_str=centralities[0], alpha=0.3, iter_max=50, centralities=centralities)
             # print("Banda Final multicetrality: ", custo_s)
-print(1)
-# nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance("./newdata/structural/bcsstk05/bcsstk05.mtx")
-
-# # Exemplo de criação de um grafo
-# G = nx.Graph()
-# G.add_edges_from(edges)
-
-# original_bandwidth = set_bandwidth(G)
-
-# nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance("./newdata/structural/bcsstk02/bcsstk02.mtx")
-
-# # Exemplo de criação de um grafo
-# G = nx.Graph()
-# G.add_edges_from(edges)
-
-# # Aplicar o algoritmo Cuthill-McKee reverso
-# rcm_order = list(nx.utils.reverse_cuthill_mckee_ordering(G))
-
-# # Criar um novo grafo com a ordem dos nós reordenada
-# G_reordered = nx.relabel_nodes(G, {old_label: new_label for new_label, old_label in enumerate(rcm_order)})
-
-# # Exibir o grafo original e o grafo reordenado
-# print("Grafo original:")
-# print(G.edges())
-
-# print("\nOrdem dos nós pelo algoritmo Cuthill-McKee reverso:")
-# print(rcm_order)
-
-# print("\nGrafo reordenado:")
-# print(G_reordered.edges())
-
-# # Calcular a largura de banda dos grafos
-# original_bandwidth = set_bandwidth(G)
-# reordered_bandwidth = set_bandwidth(G_reordered)
-
-# print(f"\nLargura de banda original: {original_bandwidth}")
-# print(f"Largura de banda reordenada: {reordered_bandwidth}")
-
-
-# #instancia os graficos 
-# grafo_adj = GrafoListaAdj()
-# grafo_adj.DefinirN(nnodes,VizinhancaDuplamenteLigada=True)
-# for (u, v) in edges:
-#     grafo_adj.AdicionarAresta(u, v)
-
-# #dict of centralities values for each centrality
-# centralities_maps={}
-# for centrality in centralities.values():
-#     centralities_maps[centrality] = get_centrality_node(G,  centrality)
-
-# solution = constructive.init_Solution_Centrality_lcr(graph=grafo_adj, nodes_centrality=centralities_maps["degree"], random_centrality="degree", alpha=0.45)
-
-
-# G_reordered = nx.relabel_nodes(G, solution)
-
-
-# main_path = "/Users/jvmaues/Documents/OTIMIZACAO/TCC-OFICIAL/CODIGOS/REFAZENDO/data"
-    
-# list_path = readFilesInDict(main_path, ".mtx")
-
-# total = len(list_path)
-# instance_n = 1
-
-
-# for loop in range(1,2):
-
-#     filename = './result_output_cuthill_autovetor_maior.csv'
-
-#     # fieldnames = ['instance', f'band{loop}', f'time{loop}']
-
-#     if loop == 1:
-#         df = pd.DataFrame()
-#     else:
-#         df = pd.read_csv(filename)
-    
-#     list_instance = []
-#     list_band = []
-#     list_time = []
-
-        
-#     for instance_path in list_path:
-
-#         instance_name = instance_path.replace(main_path, "").replace("/", "").replace(".mtx", "")
-
-#         print("#######", instance_name ,"# instance: ", instance_n, " of ", total,"\n", end='\r')
-#         instance_n = instance_n + 1 
-        
-#         nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance(instance_path)
-
-#         #instancia os graficos
-#         grafo_adj = GrafoListaAdj()
-#         grafo_adj.DefinirN(nnodes,VizinhancaDuplamenteLigada=True)
-#         for (u, v) in edges:
-#             grafo_adj.AdicionarAresta(u, v)
-
-#         try:
-#             band = float("inf")
-#             solution = None
-            
-#             init = time.time()
-#             G = nx.Graph()
-#             G.add_edges_from(edges)
-#             labels_before = {node: node for node in G.nodes}
-
-#             resp_centrality_eigenvector = nx.eigenvector_centrality_numpy(G)
-#             nodes_centrality_eigenvector = {}
-#             for node, centrality in resp_centrality_eigenvector.items():
-#                 nodes_centrality_eigenvector[node] = centrality
-
-#             resp_centrality_degree = nx.degree_centrality(G)
-#             nodes_centrality_degree = {}
-#             for node, centrality in resp_centrality_degree.items():
-#                 nodes_centrality_degree[node] = centrality
-
-#             rcm = nx.utils.cuthill_mckee_ordering(G, heuristic=biggest_eigenvector)
-#             labels_after = {i+1: labels_before[node] for i, node in enumerate(rcm)}
-#             for i in range(300):  
-#                 # heuristics = [ (nx.degree_centrality, False), (nx.eigenvector_centrality_numpy, False)]
-#                 # random_centrality = random.choice(heuristics)
-#                 solution = init_solution.initialSolution(graph=grafo_adj)
-#                 # solution = init_solution.initialSolutionMultiNivel(graph=grafo_adj,nodes_centrality_eigenvector=nodes_centrality_degree )
-#             band_solution= Bf_graph(grafo_adj, labels_after)
-
-#             if band > band_solution:
-#                 solution = solution 
-#                 band = band_solution
-
-#             final = time.time()
-#             delta = final - init
-
-#             print("BF final: ", band)
-
-#         except:
-#             delta = "error"
-#             band = "error"
-
-#         finally:
-#             list_instance.append(instance_name)
-#             list_time.append(delta)
-#             list_band.append(band)
-            
-#     if loop == 1:
-#         df['instance'] = list_instance
-#         df['band0'] = list_band
-#         df['time0'] = list_time
-
-#     else:
-#         df[f'band{loop}'] = list_band
-#         df[f'time{loop}'] = list_time
-    
-#     df.to_csv(filename, index=False)
+    df_global = pd.DataFrame(global_iteration)
+    df_global.to_csv(filename, index=False)
+    print(1)

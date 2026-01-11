@@ -39,15 +39,21 @@ def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:s
     solution = None
     best_solution = None
     graph_rebuilt = None
+    it = []
     for _ in range(iter_max):
         solution = constructive.init_Solution_Centrality_lcr(graph=graph, nodes_centrality=centrality_values, random_centrality=cent_str, alpha=alpha, centralities=centralities)
         
-        band_solution= Bf_graph(graph=graph, F_labels=solution) 
+        band_solution = Bf_graph(graph=graph, F_labels=solution) 
+
+        it.append({
+            "bandwidth": band_solution,
+            "centrality": cent_str
+        })
 
         if bandwidth > band_solution:
             best_solution = solution 
             bandwidth = band_solution
             graph_rebuilt = reconstruct_graph_by_labels(graph, best_solution)
 
-    return bandwidth, graph_rebuilt, best_solution
+    return bandwidth, graph_rebuilt, best_solution, it
 
