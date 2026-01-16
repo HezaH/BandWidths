@@ -7,6 +7,7 @@ import json
 import matplotlib.pyplot as plt
 import plotly.express as px
 import seaborn as sns
+import imgkit
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
@@ -83,6 +84,7 @@ for instance in list_of_instances:
 
         fig.update_layout(legend_title_text="Centralidade")
         fig.write_html(html_path, include_plotlyjs="cdn")
+        # fig.write_image(html_path.replace('.html', '.jpeg'), format="jpeg")
 
     # Definig frequency of centrality usage
     freq_df = df_instance["centrality"].value_counts().reset_index()
@@ -139,7 +141,6 @@ for y in list_of_columns[3::]:
         plt.xlabel(f'{x}')
         plt.ylabel(y)
         plt.legend()  # mostra a legenda com a média
-        plt.show()
         plt.savefig(fig_path)
 
     bins = pd.qcut(best_adap[y], q=5, duplicates='drop')
@@ -188,5 +189,6 @@ for centrality in list_of_centralities:
             fig.update_traces(textposition="outside")
             fig.update_layout(uniformtext_minsize=8, uniformtext_mode="hide")
             fig.write_html(fig_beans, include_plotlyjs="cdn")
+            # fig.write_image(fig_beans.replace('.html', '.jpeg'), format="jpeg", scale=2)
 
 a = 0
