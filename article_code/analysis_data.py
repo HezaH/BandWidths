@@ -6,6 +6,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 import plotly.express as px
+import seaborn as sns
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
@@ -17,9 +18,8 @@ with open(json_path, "r", encoding="utf-8") as f:
 # 2. Converter para DataFrame 
 df = pd.DataFrame(data)
 
-list_of_columns = ['bandwidth', 'centrality', 'Instance', 'Edges', 'Nodes', 'LargestCompSize', 'Diameter', 'Node Connectivity', 'Edge Connectivity', 'Algebraic Connectivity', 'Graph Density', 'Average Shortest Path Length'] #df.columns.tolist()
+list_of_columns = ['bandwidth', 'centrality', 'Instance', 'Edges', 'Nodes', 'Diameter', 'Node Connectivity', 'Edge Connectivity', 'Algebraic Connectivity', 'Graph Density', 'Average Shortest Path Length'] #df.columns.tolist()
 list_of_instances = df['Instance'].drop_duplicates().to_list()
-
 
 legend_labels = { 'DEG': 'DEG: Degree', 'CLO': 'CLO: Closeness', 'BTW': 'BTW: Betweenness', 'EIG': 'EIG: Eigenvector', 'KAT': 'KAT: Katz Centrality', 'PRK': 'PRK: PageRank', 'HAR': 'HAR: Harmonic Centrality' }
 order = ['Degree', 'Closeness', 'Betweenness', 'Eigenvector', 'Katz Centrality', 'PageRank', 'Harmonic Centrality']
@@ -111,12 +111,82 @@ for instance in list_of_instances:
     # Setting better solutions of each instance
     df_instance = df_instance.drop_duplicates().reset_index(drop=True)
     better_bandwidth = df_instance[df_instance['bandwidth'] == df_instance['bandwidth'].min()]
-    # if len((better_bandwidth)) > 1:
-    #     better_bandwidth = better_bandwidth.iloc[[0]]
+
     best_solutions = pd.concat([best_solutions, better_bandwidth], ignore_index=True)
 
 best_solutions = best_solutions.reset_index(drop=True)
+best_solutions["ReasonEdgeNodes"] = best_solutions["Edges"] / best_solutions["Nodes"]
 best_adap = best_solutions.drop_duplicates(subset=["Instance"], keep="first").reset_index(drop=True)
 df_repeated = best_solutions[best_solutions.duplicated(subset=["Instance"], keep=False)]
 
+x = 'Instance'
+for y in list_of_columns[3::]:
 
+    fig_path = os.path.join(plt_path, f"instace_{y}.jpeg")
+    
+    if not os.path.exists(fig_path):
+        plt.figure(figsize=(10,6))
+        sns.scatterplot(x=x, y=y, data=best_adap)
+
+        # Calcula a média da coluna Graph Density
+        avr = best_adap[y].mean()
+
+        # Adiciona a linha horizontal em vermelho
+        plt.axhline(y=avr, color='red', linestyle='--', label=f'Average = {avr:.2f}')
+
+        plt.xticks(rotation=45)
+        plt.title(f'{y} by {x}')
+        plt.xlabel(f'{x}')
+        plt.ylabel(y)
+        plt.legend()  # mostra a legenda com a média
+        plt.show()
+        plt.savefig(fig_path)
+
+    bins = pd.qcut(best_adap[y], q=5, duplicates='drop')
+    best_adap[f'{y}_bins'] = bins
+
+# Colunas prioritárias
+first_cols = ['bandwidth', 'centrality', 'Instance']
+
+# Demais colunas em ordem alfabética
+other_cols = sorted([c for c in best_adap.columns if c not in first_cols])
+
+# Nova ordem de colunas
+new_order = first_cols + other_cols
+
+# Reorganizar DataFrame
+best_adap = best_adap[new_order]
+
+list_of_centralities = list(set(best_adap['centrality'].to_list()))
+
+for centrality in list_of_centralities:
+    subset = best_adap[best_adap['centrality'] == centrality].reset_index(drop=True)
+    for y in list_of_columns[3:]:
+        fig_beans = os.path.join(plt_path, f"beans_{centrality}_{y}.html")
+        # todas as categorias possíveis do qcut (mantém ordem crescente)
+        all_bins = best_adap[f'{y}_bins'].cat.categories
+
+        # contar frequência no subset
+        freq = subset[f'{y}_bins'].value_counts(sort=False)
+
+        # reindexar para incluir bins vazios e manter ordem
+        freq = freq.reindex(all_bins, fill_value=0).reset_index()
+        freq.columns = ['Bin', 'Count']
+
+        # converter os bins para string só na hora de plotar
+        freq['Bin'] = freq['Bin'].astype(str)
+
+        if not os.path.exists(fig_beans):
+            fig = px.bar(
+                freq,
+                x="Bin",
+                y="Count",
+                text="Count",
+                labels={"Bin": "Intervalo (qcut)", "Count": "Frequência"},
+                title=f"Distribuição de {y} em {len(all_bins)} grupos, pela centralidade {centrality}"
+            )
+            fig.update_traces(textposition="outside")
+            fig.update_layout(uniformtext_minsize=8, uniformtext_mode="hide")
+            fig.write_html(fig_beans, include_plotlyjs="cdn")
+
+a = 0
