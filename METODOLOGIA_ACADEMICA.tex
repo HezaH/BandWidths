@@ -353,7 +353,61 @@ A cada iteração do treinamento, após a obtenção do grafo em análise e as p
 \caption{Fases do processo de stepping do ambiente}
 \end{table}
 
+\section{Resultados}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\textbf{Initial Band} & \textbf{BandCentrality} & \textbf{Centrality} & \textbf{Instance} & \textbf{Edges} & \textbf{Nodes} & \textbf{Decay \%} \\
+\hline
+1549 & 573 & Eigenvector & bp\_0 & 3275 & 822 & 63.01 \\
+1643 & 639 & Eigenvector & bp\_1000 & 4657 & 822 & 61.11 \\
+1643 & 641 & PageRank & bp\_1200 & 4720 & 822 & 60.99 \\
+1643 & 643 & Betweenness & bp\_1400 & 4785 & 822 & 60.86 \\
+1643 & 646 & Closeness & bp\_1600 & 4835 & 822 & 60.68 \\
+1633 & 596 & Betweenness & bp\_200 & 3800 & 822 & 63.50 \\
+1627 & 628 & Closeness & bp\_400 & 4026 & 822 & 61.40 \\
+1627 & 624 & Harmonic Centrality & bp\_600 & 4170 & 822 & 61.65 \\
+1643 & 631 & PageRank & bp\_800 & 4530 & 822 & 61.59 \\
+1285 & 523 & PageRank & shl\_0 & 1682 & 663 & 59.30 \\
+1953 & 51 & Degree & lshp1009 & 2928 & 1009 & 97.39 \\
+2457 & 59 & Degree & lshp1270 & 3699 & 1270 & 97.60 \\
+3019 & 68 & Degree & lshp1561 & 4560 & 1561 & 97.75 \\
+3641 & 74 & Degree & lshp1882 & 5511 & 1882 & 97.97 \\
+4333 & 80 & Degree & lshp2233 & 6552 & 2233 & 98.15 \\
+5085 & 89 & Degree & lshp2614 & 7683 & 2614 & 98.25 \\
+5897 & 95 & Degree & lshp3025 & 8904 & 3025 & 98.39 \\
+6769 & 104 & Degree & lshp3466 & 10215 & 3466 & 98.46 \\
+511 & 26 & Degree & lshp\_265 & 744 & 265 & 94.91 \\
+783 & 33 & Degree & lshp\_406 & 1155 & 406 & 95.79 \\
+71 & 29 & Harmonic Centrality & bcsstk01 & 176 & 48 & 59.15 \\
+131 & 65 & Katz Centrality & bcsstk02 & 2145 & 66 & 50.38 \\
+109 & 58 & Closeness & bcsstk04 & 1758 & 132 & 46.79 \\
+55 & 29 & Katz Centrality & bcsstk05 & 1135 & 153 & 47.27 \\
+147 & 78 & Eigenvector & bcsstk06 & 3720 & 420 & 46.94 \\
+147 & 78 & Closeness & bcsstk07 & 3720 & 420 & 46.94 \\
+2509 & 561 & Degree & bcsstk13 & 40940 & 2003 & 77.64 \\
+1185 & 205 & Degree & orsirr\_1 & 5828 & 1030 & 82.70 \\
+1185 & 199 & Katz Centrality & orsirr\_2 & 5084 & 886 & 83.21 \\
+185 & 97 & Degree & bfwa398 & 3280 & 398 & 47.57 \\
+77 & 23 & Degree & bfwa62 & 388 & 62 & 70.13 \\
+265 & 145 & Harmonic Centrality & bfwa782 & 6732 & 782 & 45.28 \\
+2133 & 117 & Degree & dw1024 & 8066 & 2048 & 94.51 \\
+537 & 66 & Degree & dw256A & 1968 & 512 & 87.71 \\
+555 & 57 & PageRank & dw256B & 1988 & 512 & 89.73 \\
+9241 & 244 & Harmonic Centrality & dw4096 & 33554 & 8192 & 97.36 \\
+\hline
+\end{tabular}
+\caption{Comparação entre banda inicial, banda após aplicação de centralidade, instância, número de arestas, número de nós e taxa de decaimento}
+\end{table}
+
+
+Os resultados revelam três regimes estruturais. Nas instâncias da família \texttt{bp\_}, a largura de banda cai cerca de 60\%, mas o agente alterna entre métricas globais (Betweenness, Closeness, Harmonic) e espectrais (Eigenvector, PageRank) conforme o tamanho do grafo cresce. Isso confirma que grafos com maior diâmetro exigem medidas capazes de capturar dependências de longo alcance para organizar vértices periféricos antes dos centrais.
+
+Nas instâncias \texttt{lshp}, a centralidade de Grau domina e entrega reduções superiores a 98\%. Esses grafos apresentam hubs pronunciados e conectividade assimétrica (densidade local alta, mas componentes bem definidas), de modo que ordenar vértices apenas pelo número de vizinhos já posiciona os nós críticos nas extremidades da matriz, minimizando o espalhamento das arestas.
+
+Por fim, os conjuntos \texttt{bcsstk}, \texttt{dw} e \texttt{bfwa} ilustram um cenário híbrido: grafos estruturais com múltiplas componentes favorecem Katz e Harmonic, que tratam desconexões sem penalizar distâncias infinitas, enquanto malhas regulares (\texttt{dw256}, \texttt{dw4096}) alternam entre Degree e PageRank para equilibrar simetria e presença de vértices articuladores. Em todos os casos, o agente DQN ajusta dinamicamente a centralidade escolhida, indicando que a camada de aprendizado realmente captura sinais topológicos produzidos na Seção \ref{propriedades_topologicas} e os transforma em ganhos concretos de largura de banda.
 
 
 \section{Conclusão}

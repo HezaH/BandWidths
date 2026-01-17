@@ -19,7 +19,7 @@ with open(json_path, "r", encoding="utf-8") as f:
 # 2. Converter para DataFrame 
 df = pd.DataFrame(data)
 
-list_of_columns = ['bandwidth', 'centrality', 'Instance', 'Edges', 'Nodes', 'Diameter', 'Node Connectivity', 'Edge Connectivity', 'Algebraic Connectivity', 'Graph Density', 'Average Shortest Path Length'] #df.columns.tolist()
+list_of_columns = ['Initial Bandwidth','bandwidth', 'centrality', 'Instance', 'Edges', 'Nodes', 'Diameter', 'Node Connectivity', 'Edge Connectivity', 'Algebraic Connectivity', 'Graph Density', 'Average Shortest Path Length'] #df.columns.tolist()
 list_of_instances = df['Instance'].drop_duplicates().to_list()
 
 legend_labels = { 'DEG': 'DEG: Degree', 'CLO': 'CLO: Closeness', 'BTW': 'BTW: Betweenness', 'EIG': 'EIG: Eigenvector', 'KAT': 'KAT: Katz Centrality', 'PRK': 'PRK: PageRank', 'HAR': 'HAR: Harmonic Centrality' }
@@ -94,7 +94,7 @@ for instance in list_of_instances:
     freq_df["centrality"] = pd.Categorical(freq_df["centrality"], categories=order, ordered=True)
     # ordenar pelo nível categórico
     freq_df = freq_df.sort_values("centrality").reset_index(drop=True)
-    for c in list_of_columns[2::]:
+    for c in list_of_columns[3::]:
         freq_df[c] = df_instance[c].iloc[0]
 
     frequences = pd.concat([frequences, freq_df], ignore_index=True)
@@ -119,10 +119,12 @@ for instance in list_of_instances:
 best_solutions = best_solutions.reset_index(drop=True)
 best_solutions["ReasonEdgeNodes"] = best_solutions["Edges"] / best_solutions["Nodes"]
 best_adap = best_solutions.drop_duplicates(subset=["Instance"], keep="first").reset_index(drop=True)
+sol = best_adap[list_of_columns[:6]]
+sol['Decay %'] = round(100* ((best_adap["Initial Bandwidth"] - best_adap["bandwidth"])/best_adap["Initial Bandwidth"]), 2)
 df_repeated = best_solutions[best_solutions.duplicated(subset=["Instance"], keep=False)]
 
 x = 'Instance'
-for y in list_of_columns[3::]:
+for y in list_of_columns[4::]:
 
     fig_path = os.path.join(plt_path, f"instace_{y}.jpeg")
     
@@ -162,7 +164,7 @@ list_of_centralities = list(set(best_adap['centrality'].to_list()))
 
 for centrality in list_of_centralities:
     subset = best_adap[best_adap['centrality'] == centrality].reset_index(drop=True)
-    for y in list_of_columns[3:]:
+    for y in list_of_columns[4:]:
         fig_beans = os.path.join(plt_path, f"beans_{centrality}_{y}.html")
         # todas as categorias possíveis do qcut (mantém ordem crescente)
         all_bins = best_adap[f'{y}_bins'].cat.categories
