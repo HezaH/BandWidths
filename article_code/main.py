@@ -5,19 +5,14 @@ import time
 import pandas as pd
 import networkx as nx
 import torch
-import numpy as np
 from modules.utils.read_filenames import readFilesInDict
 from modules.graph.Grafo import GrafoListaAdj
-from centralities import get_centrality_node, centrality_heuristic
+from centralities import get_centrality_node
 from agent import Agent
 from enviroment import Env
 from modules.utils import read_Instances
-from modules.centralities.heuristics import biggest_eigenvector, reverse_cuthill
-from modules.components import constructive
 import matplotlib.pyplot as plt
-from modules.VNS import init_solution
-from modules.utils.handle_labels import Bf_graph, set_bandwidth
-import sys
+from modules.utils.handle_labels import set_bandwidth
 import json
 
 # Função para plotar uma matriz esparsa
