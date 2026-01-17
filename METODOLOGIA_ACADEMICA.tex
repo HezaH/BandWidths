@@ -134,7 +134,7 @@ A segunda camada é o ambiente de otimização, que implementa as heurísticas d
 
 A terceira camada é a representação do grafo, que fornece a estrutura de dados necessária para armazenar e manipular o grafo em questão. A cada iteração do agente, essa camada atualiza a representação do grafo conforme as soluções geradas pelas heurísticas, garantindo que o ambiente de otimização tenha acesso às informações mais recentes para avaliação e tomada de decisão, bem como memorização das instâncias carregadas em cada tentativa.
 
-\section{Técnica Principal: Aprendizado por Reforço Profundo (DQN)}
+\section{Técnica Principal: Aprendizado por Reforço Profundo (DQN)} \label{dqn_section}
 
 \subsection{Fundamentos Teóricos}
 
@@ -180,7 +180,7 @@ Penalidade Suave & \text{caso contrário (piora ou estagnação)}
 Na qual as recompensa máxima dita a melhorias globais com inovação (descoberta de nova solução ótima), enquanto a recompensa intermediária reconhece avanços incrementais. A penalidade suave desestimula escolhas que não contribuem para o progresso, mas sem eliminar completamente a ação, permitindo que o agente explore alternativas.
 
 
-\section{Heurísticas de Centralidade}
+\section{Heurísticas de Centralidade} \label{heuristicas_centralidade}
 
 \subsection{Conceito de Centralidade em Redes}
 
@@ -192,7 +192,7 @@ Esta suposição baseia-se na observação empírica de que nós centrais freque
 
 Dado uma possibilidade de centralidade utilizada na formulação, a diversidade dessas medidas permite que o agente experimente múltiplas estratégias de ordenação, aprendendo qual é mais eficaz para cada classe de grafo. O sistema utiliza sete medidas complementares de centralidade, cada uma capturando diferentes aspectos da importância estrutural:
 
-\subsubsection{Degree Centrality (Grau)}
+\subsubsection{Degree Centrality (Grau)} \label{Degree}
 
 \begin{equation}
 C_D(v) = \frac{\deg(v)}{n-1}
@@ -200,7 +200,7 @@ C_D(v) = \frac{\deg(v)}{n-1}
 
 Mede o número de conexões diretas. Vértices altamente conectados recebem maior prioridade. É uma medida local que não leva em conta a topologia global.
 
-\subsubsection{Closeness Centrality (Proximidade)}
+\subsubsection{Closeness Centrality (Proximidade)} \label{Closeness}
 
 \begin{equation}
 C_C(v) = \frac{n-1}{\sum_{u \neq v} d(v,u)}
@@ -208,7 +208,7 @@ C_C(v) = \frac{n-1}{\sum_{u \neq v} d(v,u)}
 
 Identifica vértices que, em média, estão próximos de todos os outros. Reflete a capacidade de propagação de informações e é uma medida global baseada em distâncias.
 
-\subsubsection{Betweenness Centrality (Intermediação)}
+\subsubsection{Betweenness Centrality (Intermediação)} \label{Betweenness}
 
 \begin{equation}
 C_B(v) = \sum_{s \neq v \neq t} \frac{\sigma_{st}(v)}{\sigma_{st}}
@@ -216,7 +216,7 @@ C_B(v) = \sum_{s \neq v \neq t} \frac{\sigma_{st}(v)}{\sigma_{st}}
 
 Mede quantos caminhos mais curtos passam por um vértice. Identifica ``pontes'' estruturais na rede que são essenciais para conectividade.
 
-\subsubsection{Eigenvector Centrality (Autovetor)}
+\subsubsection{Eigenvector Centrality (Autovetor)} \label{Eigenvector}
 
 \begin{equation}
 C_E(v) = \frac{1}{\lambda} \sum_{u \in N(v)} C_E(u)
@@ -224,7 +224,7 @@ C_E(v) = \frac{1}{\lambda} \sum_{u \in N(v)} C_E(u)
 
 Considera a importância dos vizinhos. Nós conectados a nós importantes são considerados mais importantes. Baseada em propriedades espectrais.
 
-\subsubsection{Katz Centrality}
+\subsubsection{Katz Centrality} \label{Katz}
 
 \begin{equation}
 C_K(v) = \alpha \sum_{u} A_{vu} C_K(u) + \beta
@@ -232,7 +232,7 @@ C_K(v) = \alpha \sum_{u} A_{vu} C_K(u) + \beta
 
 Generalização que considera caminhos de todas as comprimentos, com decaimento exponencial.
 
-\subsubsection{PageRank}
+\subsubsection{PageRank} \label{PageRank}
 
 O \emph{PageRank} é uma métrica de centralidade em grafos que avalia a importância de um vértice $v$ pela soma das contribuições dos seus vizinhos. Cada vizinho $u$ transfere parte de sua relevância proporcional ao seu grau de saída $\deg(u)$. O fator de amortecimento $d$ controla a probabilidade de seguir uma aresta ou reiniciar em um vértice aleatório, garantindo estabilidade.
 
@@ -240,7 +240,7 @@ O \emph{PageRank} é uma métrica de centralidade em grafos que avalia a import�
 PR(v) = \frac{1-d}{n} + d \sum_{u \in N(v)} \frac{PR(u)}{\deg(u)}
 \end{equation}
 
-\subsubsection{Harmonic Centrality}
+\subsubsection{Harmonic Centrality} \label{Harmonic}
 
 \begin{equation}
 C_H(v) = \sum_{u \neq v} \frac{1}{d(v,u)}
@@ -453,6 +453,62 @@ Reportam‑se estatísticas resumo por centralidade — mediana, média, desvio 
 \end{figure}
 
 A importância dessas representações gráficas reside em três pontos principais. Primeiro, os violin plots permitem visualizar simultaneamente tendência central e densidade, o que facilita a identificação da centralidade que, em média, reduz mais a largura de banda. Segundo, a sobreposição de pontos individuais evidencia outliers e casos extremos que podem distorcer médias; por isso, a mediana e o IQR são métricas complementares essenciais. Terceiro, ao comparar figuras de diferentes instâncias (por exemplo, Figura~\ref{fig:dw4096} versus Figura~\ref{fig:bcsstk07}) é possível relacionar padrões de melhoria com propriedades topológicas do grafo (número de nós, presença de hubs, densidade local), orientando hipóteses sobre por que certa centralidade funciona melhor em determinados cenários.
+
+\subsection{Análise das Propriedades Topológicas das Instâncias}
+
+A compreensão das propriedades estruturais dos grafos é fundamental para interpretar o desempenho das heurísticas de centralidade na minimização da largura de banda. Nesta subseção, apresentamos uma análise sistemática de três métricas topológicas chave: densidade do grafo, comprimento médio do caminho mais curto e diâmetro. Essas propriedades, calculadas conforme descrito na Seção~\ref{propriedades_topologicas}, revelam padrões estruturais que influenciam diretamente a eficácia das estratégias de otimização.
+
+\subsubsection{Densidade do Grafo}
+
+A densidade do grafo, definida pela equação apresentada anteriormente, quantifica o quão conectada é a rede em relação ao número máximo possível de arestas. A Figura~\ref{fig:density} apresenta a distribuição da densidade por instância, com uma linha tracejada indicando a densidade média de 0.05 entre todas as instâncias analisadas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/instace_Graph Density.jpeg}
+    \caption{Densidade do grafo por instância.}
+    \label{fig:density}
+\end{figure}
+
+Observa-se que a maioria das instâncias apresenta densidade muito baixa (próxima a zero), característica típica de grafos esparsos provenientes de aplicações práticas em engenharia e simulação numérica. Entretanto, identifica-se um outlier significativo com densidade próxima a 1.0, indicando um grafo quase ou completo. Instâncias com densidade extremamente baixa ($\rho < 0.01$) tendem a favorecer centralidades locais como \texit{Degree} [\ref{Degree}], uma vez que a conectividade limitada reduz a relevância de medidas globais baseadas em caminhos longos. Por outro lado, grafos com densidade moderada ($0.05 < \rho < 0.2$) apresentam estrutura mais rica, onde centralidades como \texit{Betweenness} e \texit{Closeness} [\ref{Betweenness}, \ref{Closeness}] capturam melhor a importância relativa dos vértices na topologia global.
+
+\subsubsection{Comprimento Médio do Caminho Mais Curto} \label{aspl_section}
+
+O comprimento médio do caminho mais curto (Average Shortest Path Length - ASPL) mede a eficiência de propagação na rede e está diretamente relacionado à coesão estrutural do grafo. A Figura~\ref{fig:aspl} ilustra a distribuição desta métrica por instância, com média de 10.97.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/instace_Average Shortest Path Length.jpeg}
+    \caption{Comprimento médio do caminho mais curto por instância.}
+    \label{fig:aspl}
+\end{figure}
+
+A distribuição revela três agrupamentos distintos. O primeiro grupo, com ASPL entre 2 e 5, corresponde a grafos altamente coesos, típicos de malhas estruturais regulares (famílias \texttt{bp\_} e \texttt{bcsstk}), onde centralidades espectrais (\ref{Eigenvector}, \ref{PageRank}) e de intermediação funcionam bem devido à presença de vértices articuladores claramente definidos. O segundo grupo, com ASPL entre 8 e 12, representa instâncias de conectividade intermediária, onde o equilíbrio entre exploração local e global torna-se crítico, explicando a alternância de centralidades observada na Seção \ref{heuristicas_centralidade}. O terceiro grupo apresenta valores extremos (ASPL > 25), indicando grafos alongados ou com gargalos estruturais, nos quais centralidades que consideram caminhos de todas as comprimentos (\ref{Katz}, \ref{Harmonic}) demonstram superioridade por não sofrer penalidades excessivas em presença de distâncias grandes ou infinitas.
+
+\subsubsection{Diâmetro da Rede}
+
+O diâmetro, definido como a maior distância entre qualquer par de vértices, caracteriza a extensão máxima da propagação na rede. A Figura~\ref{fig:diameter} apresenta a distribuição do diâmetro por instância, com média de 29.47.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/instace_Diameter.jpeg}
+    \caption{Diâmetro por instância.}
+    \label{fig:diameter}
+\end{figure}
+
+A análise do diâmetro corrobora e complementa as observações sobre ASPL [\ref{aspl_section}]. Instâncias com diâmetro reduzido ($D < 10$) são compactas e bem conectadas, favorecendo estratégias gulosas simples baseadas em Degree. Em contraste, grafos com diâmetro elevado ($D > 50$) exibem estrutura alongada ou ramificada, demandando centralidades globais capazes de identificar vértices periféricos e posicioná-los adequadamente nos extremos da rótulação. A correlação positiva entre diâmetro e ASPL ($r > 0.85$) confirma que ambas as métricas capturam aspectos complementares da extensão estrutural da rede.
+
+\subsubsection{Implicações para Seleção de Centralidade}
+
+A análise integrada das três propriedades topológicas permite estabelecer diretrizes heurísticas para seleção inicial de centralidades:
+
+\begin{itemize}
+    \item Grafos densos e compactos ($\rho > 0.1$, $D < 15$): \textit{Degree e Eigenvector são suficientes [\ref{Degree}, \ref{Eigenvector}].}
+    \item Grafos esparsos e coesos ($\rho < 0.05$, $8 < ASPL < 15$): Alternar entre \textit{Betweenness}, \textit{Closeness} e \textit{PageRank} [\ref{Betweenness}, \ref{Closeness}, \ref{PageRank}].
+    \item Grafos alongados ($D > 50$, $ASPL > 20$): Priorizar \textit{Katz} e \textit{Harmonic Centrality} [\ref{Katz}, \ref{Harmonic}].
+    \item {Grafos desconectados ou com múltiplas componentes}: \textit{Harmonic Centrality} é obrigatória [\ref{Harmonic}].
+\end{itemize}
+
+Esses padrões explicam qualitativamente o comportamento adaptativo do agente DQN observado na Seção \ref{dqn_section}, onde a seleção de centralidade varia conforme as propriedades estruturais das instâncias, confirmando que o sistema proposto captura sinais topológicos relevantes e os traduz em decisões de otimização eficazes.
 
 \section{Conclusão}
 
