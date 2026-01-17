@@ -436,26 +436,19 @@ Por fim, os conjuntos \texttt{bcsstk}, \texttt{dw} e \texttt{bfwa} ilustram um c
 \subsection{Distribuições de Largura de Banda por Centralidade} \label{distribuicoes_largura_banda}
 O gráfico principal é um \emph{violin plot} que combina densidade, caixa e pontos individuais; a legenda é atualizada para exibir, de forma explícita, a sigla seguida do nome completo da centralidade. A forma do violino mostra a densidade dos valores de \textit{bandwidth} por centralidade, permitindo identificar concentrações e lacunas na distribuição. A caixa e a mediana incorporadas no violino facilitam a comparação de tendência central e dispersão entre centralidades, apontando quais métodos tendem a produzir valores mais baixos de largura de banda. A plotagem de todos os pontos evidencia outliers e variabilidade amostral, o que é útil para distinguir centralidades robustas de outras cujo desempenho depende fortemente da amostra específica.
 
-Reportam‑se estatísticas resumo por centralidade — mediana, média, desvio padrão e intervalo interquartil — e devem ser realizadas comparações pareadas entre centralidades para instâncias específicas a fim de destacar diferenças significativas entre seus desempenhos. Para complementar a análise visual, calcula‑se a taxa de melhoria (Decay) conforme a Equação~\ref{eq:decay}, e sumarizam‑se as métricas por centralidade para facilitar comparações agregadas.
-
-\begin{equation}
-\label{eq:decay}
-\mathrm{Decay} \;=\; \frac{B_{\mathrm{init}} - B_{\mathrm{cent}}}{B_{\mathrm{init}}}\times 100\%
-\end{equation}
-
-A seguir apresentam‑se duas figuras exemplares que ilustram padrões distintos: a instância \texttt{dw4096} (com forte decaimento e comportamento dominado por certas centralidades) e a instância \texttt{bcsstk07} (com distribuição mais concentrada e menor variabilidade entre métodos). Essas imagens servem tanto para evidenciar diferenças de escala entre instâncias quanto para mostrar como a forma dos violinos e a presença de outliers orientam a interpretação quantitativa.
+Reportam‑se estatísticas resumo por centralidade — mediana, média, desvio padrão e intervalo interquartil — e devem ser realizadas comparações pareadas entre centralidades para instâncias específicas a fim de destacar diferenças significativas entre seus desempenhos.  A seguir apresentam‑se duas figuras exemplares que ilustram padrões distintos: a instância \texttt{dw4096} (com forte decaimento e comportamento dominado por certas centralidades) e a instância \texttt{bcsstk07} (com distribuição mais concentrada e menor variabilidade entre métodos). Essas imagens servem tanto para evidenciar diferenças de escala entre instâncias quanto para mostrar como a forma dos violinos e a presença de outliers orientam a interpretação quantitativa. Observa‑se forte redução média e alta variabilidade entre centralidades; violinos estreitos indicam resultados consistentes, enquanto violinos largos e pontos dispersos revelam maior sensibilidade à amostra. Também é observado que a mediana das centralidades nas quais são mais próxima os violinos são mais compactos, sugerindo desempenho mais homogêneo entre heurísticas.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{figures/grafico_bandwidth_dw4096.png}
-    \caption{Distribuição de \textit{bandwidth} por centralidade para a instância \texttt{dw4096}. Observa‑se forte redução média e alta variabilidade entre centralidades; violinos estreitos indicam resultados consistentes, enquanto violinos largos e pontos dispersos revelam maior sensibilidade à amostra.}
+    \caption{Distribuição de \textit{bandwidth} por centralidade para a instância \texttt{dw4096}. }
     \label{fig:dw4096}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{figures/grafico_bandwidth_bcsstk07.png}
-    \caption{Distribuição de \textit{bandwidth} por centralidade para a instância \texttt{bcsstk07}. Aqui a mediana das centralidades é mais próxima e os violinos são mais compactos, sugerindo desempenho mais homogêneo entre heurísticas.}
+    \caption{Distribuição de \textit{bandwidth} por centralidade para a instância \texttt{bcsstk07}.}
     \label{fig:bcsstk07}
 \end{figure}
 
