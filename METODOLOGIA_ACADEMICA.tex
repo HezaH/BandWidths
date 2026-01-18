@@ -139,7 +139,7 @@ A terceira camada é a representação do grafo, que fornece a estrutura de dado
 
 \subsection{Fundamentos Teóricos}
 
-O Aprendizado por Reforço (Reinforcement Learning - RL) é um paradigma onde um agente aprende através da interação com o ambiente, recebendo recompensas (\textit{rewards}) por ações bem-sucedidas. No contexto deste projeto, implementamos \textit{Deep Q-Learning}, que combinama \textit{Q-Learning} tradicional com redes neurais profundas para aproximar a função de valor de ação $Q(s,a)$ [\ref{bellman_eq}]. Essa técnica é particularmente eficaz em ambientes com espaços de estados e ações grandes ou contínuos, onde tabelas tradicionais seriam impraticáveis. Esta abordagem híbrida permite que o agente generalize sobre um espaço de estados contínuo, algo de bastante dificuldade em \textit{Q-Learning} tabular tradicional.
+O Aprendizado por Reforço (\textit{Reinforcement Learning} - RL) é um paradigma onde um agente aprende através da interação com o ambiente, recebendo recompensas (\textit{rewards}) por ações bem-sucedidas. No contexto deste projeto, implementamos \textit{Deep Q-Learning}, que combinama \textit{Q-Learning} tradicional com redes neurais profundas para aproximar a função de valor de ação $Q(s,a)$ [\ref{bellman_eq}]. Essa técnica é particularmente eficaz em ambientes com espaços de estados e ações grandes ou contínuos, onde tabelas tradicionais seriam impraticáveis. Esta abordagem híbrida permite que o agente generalize sobre um espaço de estados contínuo, algo de bastante dificuldade em \textit{Q-Learning} tabular tradicional.
 
 \subsection{Equação de Bellman Aplicada}
 
@@ -354,13 +354,13 @@ A cada iteração do treinamento, após a obtenção do grafo em análise e as p
 \caption{Fases do processo de stepping do ambiente}
 \end{table}
 
-\section{Resultados}
+\section{Resultados} \label{resultados}
 
-Nessa seção, apresentamos uma análise detalhada dos resultados obtidos através da aplicação do sistema proposto em diversas instâncias de grafos esparsos. A avaliação foca na eficácia da combinação de Aprendizado por Reforço Profundo com heurísticas de centralidade na minimização da largura de banda. Também foi levantada a influência das propriedades topológicas dos grafos na performance das soluções geradas, em função de representações visuais.
+Nessa seção, apresentamos uma análise detalhada dos resultados obtidos através da aplicação do sistema proposto em diversas instâncias de grafos esparsos. A avaliação foca na eficácia da combinação de Aprendizado por Reforço Profundo com heurísticas de centralidade na minimização da largura de banda. Também foi levantada a influência das propriedades topológicas dos grafos na performance das soluções geradas, juntado ao uso de representações visuais.
 
 \subsection{Interpretação das Métricas por Instância.}
 
-Para quantificar a melhoria obtida por cada centralidade, adotou‑se a taxa de melhoria relativa entre a largura de banda inicial e a obtida após aplicação da centralidade. A métrica utilizada é dado pela equação \ref{eq:decay},  onde valores maiores indicam maior redução (melhoria).
+Para quantificar a melhoria obtida por cada centralidade, adotou‑se a taxa de melhoria relativa entre a largura de banda inicial e a obtida após aplicação da centralidade. A métrica utilizada é dado pela equação \ref{eq:decay},  onde valores maiores indicam maior redução, sinalizanod melhoria.
 
 \begin{equation}
 \label{eq:decay}
@@ -416,7 +416,7 @@ A Tabela 1 apresenta um resumo dos resultados obtidos para diversas instâncias 
 \caption{Comparação entre banda inicial, banda após aplicação de centralidade, instância, número de arestas, número de nós e taxa de decaimento}
 \end{table}
 
-Os resultados revelam três regimes estruturais. Nas instâncias da família \texttt{bp\_}, a largura de banda cai cerca de 60\%, mas o agente alterna entre métricas globais (Betweenness, Closeness, Harmonic) e espectrais (Eigenvector, PageRank) conforme o tamanho do grafo cresce. Isso confirma que grafos com maior diâmetro exigem medidas capazes de capturar dependências de longo alcance para organizar vértices periféricos antes dos centrais. É possivel observar na figura abaixo \ref{fig:bp1600}, a frequência com que o agente DQN selecionou cada centralidade ao longo do treinamento na instância \texttt{bp\_1600}.
+Os resultados revelam três regimes estruturais. Nas instâncias da família \texttt{bp\_}, a largura de banda cai cerca de 60\%, mas o agente alterna entre métricas globais (\textit{Betweenness}, \textit{Closeness}, \textit{Harmonic}) e espectrais (\textit{Eigenvector}, \textit{PageRank}) conforme o tamanho do grafo cresce. Isso confirma que grafos com maior diâmetro exigem medidas capazes de capturar dependências de longo alcance para organizar vértices periféricos antes dos centrais. É possivel observar na figura abaixo \ref{fig:bp1600}, a frequência com que o agente DQN selecionou cada centralidade ao longo do treinamento na instância \texttt{bp\_1600}.
 
 \begin{figure}[H]
     \centering
@@ -424,7 +424,7 @@ Os resultados revelam três regimes estruturais. Nas instâncias da família \te
     \caption{Frequência de centralidade da instância \texttt{bp\_1600}.} \label{fig:bp1600}
 \end{figure}
 
-Nas instâncias \texttt{lshp}, a centralidade de Grau domina e entrega reduções superiores a 98\%. Esses grafos apresentam hubs pronunciados e conectividade assimétrica (densidade local alta, mas componentes bem definidas), de modo que ordenar vértices apenas pelo número de vizinhos já posiciona os nós críticos nas extremidades da matriz, minimizando o espalhamento das arestas. Na figura abaixo ~\ref{fig:lshp1882}, observa-se a frequência com que o agente DQN selecionou cada centralidade ao longo do treinamento na instância \texttt{lshp1882}.
+Nas instâncias \texttt{lshp}, a centralidade de \textit{Degree} domina e entrega reduções superiores a 98\%. Esses grafos apresentam hubs pronunciados e conectividade assimétrica (densidade local alta, mas componentes bem definidas), de modo que ordenar vértices apenas pelo número de vizinhos já posiciona os nós críticos nas extremidades da matriz, minimizando o espalhamento das arestas. Na figura abaixo ~\ref{fig:lshp1882}, observa-se a frequência com que o agente DQN selecionou cada centralidade ao longo do treinamento na instância \texttt{lshp1882}. Mesmo havendo uma frequência alta de seleção para \textit{Closeness} e \textit{Betweenness} se comparado as demais, a centralidade de \textit{Degree} foi a que obteve o melhor desempenho na redução da largura de banda, sinalizando que a frequência de seleção não necessariamente se traduz em melhor desempenho.
 
 \begin{figure}[H]
     \centering
@@ -432,7 +432,7 @@ Nas instâncias \texttt{lshp}, a centralidade de Grau domina e entrega reduçõe
     \caption{Frequência de centralidade da instância \texttt{lshp1882}.} \label{fig:lshp1882}
 \end{figure}
 
-Por fim, os conjuntos \texttt{bcsstk}, \texttt{dw} e \texttt{bfwa} ilustram um cenário híbrido: grafos estruturais com múltiplas componentes favorecem Katz e Harmonic, que tratam desconexões sem penalizar distâncias infinitas, enquanto malhas regulares (\texttt{dw256}, \texttt{dw4096}) alternam entre Degree e PageRank para equilibrar simetria e presença de vértices articuladores. Em todos os casos, o agente DQN ajusta dinamicamente a centralidade escolhida, indicando que a camada de aprendizado realmente captura sinais topológicos produzidos na Seção ~\ref{propriedades_topologicas} e os transforma em ganhos concretos de largura de banda.
+Por fim, os conjuntos \texttt{bcsstk}, \texttt{dw} e \texttt{bfwa} ilustram um cenário híbrido: grafos estruturais com múltiplas componentes favorecem \textit{Katz} e \textit{Harmonic}, que tratam desconexões sem penalizar distâncias infinitas, enquanto malhas regulares (\texttt{dw256}, \texttt{dw4096}) alternam entre \textit{Degree} e \textit{PageRank} para equilibrar simetria e presença de vértices articuladores. Em todos os casos, o agente DQN ajusta dinamicamente a centralidade escolhida, indicando que a camada de aprendizado realmente captura sinais topológicos produzidos na Seção ~\ref{propriedades_topologicas} e os transforma em resultados de largura de banda.
 
 \subsection{Distribuições de Largura de Banda por Centralidade} \label{distribuicoes_largura_banda}
 O gráfico principal é um \emph{violin plot} que combina densidade, caixa e pontos individuais; a legenda é atualizada para exibir, de forma explícita, a sigla seguida do nome completo da centralidade. A forma do violino mostra a densidade dos valores de \textit{bandwidth} por centralidade, permitindo identificar concentrações e lacunas na distribuição. A caixa e a mediana incorporadas no violino facilitam a comparação de tendência central e dispersão entre centralidades, apontando quais métodos tendem a produzir valores mais baixos de largura de banda. A plotagem de todos os pontos evidencia outliers e variabilidade amostral, o que é útil para distinguir centralidades robustas de outras cujo desempenho depende fortemente da amostra específica.
@@ -453,7 +453,7 @@ Reportam‑se estatísticas resumo por centralidade — mediana, média, desvio 
     \label{fig:bcsstk07}
 \end{figure}
 
-A importância dessas representações gráficas reside em três pontos principais. Primeiro, os violin plots permitem visualizar simultaneamente tendência central e densidade, o que facilita a identificação da centralidade que, em média, reduz mais a largura de banda. Segundo, a sobreposição de pontos individuais evidencia outliers e casos extremos que podem distorcer médias; por isso, a mediana e o IQR são métricas complementares essenciais. Terceiro, ao comparar figuras de diferentes instâncias (por exemplo, Figura~\ref{fig:dw4096} versus Figura~\ref{fig:bcsstk07}) é possível relacionar padrões de melhoria com propriedades topológicas do grafo (número de nós, presença de hubs, densidade local), orientando hipóteses sobre por que certa centralidade funciona melhor em determinados cenários.
+A importância dessas representações gráficas reside em três pontos principais. Primeiro, os violin plots permitem visualizar simultaneamente tendência central e densidade, o que facilita a identificação da centralidade que, em média, reduz mais a largura de banda. Segundo, a sobreposição de pontos individuais evidencia outliers e casos extremos que podem distorcer médias; por isso, a mediana e o IQR são métricas complementares essenciais. Terceiro, ao comparar figuras de diferentes instâncias (Figura~\ref{fig:dw4096} versus Figura~\ref{fig:bcsstk07}) é possível relacionar padrões de melhoria com propriedades topológicas do grafo (número de nós, presença de hubs, densidade local), orientando hipóteses sobre por que certa centralidade funciona melhor em determinados cenários.
 
 \subsection{Análise das Propriedades Topológicas das Instâncias}
 
