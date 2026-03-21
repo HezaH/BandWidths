@@ -41,13 +41,15 @@ def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:s
     graph_rebuilt = None
     it = []
     for _ in range(iter_max):
+        start_time = time.time()
         solution = constructive.init_Solution_Centrality_lcr(graph=graph, nodes_centrality=centrality_values, random_centrality=cent_str, alpha=alpha, centralities=centralities)
         
         band_solution = Bf_graph(graph=graph, F_labels=solution) 
 
         it.append({
             "bandwidth": band_solution,
-            "centrality": cent_str
+            "centrality": cent_str,
+            "local_time": time.time() - start_time
         })
 
         if bandwidth > band_solution:

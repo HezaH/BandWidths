@@ -23,7 +23,7 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
     plt.savefig(file_name)   # salva em arquivo
     plt.close()              # fecha a figura para não abrir
 
-dir_list = [ "optimization", "thermal", "structural", "computational_fluid_dynamics", "electromagnetics", ]
+dir_list = ["optimization", "thermal", "structural", "computational_fluid_dynamics", "electromagnetics", ]
 
 for loop in range(1,2):
 
@@ -33,11 +33,8 @@ for loop in range(1,2):
     else:
         df = pd.read_csv(filename)
 
-    list_instance = []
-    list_band = []
-    list_time = []
+    list_instance, list_band, list_time, global_iteration = [], [], [], []
 
-    global_iteration = []
     base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
     json_global = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
     
@@ -55,15 +52,15 @@ for loop in range(1,2):
             torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
             json_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'analysis_inputs_{instance_path}.json')
             
-            if os.path.exists(torch_save_path):
-                print(f"Modelo já treinado para a instância {instance_path}, pulando...")
-                continue
+            # if os.path.exists(torch_save_path):
+            #     print(f"Modelo já treinado para a instância {instance_path}, pulando...")
+            #     continue
 
             print( "####### instancia", instancia )
             nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance(instancia)
             
             #parametros
-            max_iter = 100
+            max_iter = 30
 
             centralities = {
                     #Standard centrality measures
@@ -116,7 +113,8 @@ for loop in range(1,2):
             # Diameter of the largest component
             diameter = nx.diameter(largest_subgraph)
 
-
+            start_time = time.time()
+            
             print(f"Number of connected components: {num_components}")
             print(f"Size of the largest connected component: {largest_size}")
             print(f"Diameter of the largest connected component: {diameter}")
@@ -164,7 +162,7 @@ for loop in range(1,2):
 
             for i in range(max_iter):
                 env.reset()
-                t = i+2
+                t = i + 2
                 #Escolha da centralidade e da lista
                 action = agent.choose_action(state)
                 centrality = centralities_list[action]
@@ -203,6 +201,8 @@ for loop in range(1,2):
                     adj_matrix_reordered = nx.to_numpy_array(G_reordered) 
                     plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
 
+            end_time = time.time()
+            global_time = end_time - start_time
             df_iteration = pd.DataFrame(local_iteration)
             df_iteration["Instance"] = instance_path
             df_iteration["Edges"] = nedges
@@ -216,7 +216,7 @@ for loop in range(1,2):
             # df_iteration["Average Node Connectivity"] = results.get("Average Node Connectivity", None)
             df_iteration["Graph Density"] = results.get("Graph Density", None)
             df_iteration["Average Shortest Path Length"] = results.get("Average Shortest Path Length", None)
-
+            df_iteration['Global Time (s)'] = global_time
             df_iteration_dict = df_iteration.to_dict(orient='records')
 
             with open(json_save_path, 'w') as f:
