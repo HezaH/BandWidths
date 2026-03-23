@@ -23,22 +23,24 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
     plt.savefig(file_name)   # salva em arquivo
     plt.close()              # fecha a figura para não abrir
 
-for loop in range(1,2):
-
+if __name__ == "__main__":
     list_instance, list_band, list_time, global_iteration = [], [], [], []
 
     base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
     survey_file = os.path.join(base_dir, "data", "survey", )
     
+    dir_list = [nome for nome in os.listdir(survey_file) 
+                    if os.path.isdir(os.path.join(survey_file, nome))]
+    
     for kind in dir_list:
-        path = os.path.join(base_dir, "data", "newdata", kind)
+        path = os.path.join(survey_file, kind)
         list_path = readFilesInDict(path, ".mtx")
 
         for instancia in list_path:
             results = {}
 
             instance_path = os.path.basename(instancia).replace(".mtx", "")
-            path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}")
+            path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}")
             # criar o diretório se não existir
             os.makedirs(path_name, exist_ok=True)
             torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
@@ -224,3 +226,4 @@ for loop in range(1,2):
     df_global = pd.DataFrame(global_iteration)
     df_global.to_csv(filename, index=False)
     print(1)
+
