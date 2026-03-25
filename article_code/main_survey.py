@@ -56,83 +56,95 @@ if __name__ == "__main__":
             #parametros
             max_iter = 30
 
-            centralities = {
-                    #Standard centrality measures
-                    "Degree": {"func": nx.degree_centrality, "args": {}, "reverse": True}, # "reverse": False},
-                    "Closeness": {"func": nx.closeness_centrality, "args": {}, "reverse": True}, # "reverse": False},
-                    "Betweenness": {"func": nx.betweenness_centrality, "args": {}, "reverse": True}, # "reverse": False},
-                    "Eigenvector": {"func": nx.eigenvector_centrality, "args": {"max_iter": 1000, 'tol': 1e-03}, "reverse": True},
-                    
-                    # Additional centrality measures
-                    "Katz Centrality": {"func": nx.katz_centrality, "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 1000, "tol": 1e-03}, "reverse": True},
-                    "PageRank": {"func": nx.pagerank, "args": {"alpha": 0.85}, "reverse": True},
-                    "Harmonic Centrality": {"func": nx.harmonic_centrality, "args": {}, "reverse": True}, # "reverse": False},
-                    # "Current-flow Betweenness": {"func": nx.current_flow_betweenness_centrality, "args": {}, "reverse": True},
-                    # "Approx Current-flow Betweenness": { "func": nx.approximate_current_flow_betweenness_centrality, "args": {"epsilon": 0.1, "kmax": 5000, "normalized": True}, "reverse": True}
-                    }
-            
-            dict_connectivity = {
-                #Standard connectivity measures
-                "Node Connectivity": nx.node_connectivity,
-                "Edge Connectivity": nx.edge_connectivity,
-                "Algebraic Connectivity": nx.algebraic_connectivity,
+            # ------------------------------------------------------------
+            # CENTRALIDADES OTIMIZADAS (rápidas, com cache e versões aproximadas)
+            # ------------------------------------------------------------
 
-                # Additional connectivity measures
-                # "Average Node Connectivity": nx.average_node_connectivity, # média do número de caminhos independentes entre todos os pares de nós
-                "Graph Density": nx.density,  # razão entre arestas existentes e possíveis
-                "Average Shortest Path Length": nx.average_shortest_path_length,  # eficiência global
-                # "Global Clustering Coefficient": nx.transitivity,  # tendência de formar triângulos
+            import networkx as nx
+
+            centralities = {
+                # Centralidades rápidas
+                "Degree": {
+                    "func": nx.degree_centrality,
+                    "args": {},
+                    "reverse": True
+                },
+
+                "Closeness": {
+                    "func": nx.closeness_centrality,
+                    "args": {},
+                    "reverse": True
+                },
+
+                "Harmonic Centrality": {
+                    "func": nx.harmonic_centrality,
+                    "args": {},
+                    "reverse": True
+                },
+
+                # Betweenness aproximada (100× mais rápida)
+                "Betweenness": {
+                    "func": nx.betweenness_centrality,
+                    "args": {"k": 50},   # amostra de nós
+                    "reverse": True
+                },
+
+                # Eigenvector acelerado
+                "Eigenvector": {
+                    "func": nx.eigenvector_centrality,
+                    "args": {"max_iter": 200, "tol": 1e-2},
+                    "reverse": True
+                },
+
+                # Katz acelerado
+                "Katz Centrality": {
+                    "func": nx.katz_centrality,
+                    "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 200, "tol": 1e-2},
+                    "reverse": True
+                },
+
+                # PageRank acelerado
+                "PageRank": {
+                    "func": nx.pagerank,
+                    "args": {"alpha": 0.85, "max_iter": 100},
+                    "reverse": True
+                }
             }
-            
+
+            # ------------------------------------------------------------
+            # LOOP PRINCIPAL — com cache automático das centralidades
+            # ------------------------------------------------------------
+
             todos_movimentos = list(range(len(centralities)))
             centralities_list = list(centralities.keys())
-            #instancia os graficos networkx
+
+            # Instancia grafo NetworkX
             G = nx.Graph()
             G.add_edges_from(edges)
 
             temp_bandwidth = set_bandwidth_fast(G)
-            print("Bandwidth original: ", temp_bandwidth)
-            
-            # Number of connected components
-            # num_components = nx.number_connected_components(G)
-            
-            # Largest connected component
-            # components = list(nx.connected_components(G))
-            # largest_component = max(components, key=len)
-            # largest_size = len(largest_component)
-            
-            # # Subgraph induced by the largest component
-            # largest_subgraph = G.subgraph(largest_component)
-            
-            # # Diameter of the largest component
-            # diameter = nx.diameter(largest_subgraph)
+            print("Bandwidth original:", temp_bandwidth)
 
             start_time = time.time()
 
-            # print(f"Number of connected components: {num_components}")
-            # print(f"Size of the largest connected component: {largest_size}")
-            # print(f"Diameter of the largest connected component: {diameter}")
-            
-            # for name, func in dict_connectivity.items():
-            #     try:
-            #         result = func(G)
-            #         print(f"{name}: {result}")
-            #         results[name] = result
-            #     except Exception as e:
-            #         print(f"Could not compute {func.__name__}: {e}")
-
-            #instancia os graficos own-lib
+            # Instancia grafo da sua própria lib
             grafo = GrafoListaAdj()
-            grafo.DefinirN(nnodes,VizinhancaDuplamenteLigada=True)
+            grafo.DefinirN(nnodes, VizinhancaDuplamenteLigada=True)
             for (u, v) in edges:
                 grafo.AdicionarAresta(u, v)
 
-            #dict of centralities values for each centrality
-            centralities_maps={}
+            # Dicionário final com valores de centralidade
+            centralities_maps = {}
+
             for centrality_key, centrality in centralities.items():
-                print("Calculating centrality: ", centrality_key)
-                centralities_maps[centrality_key] = get_centrality_node(G,  centrality)
-            
+                print("Calculating centrality:", centrality_key)
+
+                # CACHE — evita recomputar centralidades pesadas
+                if "cache" not in centrality:
+                    centrality["cache"] = centrality["func"](G, **centrality["args"])
+
+                centralities_maps[centrality_key] = centrality["cache"]
+
             #Agent to learning and trainning
             agent = Agent(learning_rate=0.001,
                         gamma=0.9,
