@@ -14,6 +14,13 @@ def set_bandwidth(G: GrafoListaAdj) -> int:
     w = (y - x).max() + (x - y).max() + 1
     return w
 
+def set_bandwidth_fast(G):
+    bw = 0
+    for u in G:
+        for v in G[u]:
+            bw = max(bw, abs(u - v))
+    return bw
+
 def simples_init_sol(graph):
     ''''
     Gerador simples de solucao para mockar testes dos algoritmos pontualmente (substitui a solucao inicial do VNS)

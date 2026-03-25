@@ -3,7 +3,7 @@ import numpy as np
 import random
 import time
 import networkx as nx
-
+import heapq
 #import models
 from modules.utils import handle_labels
 from modules.graph.Grafo import Grafo, GrafoListaAdj
@@ -29,17 +29,23 @@ def get_LCR(queue:list, chosen_centrality:dict, random_centrality:str, alpha:flo
               (restricted set) followed by randomized remaining vertices (complementary set).
     """
     reverse_flag = centralities[random_centrality]["reverse"]
+    qtd_elem = int(len(queue) * alpha)
 
-    vertices_ordenados = sorted(
-        queue,
-        key=lambda x: chosen_centrality[x],
-        reverse=reverse_flag
-    )
-    qtd_elem = int(len(vertices_ordenados) * alpha)
-    LCR = vertices_ordenados[:qtd_elem]
-    LCR_comp = vertices_ordenados[qtd_elem:]
+    # pega top k
+    if reverse_flag:
+        LCR = heapq.nlargest(qtd_elem, queue, key=lambda x: chosen_centrality[x])
+    else:
+        LCR = heapq.nsmallest(qtd_elem, queue, key=lambda x: chosen_centrality[x])
+
+    # marca os escolhidos
+    mark = {v: True for v in LCR}
+
+    # complementares sem custo extra
+    LCR_comp = [v for v in queue if v not in mark]
+
     random.shuffle(LCR)
     random.shuffle(LCR_comp)
+
     return LCR + LCR_comp
 
 def init_Solution(graph: GrafoListaAdj)->dict:
@@ -212,70 +218,62 @@ def init_Solution_Centrality_otm(graph: GrafoListaAdj, nodes_centrality:dict)->d
         
     return f
 
-def init_Solution_Centrality_lcr(graph: GrafoListaAdj,  nodes_centrality:dict, random_centrality:str, alpha:float, centralities:dict)->dict:
+def init_Solution_Centrality_lcr(graph: GrafoListaAdj, nodes_centrality:dict, 
+                                 random_centrality:str, alpha:float, centralities:dict)->dict:
     
-    # calculando a centralidade de cada vertice
+    V = list(graph.V())
+    n = len(V)
 
-    f = {}
+    # f e mark mais rápidos
+    f = {v: None for v in V}
+    mark = {v: False for v in V}
 
-    for i in graph.V():
-        f[i] = None
+    # cache de vizinhos (opcional, mas acelera muito)
+    neighbors = {v: graph.N(v) for v in V}
 
-    mark = [] #vertices visitados
+    # probabilidades
+    values = list(nodes_centrality.values())
+    sum_values = sum(values)
 
-    queue = [] #representa a sequência de vértices encontrada pelo algoritmo de busca em profundidade
+    if sum_values == 0:
+        probs = [1/n] * n
+    else:
+        probs = [v / sum_values for v in values]
 
-    for i in range(len(list(graph.V()))+1): #popula a lista mark de False
-        mark.append(False)
-    
-    # Escolher vértice inicial baseado em centralidade
+    # sorteio
+    k = random.choices(V, probs)[0]
 
-    # Calcular as probabilidades de cada vértice
-    #! old
-    sum_values = sum(nodes_centrality.values())
-    if sum_values == 0: 
-        # fallback: escolher uniformemente 
-        probs = [1/len(nodes_centrality) for _ in nodes_centrality.values()] 
-    else: 
-        probs = [valor/sum_values for valor in nodes_centrality.values()] 
+    mark[k] = True
+    queue = [k]
 
-    # # Sortear um item baseado nas probabilidades
-    k = random.choices(list(nodes_centrality.keys()), probs)[0] 
-
-    #! new
-    # # Opção: vértice com maior centralidade
-    # k = max(nodes_centrality.keys(), key=lambda v: nodes_centrality[v])
-
-    mark[k] = True #visita o vertice assinado nno v_zero
-    
-    queue.append(k)
-
-    ql = 1 # O numero de vertices conectado ao vertice do nivel atual 
-    f[k] = 1 #o primeiro vertice rotulado com o rotulo 1, com k escolhido aleatoriamente
+    ql = 1
+    f[k] = 1
     l = 0
 
-    while l < graph.n:
+    while l < n:
         r = 0
-        stack = []       
+        stack = []
+
         for i1 in range(ql):
             i = queue[i1]
-            for j1 in graph.N(i):
-                vert = j1
+            for vert in neighbors[i]:
                 if not mark[vert]:
-                    r = r + 1
+                    r += 1
                     stack.append(vert)
                     mark[vert] = True
-        
-        array_LCR = get_LCR(queue=queue, chosen_centrality=nodes_centrality, random_centrality=random_centrality, alpha=alpha, centralities=centralities)
-        
+
+        array_LCR = get_LCR(queue=queue, chosen_centrality=nodes_centrality,
+                            random_centrality=random_centrality, alpha=alpha,
+                            centralities=centralities)
+
         h = 0
         for j1 in range(ql):
-            n = array_LCR[h]
-            l = l + 1
-            f[n] = l
-            h = h + 1
+            n2 = array_LCR[h]
+            l += 1
+            f[n2] = l
+            h += 1
 
         queue = stack
         ql = r
-        
+
     return f

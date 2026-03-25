@@ -12,7 +12,7 @@ from agent import Agent
 from enviroment import Env
 from modules.utils import read_Instances
 import matplotlib.pyplot as plt
-from modules.utils.handle_labels import set_bandwidth
+from modules.utils.handle_labels import set_bandwidth, set_bandwidth_fast
 import json
 
 # Função para plotar uma matriz esparsa
@@ -51,7 +51,7 @@ if __name__ == "__main__":
             #     continue
 
             print( "####### instancia", instancia )
-            nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance(instancia)
+            nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance_fast(instancia)
             
             #parametros
             max_iter = 30
@@ -90,7 +90,7 @@ if __name__ == "__main__":
             G = nx.Graph()
             G.add_edges_from(edges)
 
-            temp_bandwidth = set_bandwidth(G)
+            temp_bandwidth = set_bandwidth_fast(G)
             print("Bandwidth original: ", temp_bandwidth)
             
             # Number of connected components
@@ -108,7 +108,7 @@ if __name__ == "__main__":
             diameter = nx.diameter(largest_subgraph)
 
             start_time = time.time()
-            
+
             print(f"Number of connected components: {num_components}")
             print(f"Size of the largest connected component: {largest_size}")
             print(f"Diameter of the largest connected component: {diameter}")

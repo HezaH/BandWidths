@@ -1,7 +1,53 @@
 import math
 import sys
 from collections import defaultdict
-from scipy.sparse import lil_matrix
+from scipy.sparse import lil_matrix, coo_matrix
+
+def load_instance_fast(filename):
+    neighbours = defaultdict(list)
+    edges = []
+
+    with open(filename, 'r') as f:
+        # lê primeira linha útil
+        for line in f:
+            parts = line.split()
+            if parts and not parts[0].startswith('%'):
+                nnodes, value, nedges = map(int, parts)
+                break
+
+        # lê arestas
+        for line in f:
+            parts = line.split()
+            if not parts or parts[0].startswith('%'):
+                continue
+
+            e1 = int(float(parts[0]))
+            e2 = int(float(parts[1]))
+
+            neighbours[e1].append(e2)
+
+            if e1 != e2:
+                edges.append((min(e1, e2), max(e1, e2)))
+                neighbours[e1].append(e2)
+                neighbours[e2].append(e1)
+            else:
+                nedges -= 1
+
+    # cria lista de adjacência
+    nodes = sorted(neighbours.keys())
+    lista_adj = [neighbours[n] for n in nodes]
+
+    # cria matriz esparsa diretamente com COO (muito mais rápido)
+    row = []
+    col = []
+    for u, adj in neighbours.items():
+        for v in adj:
+            row.append(u - 1)
+            col.append(v - 1)
+
+    matrix = coo_matrix(( [1]*len(row), (row, col) ), shape=(nnodes, nnodes))
+
+    return nnodes, nedges, edges, neighbours, lista_adj, matrix
 
 def load_instance(filename):
     edges = []

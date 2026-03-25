@@ -21,17 +21,8 @@ from modules.graph.Grafo import Grafo, GrafoListaAdj
 from modules.centralities.heuristics import *
 from modules.components import constructive
 
-def get_centrality_node(graph: nx.Graph, 
-                        centrality: dict,) -> dict:
-                            
-
-    resp_centrality = centrality["func"](graph, **centrality["args"])
-    
-    nodes_centrality = {}
-    for node, cent_value in resp_centrality.items():
-        nodes_centrality[node] = cent_value
-
-    return nodes_centrality
+def get_centrality_node(graph: nx.Graph, centrality: dict) -> dict:
+    return dict(centrality["func"](graph, **centrality["args"]))
 
 def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:str,  alpha:float,  iter_max:int, centralities:dict )->int:
 
