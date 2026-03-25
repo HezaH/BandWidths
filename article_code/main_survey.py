@@ -61,10 +61,10 @@ if __name__ == "__main__":
                     "Degree": {"func": nx.degree_centrality, "args": {}, "reverse": True}, # "reverse": False},
                     "Closeness": {"func": nx.closeness_centrality, "args": {}, "reverse": True}, # "reverse": False},
                     "Betweenness": {"func": nx.betweenness_centrality, "args": {}, "reverse": True}, # "reverse": False},
-                    "Eigenvector": {"func": nx.eigenvector_centrality, "args": {"max_iter": 1000, 'tol': 1e-06}, "reverse": True},
+                    "Eigenvector": {"func": nx.eigenvector_centrality, "args": {"max_iter": 1000, 'tol': 1e-03}, "reverse": True},
                     
                     # Additional centrality measures
-                    "Katz Centrality": {"func": nx.katz_centrality, "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 1000, "tol": 1e-06}, "reverse": True},
+                    "Katz Centrality": {"func": nx.katz_centrality, "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 1000, "tol": 1e-03}, "reverse": True},
                     "PageRank": {"func": nx.pagerank, "args": {"alpha": 0.85}, "reverse": True},
                     "Harmonic Centrality": {"func": nx.harmonic_centrality, "args": {}, "reverse": True}, # "reverse": False},
                     # "Current-flow Betweenness": {"func": nx.current_flow_betweenness_centrality, "args": {}, "reverse": True},
@@ -94,32 +94,32 @@ if __name__ == "__main__":
             print("Bandwidth original: ", temp_bandwidth)
             
             # Number of connected components
-            num_components = nx.number_connected_components(G)
+            # num_components = nx.number_connected_components(G)
             
             # Largest connected component
-            components = list(nx.connected_components(G))
-            largest_component = max(components, key=len)
-            largest_size = len(largest_component)
+            # components = list(nx.connected_components(G))
+            # largest_component = max(components, key=len)
+            # largest_size = len(largest_component)
             
-            # Subgraph induced by the largest component
-            largest_subgraph = G.subgraph(largest_component)
+            # # Subgraph induced by the largest component
+            # largest_subgraph = G.subgraph(largest_component)
             
-            # Diameter of the largest component
-            diameter = nx.diameter(largest_subgraph)
+            # # Diameter of the largest component
+            # diameter = nx.diameter(largest_subgraph)
 
             start_time = time.time()
 
-            print(f"Number of connected components: {num_components}")
-            print(f"Size of the largest connected component: {largest_size}")
-            print(f"Diameter of the largest connected component: {diameter}")
+            # print(f"Number of connected components: {num_components}")
+            # print(f"Size of the largest connected component: {largest_size}")
+            # print(f"Diameter of the largest connected component: {diameter}")
             
-            for name, func in dict_connectivity.items():
-                try:
-                    result = func(G)
-                    print(f"{name}: {result}")
-                    results[name] = result
-                except Exception as e:
-                    print(f"Could not compute {func.__name__}: {e}")
+            # for name, func in dict_connectivity.items():
+            #     try:
+            #         result = func(G)
+            #         print(f"{name}: {result}")
+            #         results[name] = result
+            #     except Exception as e:
+            #         print(f"Could not compute {func.__name__}: {e}")
 
             #instancia os graficos own-lib
             grafo = GrafoListaAdj()
@@ -201,15 +201,15 @@ if __name__ == "__main__":
             df_iteration["Instance"] = instance_path
             df_iteration["Edges"] = nedges
             df_iteration["Nodes"] = nnodes
-            df_iteration["NumOfComp"] = num_components
-            df_iteration["LargestCompSize"] = largest_size
-            df_iteration["Diameter"] = diameter
-            df_iteration["Node Connectivity"] = results.get("Node Connectivity", None)
-            df_iteration["Edge Connectivity"] = results.get("Edge Connectivity", None)
-            df_iteration["Algebraic Connectivity"] = results.get("Algebraic Connectivity", None)
+            # df_iteration["NumOfComp"] = num_components
+            # df_iteration["LargestCompSize"] = largest_size
+            # df_iteration["Diameter"] = diameter
+            # df_iteration["Node Connectivity"] = results.get("Node Connectivity", None)
+            # df_iteration["Edge Connectivity"] = results.get("Edge Connectivity", None)
+            # df_iteration["Algebraic Connectivity"] = results.get("Algebraic Connectivity", None)
             # df_iteration["Average Node Connectivity"] = results.get("Average Node Connectivity", None)
-            df_iteration["Graph Density"] = results.get("Graph Density", None)
-            df_iteration["Average Shortest Path Length"] = results.get("Average Shortest Path Length", None)
+            # df_iteration["Graph Density"] = results.get("Graph Density", None)
+            # df_iteration["Average Shortest Path Length"] = results.get("Average Shortest Path Length", None)
             df_iteration['Global Time (s)'] = global_time
             df_iteration_dict = df_iteration.to_dict(orient='records')
 
