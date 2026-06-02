@@ -1,6 +1,8 @@
 import math
 import os
 import subprocess
+import random
+from collections import defaultdict
 
 """ Version: v2.5 (livro Jayme) João Vitor Maués Dias Carneiro """
 
@@ -148,3 +150,155 @@ class GrafoListaAdj(Grafo):
 			if Tipo == "*" or w.Tipo == Tipo:
 				yield w if IterarSobreNo else w.Viz
 			w = w.Prox
+
+
+class RedutorGrafo(object):
+	"""Extrai um subgrafo menor a partir de uma lista de arestas.
+
+	Uso tipico (com arestas 1-based):
+		k, edges_k, mapa, inv = RedutorGrafo.ReduzirArestas(n, edges, max_nodes=2000, estrategia='bfs')
+		g_k = RedutorGrafo.ConstruirGrafoListaAdj(k, edges_k)
+
+	Retorna tambem o mapeamento no_original->no_novo para rastrear correspondencias.
+	"""
+
+	@staticmethod
+	def ReduzirArestas(n, edges, max_nodes, estrategia="bfs", start_node=None, seed=0, garantir_conexo=True):
+		if max_nodes is None:
+			mapa = {i: i for i in range(1, int(n) + 1)}
+			inv = {i: i for i in range(1, int(n) + 1)}
+			return int(n), list(edges), mapa, inv
+		if int(max_nodes) <= 0:
+			raise ValueError("max_nodes deve ser > 0")
+		if int(n) <= int(max_nodes):
+			mapa = {i: i for i in range(1, int(n) + 1)}
+			inv = {i: i for i in range(1, int(n) + 1)}
+			return int(n), list(edges), mapa, inv
+
+		# vertices presentes nas arestas
+		vertices = set()
+		for (u, v) in edges:
+			vertices.add(int(u))
+			vertices.add(int(v))
+
+		if len(vertices) == 0:
+			k = min(int(n), int(max_nodes))
+			mapa = {i: i for i in range(1, k + 1)}
+			inv = {i: i for i in range(1, k + 1)}
+			return k, [], mapa, inv
+
+		rng = random.Random(int(seed))
+		estrategia = (estrategia or "").strip().lower()
+
+		# Monta adjacencia e componentes conexos (somente vertices com arestas)
+		adj = defaultdict(list)
+		for (u, v) in edges:
+			u = int(u)
+			v = int(v)
+			adj[u].append(v)
+			adj[v].append(u)
+
+		def _componente_do_no(no_inicio):
+			comp = set()
+			pilha = [int(no_inicio)]
+			while len(pilha) > 0:
+				u = pilha.pop()
+				if u in comp:
+					continue
+				comp.add(u)
+				for w in adj.get(u, []):
+					if w not in comp:
+						pilha.append(w)
+			return comp
+
+		# Escolhe o componente alvo
+		if start_node is not None:
+			start_node = int(start_node)
+			if start_node not in vertices:
+				start_node = None
+
+		if start_node is not None:
+			componente_alvo = _componente_do_no(start_node)
+		else:
+			visitados = set()
+			componente_alvo = None
+			for vtx in vertices:
+				if vtx in visitados:
+					continue
+				comp = _componente_do_no(vtx)
+				visitados.update(comp)
+				if (componente_alvo is None) or (len(comp) > len(componente_alvo)):
+					componente_alvo = comp
+			# start_node para BFS dentro do maior componente
+			start_node = rng.choice(sorted(componente_alvo))
+
+		# Quantos nos podemos pegar mantendo conectividade
+		if garantir_conexo:
+			max_nodes_eff = min(int(max_nodes), len(componente_alvo))
+		else:
+			max_nodes_eff = int(max_nodes)
+
+		# Seleciona nos
+		if estrategia == "random" and not garantir_conexo:
+			ordenados = sorted(vertices)
+			k = min(max_nodes_eff, len(ordenados))
+			escolhidos = set(rng.sample(ordenados, k=k))
+		else:
+			# BFS (conexo) - se estrategia='random' e garantir_conexo=True, faz BFS com vizinhos embaralhados
+			escolhidos = set()
+			fila = [int(start_node)]
+			while len(fila) > 0 and len(escolhidos) < max_nodes_eff:
+				u = fila.pop(0)
+				if u in escolhidos:
+					continue
+				if garantir_conexo and (u not in componente_alvo):
+					continue
+				escolhidos.add(u)
+				vizinhos = list(adj.get(u, []))
+				if estrategia == "random":
+					rng.shuffle(vizinhos)
+				for w in vizinhos:
+					if w not in escolhidos:
+						fila.append(w)
+
+			# Se por algum motivo nao encheu (ex: componente pequeno), mantem conectado e retorna menor
+			# (nao completa com nos desconexos)
+
+		# arestas do subgrafo induzido
+		edges_sub = []
+		for (u, v) in edges:
+			u = int(u)
+			v = int(v)
+			if (u != v) and (u in escolhidos) and (v in escolhidos):
+				edges_sub.append((u, v))
+
+		# re-rotular para 1..k
+		ordenados = sorted(escolhidos)
+		mapa = {}
+		inv = {}
+		k = 0
+		for old in ordenados:
+			k += 1
+			mapa[old] = k
+			inv[k] = old
+
+		edges_relabel = set()
+		for (u, v) in edges_sub:
+			ru = mapa[u]
+			rv = mapa[v]
+			if ru == rv:
+				continue
+			if ru < rv:
+				edges_relabel.add((ru, rv))
+			else:
+				edges_relabel.add((rv, ru))
+
+		return k, sorted(edges_relabel), mapa, inv
+
+	@staticmethod
+	def ConstruirGrafoListaAdj(n, edges, VizinhancaDuplamenteLigada=True):
+		g = GrafoListaAdj()
+		g.DefinirN(int(n), VizinhancaDuplamenteLigada=VizinhancaDuplamenteLigada)
+		for (u, v) in edges:
+			g.AdicionarAresta(int(u), int(v))
+		return g

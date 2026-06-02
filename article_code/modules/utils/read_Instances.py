@@ -3,6 +3,35 @@ import sys
 from collections import defaultdict
 from scipy.sparse import lil_matrix, coo_matrix
 
+
+def _parse_mtx_dimensions(parts):
+    """Parse MatrixMarket size line.
+
+    Common formats:
+    - coordinate: nrows ncols nnz
+    - array:      nrows ncols
+    """
+    if len(parts) >= 3:
+        nrows, ncols, nnz = (int(float(parts[0])), int(float(parts[1])), int(float(parts[2])))
+        return nrows, ncols, nnz
+    if len(parts) == 2:
+        nrows, ncols = (int(float(parts[0])), int(float(parts[1])))
+        return nrows, ncols, 0
+    raise ValueError(f"Invalid MatrixMarket size line: {' '.join(parts)}")
+
+
+def _parse_mtx_edge(parts):
+    """Parse an edge line using only the first two columns.
+
+    Weighted MatrixMarket files may have 3 columns: i j value.
+    We intentionally ignore extra columns to build an unweighted graph.
+    """
+    if len(parts) < 2:
+        raise ValueError("Invalid edge line (expected at least 2 columns)")
+    e1 = int(float(parts[0]))
+    e2 = int(float(parts[1]))
+    return e1, e2
+
 def load_instance_fast(filename):
     neighbours = defaultdict(list)
     edges = []
@@ -12,7 +41,7 @@ def load_instance_fast(filename):
         for line in f:
             parts = line.split()
             if parts and not parts[0].startswith('%'):
-                nnodes, value, nedges = map(int, parts)
+                nnodes, value, nedges = _parse_mtx_dimensions(parts)
                 break
 
         # lê arestas
@@ -21,8 +50,7 @@ def load_instance_fast(filename):
             if not parts or parts[0].startswith('%'):
                 continue
 
-            e1 = int(float(parts[0]))
-            e2 = int(float(parts[1]))
+            e1, e2 = _parse_mtx_edge(parts)
 
             neighbours[e1].append(e2)
 
@@ -65,11 +93,11 @@ def load_instance(filename):
 
             if flag:
                 # primeira linha de dados (dimensões)
-                nnodes, value, nedges = map(int, parts)
+                nnodes, value, nedges = _parse_mtx_dimensions(parts)
                 flag = False
             else:
-                # converte todos os termos para int
-                e1, e2 = int(float(parts[0])), int(float(parts[1]))
+                # arestas podem ter 2+ colunas (ex: i j w); usa apenas i e j
+                e1, e2 = _parse_mtx_edge(parts)
                 neigh[e1].append(e2)
 
                 if e1 != e2:
@@ -94,29 +122,31 @@ def load_instance(filename):
     return nnodes, nedges, edges, neighbours, lista_adj, matrix
 
 def load_instance_x(filename):
-    #ler as instancias thermais
+    # ler as instancias termicas (compat): agora tolera 3 colunas e comentarios.
     edges = []
     neighbours = defaultdict(list)
     neigh = defaultdict(list)
     flag = True
-    f = open(filename, 'r')
-    for line in f:
 
-        if flag == True:
-            nnodes, value, nedges = [int(x) for x in line.split()]
-            flag = False
-        else:
-            e1, e2 = [x for x in line.split()]
-            e1 = int(e1)
-            e2 = int(e2)
+    with open(filename, 'r') as f:
+        for line in f:
+            parts = line.split()
+            if not parts or parts[0].startswith('%'):
+                continue
+
+            if flag:
+                nnodes, value, nedges = _parse_mtx_dimensions(parts)
+                flag = False
+                continue
+
+            e1, e2 = _parse_mtx_edge(parts)
             neigh[e1].append(e2)
             if e1 != e2:
                 edges.append((min(e1, e2), max(e1, e2)))
                 neighbours[e1].append(e2)
                 neighbours[e2].append(e1)
             else:
-                nedges = nedges - 1
-    f.close()
+                nedges -= 1
 
     f = []
     

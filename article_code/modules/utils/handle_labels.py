@@ -7,14 +7,8 @@ import numpy as np
 import networkx as nx
 
 #FUNCTION TO GET BANDWIDTH  by networkx
-def set_bandwidth(G: GrafoListaAdj) -> int:
+def set_bandwidth_fast(G: GrafoListaAdj) -> int:
     '''Calculate the bandwidth'''
-    A = nx.adjacency_matrix(G)
-    x, y = np.nonzero(A)
-    w = (y - x).max() + (x - y).max() + 1
-    return w
-
-def set_bandwidth_fast(G):
     bw = 0
     for u in G:
         for v in G[u]:

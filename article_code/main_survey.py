@@ -2,18 +2,76 @@
 
 import os
 import time
+import multiprocessing as mp
 import pandas as pd
 import networkx as nx
 import torch
 from modules.utils.read_filenames import readFilesInDict
-from modules.graph.Grafo import GrafoListaAdj
+from modules.graph.Grafo import GrafoListaAdj, RedutorGrafo
 from centralities import get_centrality_node
 from agent import Agent
 from enviroment import Env
 from modules.utils import read_Instances
 import matplotlib.pyplot as plt
-from modules.utils.handle_labels import set_bandwidth, set_bandwidth_fast
+from modules.utils.handle_labels import set_bandwidth_fast
 import json
+
+
+TIMEOUT_SECONDS = 90  # tempo maximo (s) para ler grafo + computar centralidades
+MAX_NODES_REDUCED = 2000  # tamanho do subgrafo caso estoure o timeout
+REDUCTION_STRATEGY = "bfs"  # 'bfs' ou 'random'
+
+
+def _worker_load_and_centralities(instancia_path, centralities, out_queue):
+    """Worker rodado em processo separado para permitir timeout (Windows-friendly)."""
+    try:
+        nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance_fast(instancia_path)
+
+        # NetworkX graph
+        G = nx.Graph()
+        G.add_edges_from(edges)
+
+        # Centralities (cache)
+        centralities_maps = {}
+        for centrality_key, centrality in centralities.items():
+            centralities_maps[centrality_key] = centrality["func"](G, **centrality["args"])
+
+        out_queue.put({
+            "ok": True,
+            "nnodes": nnodes,
+            "edges": edges,
+            "centralities_maps": centralities_maps,
+        })
+    except Exception as e:
+        out_queue.put({"ok": False, "error": repr(e)})
+
+
+def load_graph_and_centralities_with_timeout(instancia_path, centralities, timeout_seconds):
+    """Try to load graph + compute centralities within timeout.
+
+    Returns a dict with keys:
+      - ok: bool
+      - timed_out: bool
+      - nnodes, edges, centralities_maps (when ok)
+      - error (when not ok)
+    """
+    ctx = mp.get_context("spawn")
+    q = ctx.Queue(maxsize=1)
+    p = ctx.Process(target=_worker_load_and_centralities, args=(instancia_path, centralities, q))
+    p.start()
+    p.join(timeout_seconds)
+
+    if p.is_alive():
+        p.terminate()
+        p.join()
+        return {"ok": False, "timed_out": True, "error": f"timeout after {timeout_seconds}s"}
+
+    if q.empty():
+        return {"ok": False, "timed_out": False, "error": "worker returned no data"}
+
+    resp = q.get()
+    resp.setdefault("timed_out", False)
+    return resp
 
 # Função para plotar uma matriz esparsa
 def plot_sparse_matrix(matrix, title, file_name="saida.png"):
@@ -26,7 +84,68 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
 if __name__ == "__main__":
     list_instance, list_band, list_time, global_iteration = [], [], [], []
 
+    # ------------------------------------------------------------
+    # CENTRALIDADES OTIMIZADAS (rápidas, com cache e versões aproximadas)
+    # ------------------------------------------------------------
+
+    centralities = {
+        # Centralidades rápidas
+        "Degree": {
+            "func": nx.degree_centrality,
+            "args": {},
+            "reverse": True
+        },
+
+        "Closeness": {
+            "func": nx.closeness_centrality,
+            "args": {},
+            "reverse": True
+        },
+
+        "Harmonic Centrality": {
+            "func": nx.harmonic_centrality,
+            "args": {},
+            "reverse": True
+        },
+
+        # Betweenness aproximada (100× mais rápida)
+        "Betweenness": {
+            "func": nx.betweenness_centrality,
+            "args": {"k": 50},   # amostra de nós
+            "reverse": True
+        },
+
+        # Eigenvector acelerado
+        "Eigenvector": {
+            "func": nx.eigenvector_centrality,
+            "args": {"max_iter": 200, "tol": 1e-2},
+            "reverse": True
+        },
+
+        # Katz acelerado
+        "Katz Centrality": {
+            "func": nx.katz_centrality,
+            "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 200, "tol": 1e-2},
+            "reverse": True
+        },
+
+        # PageRank acelerado
+        "PageRank": {
+            "func": nx.pagerank,
+            "args": {"alpha": 0.85, "max_iter": 100},
+            "reverse": True
+        }
+    }
+
+    # ------------------------------------------------------------
+    # LOOP PRINCIPAL — com cache automático das centralidades
+    # ------------------------------------------------------------
+
+    todos_movimentos = list(range(len(centralities)))
+    centralities_list = list(centralities.keys())
+
     base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
+    filename = os.path.join(base_dir, "result_output_survey.csv")
     survey_file = os.path.join(base_dir, "data", "survey", )
     
     dir_list = [nome for nome in os.listdir(survey_file) 
@@ -51,72 +170,42 @@ if __name__ == "__main__":
             #     continue
 
             print( "####### instancia", instancia )
-            nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance_fast(instancia)
+
+            # 1) Tenta ler grafo + centralidades dentro do timeout
+            resp = load_graph_and_centralities_with_timeout(instancia, centralities, TIMEOUT_SECONDS)
+
+            if resp.get("ok"):
+                nnodes = resp["nnodes"]
+                edges = resp["edges"]
+                centralities_maps = resp["centralities_maps"]
+                nedges = len(edges)
+            else:
+                # 2) Fallback: reduz o grafo e recomputa centralidades no subgrafo
+                if resp.get("timed_out"):
+                    print(f"[timeout] {resp.get('error')} -> usando grafo reduzido (max_nodes={MAX_NODES_REDUCED})")
+                else:
+                    print(f"[erro] ao computar centralidades no grafo completo: {resp.get('error')} -> usando grafo reduzido")
+
+                nnodes_full, nedges_full, edges_full, neighbours, lista_adj, matrix = read_Instances.load_instance_fast(instancia)
+                nnodes, edges, mapa, inv = RedutorGrafo.ReduzirArestas(
+                    nnodes_full,
+                    edges_full,
+                    max_nodes=MAX_NODES_REDUCED,
+                    estrategia=REDUCTION_STRATEGY,
+                    seed=0,
+                )
+                nedges = len(edges)
+
+                # NetworkX graph reduzido
+                G_reduced = nx.Graph()
+                G_reduced.add_edges_from(edges)
+
+                centralities_maps = {}
+                for centrality_key, centrality in centralities.items():
+                    centralities_maps[centrality_key] = centrality["func"](G_reduced, **centrality["args"])
             
             #parametros
             max_iter = 30
-
-            # ------------------------------------------------------------
-            # CENTRALIDADES OTIMIZADAS (rápidas, com cache e versões aproximadas)
-            # ------------------------------------------------------------
-
-            import networkx as nx
-
-            centralities = {
-                # Centralidades rápidas
-                "Degree": {
-                    "func": nx.degree_centrality,
-                    "args": {},
-                    "reverse": True
-                },
-
-                "Closeness": {
-                    "func": nx.closeness_centrality,
-                    "args": {},
-                    "reverse": True
-                },
-
-                "Harmonic Centrality": {
-                    "func": nx.harmonic_centrality,
-                    "args": {},
-                    "reverse": True
-                },
-
-                # Betweenness aproximada (100× mais rápida)
-                "Betweenness": {
-                    "func": nx.betweenness_centrality,
-                    "args": {"k": 50},   # amostra de nós
-                    "reverse": True
-                },
-
-                # Eigenvector acelerado
-                "Eigenvector": {
-                    "func": nx.eigenvector_centrality,
-                    "args": {"max_iter": 200, "tol": 1e-2},
-                    "reverse": True
-                },
-
-                # Katz acelerado
-                "Katz Centrality": {
-                    "func": nx.katz_centrality,
-                    "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 200, "tol": 1e-2},
-                    "reverse": True
-                },
-
-                # PageRank acelerado
-                "PageRank": {
-                    "func": nx.pagerank,
-                    "args": {"alpha": 0.85, "max_iter": 100},
-                    "reverse": True
-                }
-            }
-
-            # ------------------------------------------------------------
-            # LOOP PRINCIPAL — com cache automático das centralidades
-            # ------------------------------------------------------------
-
-            todos_movimentos = list(range(len(centralities)))
-            centralities_list = list(centralities.keys())
 
             # Instancia grafo NetworkX
             G = nx.Graph()
@@ -132,18 +221,6 @@ if __name__ == "__main__":
             grafo.DefinirN(nnodes, VizinhancaDuplamenteLigada=True)
             for (u, v) in edges:
                 grafo.AdicionarAresta(u, v)
-
-            # Dicionário final com valores de centralidade
-            centralities_maps = {}
-
-            for centrality_key, centrality in centralities.items():
-                print("Calculating centrality:", centrality_key)
-
-                # CACHE — evita recomputar centralidades pesadas
-                if "cache" not in centrality:
-                    centrality["cache"] = centrality["func"](G, **centrality["args"])
-
-                centralities_maps[centrality_key] = centrality["cache"]
 
             #Agent to learning and trainning
             agent = Agent(learning_rate=0.001,
