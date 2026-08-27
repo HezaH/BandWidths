@@ -2,13 +2,13 @@
 
 import os
 import time
+import logging
 import multiprocessing as mp
 import pandas as pd
 import networkx as nx
 import torch
 from modules.utils.read_filenames import readFilesInDict
 from modules.graph.Grafo import GrafoListaAdj, RedutorGrafo
-from centralities import get_centrality_node
 from agent import Agent
 from enviroment import Env
 from modules.utils import read_Instances
@@ -20,6 +20,24 @@ import json
 TIMEOUT_SECONDS = 90  # tempo maximo (s) para ler grafo + computar centralidades
 MAX_NODES_REDUCED = 2000  # tamanho do subgrafo caso estoure o timeout
 REDUCTION_STRATEGY = "bfs"  # 'bfs' ou 'random'
+
+
+def configure_logger(log_file_path: str) -> logging.Logger:
+    """Configure logger to write both to console and file."""
+    logger = logging.getLogger("main_survey_experiment")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    file_handler = logging.FileHandler(log_file_path, mode="w", encoding="utf-8")
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    return logger
 
 
 def _worker_load_and_centralities(instancia_path, centralities, out_queue):
@@ -82,6 +100,13 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
     plt.close()              # fecha a figura para não abrir
 
 if __name__ == "__main__":
+    base_dir = os.path.dirname(__file__)  # diretorio do script
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    log_file_path = os.path.join(base_dir, f"main_survey_execution_{timestamp}.log")
+    logger = configure_logger(log_file_path)
+    logger.info("Inicio da execucao do main_survey.py")
+    logger.info("Arquivo de log salvo em: %s", log_file_path)
+
     list_instance, list_band, list_time, global_iteration = [], [], [], []
 
     # ------------------------------------------------------------
@@ -144,16 +169,17 @@ if __name__ == "__main__":
     todos_movimentos = list(range(len(centralities)))
     centralities_list = list(centralities.keys())
 
-    base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
     filename = os.path.join(base_dir, "result_output_survey.csv")
     survey_file = os.path.join(base_dir, "data", "survey", )
     
     dir_list = [nome for nome in os.listdir(survey_file) 
                     if os.path.isdir(os.path.join(survey_file, nome))]
+    logger.info("Total de classes no survey: %s", len(dir_list))
     
     for kind in dir_list:
         path = os.path.join(survey_file, kind)
         list_path = readFilesInDict(path, ".mtx")
+        logger.info("Classe %s com %s instancias", kind, len(list_path))
 
         for instancia in list_path:
             results = {}
@@ -169,7 +195,7 @@ if __name__ == "__main__":
             #     print(f"Modelo já treinado para a instância {instance_path}, pulando...")
             #     continue
 
-            print( "####### instancia", instancia )
+            logger.info("####### Instancia: %s", instancia)
 
             # 1) Tenta ler grafo + centralidades dentro do timeout
             resp = load_graph_and_centralities_with_timeout(instancia, centralities, TIMEOUT_SECONDS)
@@ -182,9 +208,9 @@ if __name__ == "__main__":
             else:
                 # 2) Fallback: reduz o grafo e recomputa centralidades no subgrafo
                 if resp.get("timed_out"):
-                    print(f"[timeout] {resp.get('error')} -> usando grafo reduzido (max_nodes={MAX_NODES_REDUCED})")
+                    logger.warning("[timeout] %s -> usando grafo reduzido (max_nodes=%s)", resp.get("error"), MAX_NODES_REDUCED)
                 else:
-                    print(f"[erro] ao computar centralidades no grafo completo: {resp.get('error')} -> usando grafo reduzido")
+                    logger.warning("[erro] ao computar centralidades no grafo completo: %s -> usando grafo reduzido", resp.get("error"))
 
                 nnodes_full, nedges_full, edges_full, neighbours, lista_adj, matrix = read_Instances.load_instance_fast(instancia)
                 nnodes, edges, mapa, inv = RedutorGrafo.ReduzirArestas(
@@ -212,7 +238,7 @@ if __name__ == "__main__":
             G.add_edges_from(edges)
 
             temp_bandwidth = set_bandwidth_fast(G)
-            print("Bandwidth original:", temp_bandwidth)
+            logger.info("Bandwidth original: %s", temp_bandwidth)
 
             start_time = time.time()
 
@@ -269,7 +295,15 @@ if __name__ == "__main__":
                 #score acumulado por iteração
                 score += reward
 
-                print(f">> Episode {i+1} Gap: {gap} Reward: {reward} Score: {score} Centrality: {centrality} Bandwidth: {bandwidth}")
+                logger.info(
+                    ">> Episode %s Gap: %s Reward: %s Score: %s Centrality: %s Bandwidth: %s",
+                    i + 1,
+                    gap,
+                    reward,
+                    score,
+                    centrality,
+                    bandwidth,
+                )
                 state = new_state
 
                 if temp_bandwidth > bandwidth:
@@ -283,6 +317,7 @@ if __name__ == "__main__":
                     G_reordered = nx.relabel_nodes(G, solution)
                     adj_matrix_reordered = nx.to_numpy_array(G_reordered) 
                     plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
+                    logger.info("Melhor solução atualizada. Plot salvo: %s", os.path.join(path_name, file_name))
 
             end_time = time.time()
             global_time = end_time - start_time
@@ -304,8 +339,10 @@ if __name__ == "__main__":
 
             with open(json_save_path, 'w') as f:
                 json.dump(df_iteration_dict, f, indent=4)
+            logger.info("Analise por instancia salva em: %s", json_save_path)
               
             torch.save(agent.Q.state_dict(), torch_save_path)
+            logger.info("Modelo salvo em: %s", torch_save_path)
 
             global_iteration.extend(df_iteration_dict)
             # todos_movimentos = list(range(len(centralities)))
@@ -314,5 +351,7 @@ if __name__ == "__main__":
             # print("Banda Final multicetrality: ", custo_s)
     df_global = pd.DataFrame(global_iteration)
     df_global.to_csv(filename, index=False)
-    print(1)
+    logger.info("Resultado global salvo em: %s", filename)
+    logger.info("Total de registros globais: %s", len(df_global))
+    logger.info("Execucao finalizada com sucesso.")
 

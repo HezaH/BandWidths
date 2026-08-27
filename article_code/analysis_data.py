@@ -1,26 +1,55 @@
 # lendo todas as instancias de uma classe
 
 import os
+import time
+import logging
 import pandas as pd
 import numpy as np
 import json
 import matplotlib.pyplot as plt
 import plotly.express as px
 import seaborn as sns
-import imgkit
+
+
+def configure_logger(log_file_path: str) -> logging.Logger:
+    """Configure logger to write both to console and file."""
+    logger = logging.getLogger("analysis_data")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    file_handler = logging.FileHandler(log_file_path, mode="w", encoding="utf-8")
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    return logger
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
+plt_path = os.path.join(base_dir, "data", "newdata", "analysis_results")
+os.makedirs(plt_path, exist_ok=True)
+timestamp = time.strftime("%Y%m%d_%H%M%S")
+log_file_path = os.path.join(plt_path, f"analysis_data_{timestamp}.log")
+logger = configure_logger(log_file_path)
+logger.info("Inicio da execucao do analysis_data.py")
+logger.info("Arquivo de log salvo em: %s", log_file_path)
 
 # 1. Ler o arquivo JSON 
 with open(json_path, "r", encoding="utf-8") as f: 
     data = json.load(f) 
+logger.info("JSON carregado de: %s", json_path)
 
 # 2. Converter para DataFrame 
 df = pd.DataFrame(data)
+logger.info("Total de linhas no dataframe: %s", len(df))
 
 list_of_columns = ['Initial Bandwidth','bandwidth', 'centrality', 'Instance', 'Edges', 'Nodes', 'Diameter', 'Node Connectivity', 'Edge Connectivity', 'Algebraic Connectivity', 'Graph Density', 'Average Shortest Path Length'] #df.columns.tolist()
 list_of_instances = df['Instance'].drop_duplicates().to_list()
+logger.info("Total de instancias unicas: %s", len(list_of_instances))
 
 legend_labels = { 'DEG': 'DEG: Degree', 'CLO': 'CLO: Closeness', 'BTW': 'BTW: Betweenness', 'EIG': 'EIG: Eigenvector', 'KAT': 'KAT: Katz Centrality', 'PRK': 'PRK: PageRank', 'HAR': 'HAR: Harmonic Centrality' }
 order = ['Degree', 'Closeness', 'Betweenness', 'Eigenvector', 'Katz Centrality', 'PageRank', 'Harmonic Centrality']
@@ -42,9 +71,9 @@ best_solutions = pd.DataFrame()
 frequences = pd.DataFrame()
 
 for instance in list_of_instances:
-    plt_path = os.path.join(base_dir, "data", "newdata", "analysis_results")
     image_path = os.path.join(plt_path, f"plot_frequency_{instance}.png")
     html_path = os.path.join(plt_path, f"grafico_bandwidth_{instance}.html")
+    logger.info("Processando instancia: %s", instance)
     # Filtering by instance
     df_instance = df[df['Instance'] == instance][list_of_columns]
 
@@ -84,6 +113,7 @@ for instance in list_of_instances:
 
         fig.update_layout(legend_title_text="Centralidade")
         fig.write_html(html_path, include_plotlyjs="cdn")
+        logger.info("Violin plot salvo em: %s", html_path)
         # fig.write_image(html_path.replace('.html', '.jpeg'), format="jpeg")
 
     # Definig frequency of centrality usage
@@ -109,6 +139,7 @@ for instance in list_of_instances:
 
         os.makedirs(plt_path, exist_ok=True)
         plt.savefig(image_path)
+        logger.info("Grafico de frequencia salvo em: %s", image_path)
 
     # Setting better solutions of each instance
     df_instance = df_instance.drop_duplicates().reset_index(drop=True)
@@ -144,6 +175,7 @@ for y in list_of_columns[4::]:
         plt.ylabel(y)
         plt.legend()  # mostra a legenda com a média
         plt.savefig(fig_path)
+        logger.info("Grafico de dispersao salvo em: %s", fig_path)
 
     bins = pd.qcut(best_adap[y], q=5, duplicates='drop')
     best_adap[f'{y}_bins'] = bins
@@ -191,6 +223,7 @@ for centrality in list_of_centralities:
             fig.update_traces(textposition="outside")
             fig.update_layout(uniformtext_minsize=8, uniformtext_mode="hide")
             fig.write_html(fig_beans, include_plotlyjs="cdn")
+            logger.info("Grafico em bins salvo em: %s", fig_beans)
             # fig.write_image(fig_beans.replace('.html', '.jpeg'), format="jpeg", scale=2)
 
-a = 0
+logger.info("Execucao finalizada com sucesso.")
