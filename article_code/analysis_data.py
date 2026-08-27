@@ -7,7 +7,7 @@ import json
 import matplotlib.pyplot as plt
 import plotly.express as px
 import seaborn as sns
-import imgkit
+from modules.utils.statistical_tests import StatisticalDecisionSupport, WilcoxonHypothesisValidator
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
@@ -193,4 +193,129 @@ for centrality in list_of_centralities:
             fig.write_html(fig_beans, include_plotlyjs="cdn")
             # fig.write_image(fig_beans.replace('.html', '.jpeg'), format="jpeg", scale=2)
 
-a = 0
+
+def run_nonparametric_statistical_analysis(dataframe: pd.DataFrame, output_path: str) -> None:
+    """Apply descriptive, Wilcoxon, Friedman and Holm analyses with logs."""
+    print("[STAT] Starting non-parametric statistical analysis...")
+
+    required_cols = ["Instance", "centrality", "bandwidth"]
+    missing = [c for c in required_cols if c not in dataframe.columns]
+    if missing:
+        raise ValueError(f"Missing required columns for statistics: {missing}")
+
+    os.makedirs(output_path, exist_ok=True)
+    alpha: float = 0.05
+    aggregation: str = "mean"
+    lower_is_better: bool = True
+
+    decision_engine = StatisticalDecisionSupport(alpha=alpha)
+    wilcoxon_validator = WilcoxonHypothesisValidator(alpha=alpha)
+
+    aggregated_df = decision_engine.aggregate_runs(
+        dataframe,
+        instance_col="Instance",
+        method_col="centrality",
+        value_col="bandwidth",
+        aggregation=aggregation,
+    )
+
+    mean_by_method = (
+        aggregated_df.groupby("centrality", as_index=False)["aggregated_value"]
+        .mean()
+        .sort_values("aggregated_value", ascending=lower_is_better)
+        .reset_index(drop=True)
+    )
+    reference_method: str = str(mean_by_method.loc[0, "centrality"])
+    methods = sorted(aggregated_df["centrality"].unique().tolist())
+    competitors = [m for m in methods if m != reference_method]
+
+    print(f"[STAT] Reference method selected by aggregated mean: {reference_method}")
+    print(f"[STAT] Methods considered: {methods}")
+
+    descriptive_df = decision_engine.descriptive_statistics(
+        dataframe,
+        method_col="centrality",
+        value_col="bandwidth",
+    )
+    descriptive_df.to_csv(os.path.join(output_path, "descriptive_statistics.csv"), index=False)
+
+    wilcoxon_df = wilcoxon_validator.compare_methods(
+        dataframe,
+        reference_method=reference_method,
+        competitor_methods=competitors,
+        instance_col="Instance",
+        method_col="centrality",
+        value_col="bandwidth",
+        aggregation=aggregation,
+        lower_is_better=lower_is_better,
+    )
+    wilcoxon_df.to_csv(os.path.join(output_path, "wilcoxon_vs_reference.csv"), index=False)
+
+    friedman_outputs = decision_engine.friedman_holm_against_reference(
+        dataframe,
+        reference_method=reference_method,
+        methods=methods,
+        instance_col="Instance",
+        method_col="centrality",
+        value_col="bandwidth",
+        aggregation=aggregation,
+        lower_is_better=lower_is_better,
+    )
+
+    friedman_result = friedman_outputs["friedman_result"]
+    posthoc_df = friedman_outputs["posthoc"]
+    ranks_df = friedman_outputs["average_ranks"]
+
+    posthoc_df.to_csv(os.path.join(output_path, "friedman_holm_posthoc.csv"), index=False)
+    ranks_df.to_csv(os.path.join(output_path, "friedman_average_ranks.csv"), index=False)
+
+    with open(os.path.join(output_path, "friedman_summary.txt"), "w", encoding="utf-8") as fh:
+        fh.write("Friedman test summary\n")
+        fh.write(f"statistic={friedman_result.statistic:.6f}\n")
+        fh.write(f"p_value={friedman_result.p_value:.6f}\n")
+        fh.write(f"alpha={friedman_result.alpha}\n")
+        fh.write(f"reject_h0={friedman_result.reject_h0}\n")
+        fh.write(f"n_instances={friedman_result.n_instances}\n")
+        fh.write(f"n_methods={friedman_result.n_methods}\n")
+
+    pairwise_matrix = pd.DataFrame(np.nan, index=methods, columns=methods)
+    pivot = friedman_outputs["paired_matrix"]
+    for i, method_i in enumerate(methods):
+        pairwise_matrix.loc[method_i, method_i] = 1.0
+        x = pivot[method_i].to_numpy(dtype=float)
+        for j in range(i + 1, len(methods)):
+            method_j = methods[j]
+            y = pivot[method_j].to_numpy(dtype=float)
+            pair_result = wilcoxon_validator.test_paired_samples(x, y)
+            pairwise_matrix.loc[method_i, method_j] = pair_result.p_value
+            pairwise_matrix.loc[method_j, method_i] = pair_result.p_value
+    pairwise_matrix.to_csv(os.path.join(output_path, "pairwise_wilcoxon_pvalues.csv"))
+
+    plt.figure(figsize=(10, 5))
+    ranks_sorted = ranks_df.sort_values("average_rank", ascending=True)
+    plt.bar(ranks_sorted["method"], ranks_sorted["average_rank"], color="darkorange")
+    plt.title("Average Ranks by Method (Friedman)")
+    plt.ylabel("Average Rank (lower is better)")
+    plt.xticks(rotation=30, ha="right")
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_path, "friedman_average_ranks.png"), dpi=150)
+    plt.close()
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(pairwise_matrix, annot=True, fmt=".3f", cmap="viridis_r", vmin=0.0, vmax=1.0)
+    plt.title("Pairwise Wilcoxon p-values")
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_path, "pairwise_wilcoxon_pvalues.png"), dpi=150)
+    plt.close()
+
+    print(
+        f"[STAT] Friedman: statistic={friedman_result.statistic:.6f}, "
+        f"p-value={friedman_result.p_value:.6f}, reject_h0={friedman_result.reject_h0}"
+    )
+    print("[STAT] Top methods by average rank:")
+    print(ranks_df.sort_values("average_rank", ascending=True).head(5).to_string(index=False))
+    print(f"[STAT] Statistical outputs saved to: {output_path}")
+
+
+stat_output_dir = os.path.join(base_dir, "data", "newdata", "analysis_results", "statistics")
+run_nonparametric_statistical_analysis(df, stat_output_dir)
