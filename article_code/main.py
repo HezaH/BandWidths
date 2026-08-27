@@ -2,6 +2,7 @@
 
 import os
 import time
+import logging
 import pandas as pd
 import networkx as nx
 import torch
@@ -15,6 +16,24 @@ import matplotlib.pyplot as plt
 from modules.utils.handle_labels import set_bandwidth
 import json
 
+
+def configure_logger(log_file_path: str) -> logging.Logger:
+    """Configure logger to write both to console and file."""
+    logger = logging.getLogger("main_experiment")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    file_handler = logging.FileHandler(log_file_path, mode="w", encoding="utf-8")
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    return logger
+
 # Função para plotar uma matriz esparsa
 def plot_sparse_matrix(matrix, title, file_name="saida.png"):
     plt.figure(figsize=(8, 8))
@@ -25,9 +44,16 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
 
 dir_list = ["optimization", "thermal", "structural", "computational_fluid_dynamics", "electromagnetics", ]
 
+base_dir = os.path.dirname(__file__)  # diretorio do script
+timestamp = time.strftime("%Y%m%d_%H%M%S")
+log_file_path = os.path.join(base_dir, f"main_execution_{timestamp}.log")
+logger = configure_logger(log_file_path)
+logger.info("Inicio da execucao do main.py")
+logger.info("Arquivo de log salvo em: %s", log_file_path)
+
 for loop in range(1,2):
 
-    filename = './result_output_cuthill_autovetor_maior.csv'
+    filename = os.path.join(base_dir, "result_output_cuthill_autovetor_maior.csv")
     if loop == 1:
         df = pd.DataFrame()
     else:
@@ -35,12 +61,13 @@ for loop in range(1,2):
 
     list_instance, list_band, list_time, global_iteration = [], [], [], []
 
-    base_dir = os.path.dirname(__file__)  # diretório onde está o main.py
     json_global = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
+    logger.info("Loop %s iniciado. Classes de instancias: %s", loop, dir_list)
     
     for kind in dir_list:
         path = os.path.join(base_dir, "data", "newdata", kind)
         list_path = readFilesInDict(path, ".mtx")
+        logger.info("Classe %s com %s instancias", kind, len(list_path))
 
         for instancia in list_path:
             results = {}
@@ -56,7 +83,7 @@ for loop in range(1,2):
             #     print(f"Modelo já treinado para a instância {instance_path}, pulando...")
             #     continue
 
-            print( "####### instancia", instancia )
+            logger.info("####### Instancia: %s", instancia)
             nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance(instancia)
             
             #parametros
@@ -97,7 +124,7 @@ for loop in range(1,2):
             G.add_edges_from(edges)
 
             temp_bandwidth = set_bandwidth(G)
-            print("Bandwidth original: ", temp_bandwidth)
+            logger.info("Bandwidth original: %s", temp_bandwidth)
             
             # Number of connected components
             num_components = nx.number_connected_components(G)
@@ -115,17 +142,17 @@ for loop in range(1,2):
 
             start_time = time.time()
             
-            print(f"Number of connected components: {num_components}")
-            print(f"Size of the largest connected component: {largest_size}")
-            print(f"Diameter of the largest connected component: {diameter}")
+            logger.info("Connected components: %s", num_components)
+            logger.info("Largest component size: %s", largest_size)
+            logger.info("Largest component diameter: %s", diameter)
             
             for name, func in dict_connectivity.items():
                 try:
                     result = func(G)
-                    print(f"{name}: {result}")
+                    logger.info("%s: %s", name, result)
                     results[name] = result
                 except Exception as e:
-                    print(f"Could not compute {func.__name__}: {e}")
+                    logger.warning("Could not compute %s: %s", func.__name__, e)
 
             #instancia os graficos own-lib
             grafo = GrafoListaAdj()
@@ -136,7 +163,7 @@ for loop in range(1,2):
             #dict of centralities values for each centrality
             centralities_maps={}
             for centrality_key, centrality in centralities.items():
-                print("Calculating centrality: ", centrality_key)
+                logger.info("Calculating centrality: %s", centrality_key)
                 centralities_maps[centrality_key] = get_centrality_node(G,  centrality)
             
             #Agent to learning and trainning
@@ -186,7 +213,15 @@ for loop in range(1,2):
                 #score acumulado por iteração
                 score += reward
 
-                print(f">> Episode {i+1} Gap: {gap} Reward: {reward} Score: {score} Centrality: {centrality} Bandwidth: {bandwidth}")
+                logger.info(
+                    ">> Episode %s Gap: %s Reward: %s Score: %s Centrality: %s Bandwidth: %s",
+                    i + 1,
+                    gap,
+                    reward,
+                    score,
+                    centrality,
+                    bandwidth,
+                )
                 state = new_state
 
                 if temp_bandwidth > bandwidth:
@@ -200,6 +235,7 @@ for loop in range(1,2):
                     G_reordered = nx.relabel_nodes(G, solution)
                     adj_matrix_reordered = nx.to_numpy_array(G_reordered) 
                     plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
+                    logger.info("Melhor solução atualizada. Plot salvo: %s", os.path.join(path_name, file_name))
 
             end_time = time.time()
             global_time = end_time - start_time
@@ -221,8 +257,10 @@ for loop in range(1,2):
 
             with open(json_save_path, 'w') as f:
                 json.dump(df_iteration_dict, f, indent=4)
+            logger.info("Analise por instancia salva em: %s", json_save_path)
               
             torch.save(agent.Q.state_dict(), torch_save_path)
+            logger.info("Modelo salvo em: %s", torch_save_path)
 
             global_iteration.extend(df_iteration_dict)
             # todos_movimentos = list(range(len(centralities)))
@@ -231,4 +269,7 @@ for loop in range(1,2):
             # print("Banda Final multicetrality: ", custo_s)
     df_global = pd.DataFrame(global_iteration)
     df_global.to_csv(filename, index=False)
-    print(1)
+    logger.info("Resultado global salvo em: %s", filename)
+    logger.info("Total de registros globais: %s", len(df_global))
+
+logger.info("Execucao finalizada com sucesso.")
