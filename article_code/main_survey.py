@@ -16,6 +16,7 @@ from modules.utils import read_Instances
 import matplotlib.pyplot as plt
 from modules.utils.handle_labels import set_bandwidth_fast
 import json
+import math
 
 TIMEOUT_SECONDS = 90  # tempo maximo (s) para ler grafo + computar centralidades
 
@@ -81,7 +82,10 @@ def load_graph_and_centralities_with_timeout(instancia_path, centralities, timeo
     q = ctx.Queue(maxsize=1)
     p = ctx.Process(target=_worker_load_and_centralities, args=(instancia_path, centralities, q))
     p.start()
-    p.join(timeout_seconds)
+    if math.isinf(timeout_seconds):
+        p.join()
+    else:
+        p.join(timeout_seconds)
 
     if p.is_alive():
         p.terminate()
