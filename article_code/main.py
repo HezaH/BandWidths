@@ -17,9 +17,9 @@ from modules.utils.handle_labels import set_bandwidth
 import json
 
 
-def configure_logger(log_file_path: str) -> logging.Logger:
+def configure_logger(log_file_path: str, logger_name: str) -> logging.Logger:
     """Configure logger to write both to console and file."""
-    logger = logging.getLogger("main_experiment")
+    logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
@@ -45,11 +45,8 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
 dir_list = ["optimization", "thermal", "structural", "computational_fluid_dynamics", "electromagnetics", ]
 
 base_dir = os.path.dirname(__file__)  # diretorio do script
-timestamp = time.strftime("%Y%m%d_%H%M%S")
-log_file_path = os.path.join(base_dir, f"main_execution_{timestamp}.log")
-logger = configure_logger(log_file_path)
-logger.info("Inicio da execucao do main.py")
-logger.info("Arquivo de log salvo em: %s", log_file_path)
+run_timestamp = time.strftime("%Y%m%d_%H%M%S")
+print(f"[INFO] Inicio da execucao do main.py ({run_timestamp})")
 
 for loop in range(1,2):
 
@@ -62,20 +59,25 @@ for loop in range(1,2):
     list_instance, list_band, list_time, global_iteration = [], [], [], []
 
     json_global = os.path.join(base_dir, "data", "newdata", "global_analysis_inputs.json")
-    logger.info("Loop %s iniciado. Classes de instancias: %s", loop, dir_list)
+    print(f"[INFO] Loop {loop} iniciado. Classes de instancias: {dir_list}")
     
     for kind in dir_list:
         path = os.path.join(base_dir, "data", "newdata", kind)
         list_path = readFilesInDict(path, ".mtx")
-        logger.info("Classe %s com %s instancias", kind, len(list_path))
+        print(f"[INFO] Classe {kind} com {len(list_path)} instancias")
 
         for instancia in list_path:
             results = {}
 
             instance_path = os.path.basename(instancia).replace(".mtx", "")
             path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}")
+            log_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), f"plots/{instance_path}/run_{instance_path}.log")
             # criar o diretório se não existir
             os.makedirs(path_name, exist_ok=True)
+            instance_timestamp = time.strftime("%Y%m%d_%H%M%S")
+            log_file_path = os.path.join(log_name, f"run_{instance_path}_{instance_timestamp}.log")
+            logger_name = f"main_experiment_{instance_path}_{instance_timestamp}"
+            logger = configure_logger(log_file_path, logger_name)
             torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
             json_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'analysis_inputs_{instance_path}.json')
             
@@ -83,7 +85,8 @@ for loop in range(1,2):
             #     print(f"Modelo já treinado para a instância {instance_path}, pulando...")
             #     continue
 
-            logger.info("####### Instancia: %s", instancia)
+            logger.info("Inicio da instancia: %s", instancia)
+            logger.info("Arquivo de log salvo em: %s", log_file_path)
             nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance(instancia)
             
             #parametros
@@ -269,7 +272,7 @@ for loop in range(1,2):
             # print("Banda Final multicetrality: ", custo_s)
     df_global = pd.DataFrame(global_iteration)
     df_global.to_csv(filename, index=False)
-    logger.info("Resultado global salvo em: %s", filename)
-    logger.info("Total de registros globais: %s", len(df_global))
+    print(f"[INFO] Resultado global salvo em: {filename}")
+    print(f"[INFO] Total de registros globais: {len(df_global)}")
 
-logger.info("Execucao finalizada com sucesso.")
+print("[INFO] Execucao finalizada com sucesso.")

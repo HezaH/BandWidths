@@ -5,6 +5,7 @@ import time
 import logging
 import multiprocessing as mp
 import pandas as pd
+import numpy as np
 import networkx as nx
 import torch
 from modules.utils.read_filenames import readFilesInDict
@@ -16,15 +17,18 @@ import matplotlib.pyplot as plt
 from modules.utils.handle_labels import set_bandwidth_fast
 import json
 
-
 TIMEOUT_SECONDS = 90  # tempo maximo (s) para ler grafo + computar centralidades
+
+if 'C:\\Temp\\C##\\BandWidths' not in os.getcwd() :
+    TIMEOUT_SECONDS = np.inf  # desabilitar timeout se não estiver rodando no servidor
+
 MAX_NODES_REDUCED = 2000  # tamanho do subgrafo caso estoure o timeout
 REDUCTION_STRATEGY = "bfs"  # 'bfs' ou 'random'
 
 
-def configure_logger(log_file_path: str) -> logging.Logger:
+def configure_logger(log_file_path: str, logger_name: str) -> logging.Logger:
     """Configure logger to write both to console and file."""
-    logger = logging.getLogger("main_survey_experiment")
+    logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
@@ -101,11 +105,8 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
 
 if __name__ == "__main__":
     base_dir = os.path.dirname(__file__)  # diretorio do script
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-    log_file_path = os.path.join(base_dir, f"main_survey_execution_{timestamp}.log")
-    logger = configure_logger(log_file_path)
-    logger.info("Inicio da execucao do main_survey.py")
-    logger.info("Arquivo de log salvo em: %s", log_file_path)
+    run_timestamp = time.strftime("%Y%m%d_%H%M%S")
+    print(f"[INFO] Inicio da execucao do main_survey.py ({run_timestamp})")
 
     list_instance, list_band, list_time, global_iteration = [], [], [], []
 
@@ -174,20 +175,28 @@ if __name__ == "__main__":
     
     dir_list = [nome for nome in os.listdir(survey_file) 
                     if os.path.isdir(os.path.join(survey_file, nome))]
-    logger.info("Total de classes no survey: %s", len(dir_list))
+    print(f"[INFO] Total de classes no survey: {len(dir_list)}")
     
     for kind in dir_list:
         path = os.path.join(survey_file, kind)
         list_path = readFilesInDict(path, ".mtx")
-        logger.info("Classe %s com %s instancias", kind, len(list_path))
+        print(f"[INFO] Classe {kind} com {len(list_path)} instancias")
 
         for instancia in list_path:
             results = {}
 
             instance_path = os.path.basename(instancia).replace(".mtx", "")
             path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}")
+            log_file_path = os.path.join(os.path.dirname(__file__), "logs",f"{instance_path}.log")
+
             # criar o diretório se não existir
             os.makedirs(path_name, exist_ok=True)
+            os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+
+            instance_timestamp = time.strftime("%Y%m%d_%H%M%S")
+            
+            logger_name = f"main_survey_experiment_{instance_path}_{instance_timestamp}"
+            logger = configure_logger(log_file_path, logger_name)
             torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
             json_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'analysis_inputs_{instance_path}.json')
             
@@ -195,11 +204,12 @@ if __name__ == "__main__":
             #     print(f"Modelo já treinado para a instância {instance_path}, pulando...")
             #     continue
 
-            logger.info("####### Instancia: %s", instancia)
+            logger.info("Inicio da instancia: %s", instancia)
+            logger.info("Arquivo de log salvo em: %s", log_file_path)
 
             # 1) Tenta ler grafo + centralidades dentro do timeout
             resp = load_graph_and_centralities_with_timeout(instancia, centralities, TIMEOUT_SECONDS)
-
+            
             if resp.get("ok"):
                 nnodes = resp["nnodes"]
                 edges = resp["edges"]
@@ -351,7 +361,7 @@ if __name__ == "__main__":
             # print("Banda Final multicetrality: ", custo_s)
     df_global = pd.DataFrame(global_iteration)
     df_global.to_csv(filename, index=False)
-    logger.info("Resultado global salvo em: %s", filename)
-    logger.info("Total de registros globais: %s", len(df_global))
-    logger.info("Execucao finalizada com sucesso.")
+    print(f"[INFO] Resultado global salvo em: {filename}")
+    print(f"[INFO] Total de registros globais: {len(df_global)}")
+    print("[INFO] Execucao finalizada com sucesso.")
 
