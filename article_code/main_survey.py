@@ -27,9 +27,9 @@ MAX_NODES_REDUCED = 2000  # tamanho do subgrafo caso estoure o timeout
 REDUCTION_STRATEGY = "bfs"  # 'bfs' ou 'random'
 
 
-def configure_logger(log_file_path: str, logger_name: str) -> logging.Logger:
+def configure_logger(log_file_path: str) -> logging.Logger:
     """Configure logger to write both to console and file."""
-    logger = logging.getLogger(logger_name)
+    logger = logging.getLogger(log_file_path)
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
@@ -199,8 +199,7 @@ if __name__ == "__main__":
 
             instance_timestamp = time.strftime("%Y%m%d_%H%M%S")
             
-            logger_name = f"main_survey_experiment_{instance_path}_{instance_timestamp}"
-            logger = configure_logger(log_file_path, logger_name)
+            logger = configure_logger(log_file_path)
             torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
             json_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'analysis_inputs_{instance_path}.json')
             
