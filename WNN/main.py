@@ -10,6 +10,13 @@ from graph_classifier import (
 )
 import numpy as np
 
+# Tenta importar o script de análise para execução automática no final
+try:
+    from analyze_results import main as run_analysis
+except ImportError:
+    run_analysis = None
+    print("[AVISO] Script de análise 'analyze_results.py' não encontrado. A análise final não será executada.")
+
 # --------------------------------------------------------------------------------
 # 0) Execução: PARTE 1 (extração) seguida da PARTE 2 (KernelCanvas++)
 # --------------------------------------------------------------------------------
@@ -136,3 +143,14 @@ if __name__ == "__main__":
 
         except FileNotFoundError as e:
             print(f"[ERRO] {dataset_name}: {e}")
+
+    # ---- NOVO: Executa a análise de resultados ao final de todos os datasets ----
+    print("\n\n" + "="*50)
+    print("=== Execução do pipeline principal concluída.      ===")
+    print("=== Iniciando a análise e geração de gráficos...   ===")
+    print("="*50)
+    if run_analysis:
+        try:
+            run_analysis()
+        except Exception as e:
+            print(f"\n[ERRO] Falha ao executar a análise de resultados: {e}")
