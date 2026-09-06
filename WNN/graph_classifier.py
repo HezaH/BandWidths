@@ -90,10 +90,11 @@ class GraphClassifier:
                 f"{self.classifier_name}"
             )
 
-    def evaluate(self, X, y):
+    def evaluate(self, X, y, sample_ids=None):
 
         X = np.asarray(X)
         y = np.asarray(y).astype(int)
+        sample_ids = np.arange(len(y)) if sample_ids is None else np.asarray(sample_ids)
 
         cv = StratifiedKFold(
             n_splits=self.n_splits,
@@ -105,6 +106,7 @@ class GraphClassifier:
         precision_scores = []
         recall_scores = []
         f1_scores = []
+        fold_results = []
 
         confusion_sum = None
 
@@ -177,6 +179,20 @@ class GraphClassifier:
             recall_scores.append(rec)
             f1_scores.append(f1)
 
+            fold_results.append({
+                "fold": fold,
+                "train_indices": train_idx.tolist(),
+                "test_indices": test_idx.tolist(),
+                "sample_ids": sample_ids[test_idx].tolist(),
+                "y_true": y_test.tolist(),
+                "y_pred": y_pred.tolist(),
+                "accuracy": float(acc),
+                "precision": float(prec),
+                "recall": float(rec),
+                "f1": float(f1),
+                "confusion_matrix": cm.tolist(),
+            })
+
             print(
                 f"Fold {fold:02d} "
                 f"| ACC={acc:.4f}"
@@ -215,11 +231,13 @@ class GraphClassifier:
                 confusion_sum,
 
             "all_scores":
-                accuracy_scores
+                accuracy_scores,
+
+            "folds": fold_results
         }
 
 
-def benchmark_classifiers(X, y):
+def benchmark_classifiers(X, y, sample_ids=None):
 
     classifiers = [
 
@@ -244,7 +262,8 @@ def benchmark_classifiers(X, y):
 
         result = clf.evaluate(
             X,
-            y
+            y,
+            sample_ids=sample_ids
         )
 
         results[clf_name] = result
