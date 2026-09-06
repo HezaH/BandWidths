@@ -93,7 +93,7 @@ class GraphClassifier:
     def evaluate(self, X, y):
 
         X = np.asarray(X)
-        y = np.asarray(y)
+        y = np.asarray(y).astype(int)
 
         cv = StratifiedKFold(
             n_splits=self.n_splits,
@@ -128,6 +128,10 @@ class GraphClassifier:
             y_pred = model.predict(
                 X_test
             )
+
+            # Garante que a saída do classificador
+            # tenha o mesmo tipo dos rótulos reais.
+            y_pred = np.asarray(y_pred).astype(int)
 
             acc = accuracy_score(
                 y_test,

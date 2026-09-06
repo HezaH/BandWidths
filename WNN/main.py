@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     # opcional: centralidades extras já filtradas por benchmark_centralities()
     extra_centralities = None  # ex.: {"Eigenvector": nx.eigenvector_centrality}
-
+    results = []
     for dataset_name in datasets_to_process:
         print(f"\n=== Processando dataset {dataset_name} ===")
         try:
@@ -47,23 +47,26 @@ if __name__ == "__main__":
                     classifier_name="rf"
                 )
 
-                results = clf.evaluate(
+                results.append(clf.evaluate(
                     X,
                     y
-                )
+                ))
 
             elif classification_mode == "wisard":
                 clf = GraphClassifier(
                     classifier_name="wisard"
                 )
 
-                results = clf.evaluate(
+                results.append(clf.evaluate(
                     X,
                     y
-                )
+                ))
 
             else:
-                results = benchmark_classifiers(X, y)
+                results.append(benchmark_classifiers(
+                    X, 
+                    y
+                ))
 
             print(results)
 
