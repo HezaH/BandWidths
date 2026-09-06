@@ -1,5 +1,6 @@
 import os
 import json
+import math
 from datetime import datetime
 from pipeline import build_binary_representations
 from reading_graphs import process_dataset
@@ -21,21 +22,27 @@ N_WORKERS = None  # None = usa todos os núcleos disponíveis
 RESULTS_PATH = os.path.join(os.path.dirname(__file__), "results", "experiments.json")
 
 
-def _json_default(value):
-    """Converte tipos NumPy para tipos aceitos pelo módulo json."""
+def _jsonable(value):
+    """Converte recursivamente tipos NumPy e valores não finitos para JSON."""
+    if isinstance(value, dict):
+        return {str(key): _jsonable(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(item) for item in value]
     if isinstance(value, np.ndarray):
-        return value.tolist()
+        return _jsonable(value.tolist())
     if isinstance(value, (np.integer,)):
         return int(value)
     if isinstance(value, (np.floating,)):
-        return float(value)
-    raise TypeError(f"Tipo não serializável: {type(value)}")
+        value = float(value)
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    return value
 
 
 def _save_results(results):
     os.makedirs(os.path.dirname(RESULTS_PATH), exist_ok=True)
     with open(RESULTS_PATH, "w", encoding="utf-8") as file:
-        json.dump(results, file, indent=2, ensure_ascii=False, default=_json_default)
+        json.dump(_jsonable(results), file, indent=2, ensure_ascii=False, allow_nan=False)
 
 
 if __name__ == "__main__":
