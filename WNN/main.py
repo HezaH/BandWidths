@@ -13,7 +13,7 @@ from graph_classifier import (
 # --------------------------------------------------------------------------------
 # 1) CONFIGURAÇÃO
 # --------------------------------------------------------------------------------
-BASE_DIR = os.path.join("WNN", "data_sets")
+BASE_DIR = os.path.join(os.getcwd(),"WNN", "data_sets")
 N_WORKERS = None  # None = usa todos os núcleos disponíveis
 
 
@@ -38,8 +38,11 @@ if __name__ == "__main__":
                 n_kernels=8, bits_per_kernel=4, k_activate=2,
             )
 
-            # PARTE 3 -- Classificação dos vetores binários (X) com SVM, RF, KNN e MLP
-            if False:
+            # PARTE 3 -- Classificação dos vetores binários (X)
+            # Opções: "single_rf", "wisard", "benchmark".
+            classification_mode = "wisard"
+
+            if classification_mode == "single_rf":
                 clf = GraphClassifier(
                     classifier_name="rf"
                 )
@@ -49,9 +52,19 @@ if __name__ == "__main__":
                     y
                 )
 
+            elif classification_mode == "wisard":
+                clf = GraphClassifier(
+                    classifier_name="wisard"
+                )
+
+                results = clf.evaluate(
+                    X,
+                    y
+                )
+
             else:
                 results = benchmark_classifiers(X, y)
- 
+
             print(results)
 
             print("\nExemplo -- vetor binário do grafo 0:")
