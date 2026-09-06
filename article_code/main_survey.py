@@ -20,8 +20,8 @@ import math
 
 TIMEOUT_SECONDS = 90  # tempo maximo (s) para ler grafo + computar centralidades
 
-if 'C:\\Temp\\C##\\BandWidths' not in os.getcwd() :
-    TIMEOUT_SECONDS = np.inf  # desabilitar timeout se não estiver rodando no servidor
+# if 'C:\\Temp\\C##\\BandWidths' not in os.getcwd() :
+#     TIMEOUT_SECONDS = np.inf  # desabilitar timeout se não estiver rodando no servidor
 
 MAX_NODES_REDUCED = 2000  # tamanho do subgrafo caso estoure o timeout
 REDUCTION_STRATEGY = "bfs"  # 'bfs' ou 'random'
