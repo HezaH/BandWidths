@@ -243,7 +243,7 @@ def plot_accuracy_rank_over_datasets(df: pd.DataFrame, output_dir: str):
     if rank_pivot.empty:
         print("Não foi possível criar a tabela de ranking. Pulando o heatmap de ranking.")
         return
-
+    
     plt.style.use('default')
     plt.figure(figsize=(max(10, rank_pivot.shape[1] * 1.2), max(6, rank_pivot.shape[0] * 0.6)))
 
@@ -373,6 +373,50 @@ def plot_performance_by_mode(df: pd.DataFrame, output_dir: str):
     plt.savefig(save_path, dpi=150)
     plt.close()
     print(f"Gráfico de desempenho por modo de classificação salvo em: {save_path}")
+
+def plot_parameter_sensitivity(df: pd.DataFrame, output_dir: str):
+    """
+    Analisa a sensibilidade da acurácia aos parâmetros da representação,
+    criando um gráfico para cada parâmetro que foi variado nos experimentos.
+    """
+    params_to_plot = [p for p in df.columns if p.startswith('param_')]
+    if not params_to_plot:
+        print("Nenhum parâmetro de representação ('param_*') encontrado para análise de sensibilidade.")
+        return
+
+    # Filtra apenas os parâmetros que foram realmente variados
+    variable_params = [p for p in params_to_plot if df[p].nunique() > 1]
+    if not variable_params:
+        print("Nenhum parâmetro de representação com variação suficiente para plotar.")
+        return
+
+    print("\n--- Gerando Gráficos de Sensibilidade de Parâmetros ---")
+    for param in variable_params:
+        plt.style.use('seaborn-v0_8-whitegrid')
+
+        g = sns.catplot(
+            data=df,
+            x=param,
+            y='accuracy_mean',
+            hue='kernel_strategy',
+            col='dataset_name',
+            kind='point',
+            col_wrap=3,
+            palette='magma',
+            height=4,
+            aspect=1.2,
+            sharey=False
+        )
+        
+        g.fig.suptitle(f"Sensibilidade da Acurácia ao Parâmetro: {param.replace('param_', '')}", y=1.03, fontsize=16)
+        g.set_axis_labels(f"Valor de {param.replace('param_', '')}", "Acurácia Média")
+        g.set_titles("Dataset: {col_name}")
+        
+        plt.tight_layout(rect=[0, 0, 1, 0.97])
+        save_path = os.path.join(output_dir, f"sensitivity_{param}.png")
+        plt.savefig(save_path, dpi=150)
+        plt.close()
+        print(f"Gráfico de sensibilidade para '{param}' salvo em: {save_path}")
 
 
 def main():

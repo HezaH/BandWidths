@@ -47,102 +47,116 @@ def _jsonable(value):
 
 
 def _save_results(results):
+    """Carrega resultados existentes, anexa os novos e salva o arquivo JSON."""
     os.makedirs(os.path.dirname(RESULTS_PATH), exist_ok=True)
-    with open(RESULTS_PATH, "w", encoding="utf-8") as file:
-        json.dump(_jsonable(results), file, indent=2, ensure_ascii=False, allow_nan=False)
+    
+    all_results = []
+    if os.path.exists(RESULTS_PATH):
+        try:
+            with open(RESULTS_PATH, "r", encoding="utf-8") as f:
+                # Evita erro se o arquivo estiver vazio
+                content = f.read()
+                if content:
+                    all_results = json.loads(content)
+        except json.JSONDecodeError:
+            print(f"[AVISO] O arquivo {RESULTS_PATH} está corrompido ou vazio. Um novo arquivo será criado.")
+            all_results = []
+
+    all_results.extend(results)
+
+    with open(RESULTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(_jsonable(all_results), f, indent=2, ensure_ascii=False, allow_nan=False)
 
 
 if __name__ == "__main__":
-    # Ajuste aqui os nomes das pastas de dataset que você tem disponíveis.
-    # Cada nome deve corresponder a uma pasta dentro de BASE_DIR contendo os
-    # arquivos <NOME>_A.txt, <NOME>_graph_indicator.txt, etc.
     datasets_to_process = os.listdir(BASE_DIR)
-
-    # opcional: centralidades extras já filtradas por benchmark_centralities()
     extra_centralities = None  # ex.: {"Eigenvector": nx.eigenvector_centrality}
-    kernel_strategy = np.random.choice(["fps", None])
-    print(f"\nEstratégia de kernel escolhida: {kernel_strategy}")
-    results = []
 
-    # Opções: "single_rf", "wisard", "benchmark".
-    classification_mode = np.random.choice(["single_rf", "wisard", "benchmark"])
-    print(f"\nClassificação dos vetores binários (X) usando o modo: {classification_mode}")
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # --- Definição das configurações de experimento para avaliação ---
+    # Cada dicionário define uma combinação de parâmetros a ser testada.
+    experiment_configs = [
+        # Configuração 1: K-means (padrão) com parâmetros base e benchmark de classificadores
+        {"kernel_strategy": None, "n_kernels": 8, "bits_per_kernel": 4, "k_activate": 2, "classification_mode": "benchmark"},
+        # Configuração 2: K-means com mais kernels
+        {"kernel_strategy": None, "n_kernels": 16, "bits_per_kernel": 4, "k_activate": 3, "classification_mode": "benchmark"},
+        # Configuração 3: FPS (Farthest Point Sampling) com parâmetros base e benchmark
+        {"kernel_strategy": "fps", "n_kernels": 8, "bits_per_kernel": 4, "k_activate": 2, "classification_mode": "benchmark"},
+        # Configuração 4: FPS com mais kernels e apenas WiSARD
+        {"kernel_strategy": "fps", "n_kernels": 16, "bits_per_kernel": 8, "k_activate": 4, "classification_mode": "wisard"},
+    ]
 
-    for dataset_name in datasets_to_process:
-        print(f"\n=== Processando dataset {dataset_name} ===")
-        try:
-            # PARTE 1 -- extração paralela das métricas (M)
-            csv_nodes, csv_edges = process_dataset(dataset_name, extra_centralities=extra_centralities)
+    for i, config in enumerate(experiment_configs):
+        print("\n" + "="*80)
+        print(f"--- INICIANDO EXPERIMENTO {i+1}/{len(experiment_configs)} ---")
+        print(f"Configuração: {config}")
+        print("="*80 + "\n")
 
-            # PARTE 2 -- KernelCanvas++ com ECDF + K-means (Q)
-            X, y, models, diagnostics = build_binary_representations(
-                csv_nodes, edge_metrics_csv_path=csv_edges,
-                n_kernels=8, bits_per_kernel=4, k_activate=2,kernel_strategy=kernel_strategy,
-            )
+        run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        results_for_config = []
 
-            sample_ids = np.arange(len(y))
+        for dataset_name in datasets_to_process:
+            print(f"\n--- Processando dataset {dataset_name} para a configuração atual ---")
+            try:
+                # PARTE 1 -- extração paralela das métricas (M)
+                csv_nodes, csv_edges = process_dataset(dataset_name, extra_centralities=extra_centralities)
 
-            # PARTE 3 -- Classificação dos vetores binários (X)
-            if classification_mode == "single_rf":
-                clf = GraphClassifier(
-                    classifier_name="rf"
+                # PARTE 2 -- KernelCanvas++ com ECDF + K-means (Q)
+                X, y, models, diagnostics = build_binary_representations(
+                    csv_nodes, edge_metrics_csv_path=csv_edges,
+                    n_kernels=config["n_kernels"],
+                    bits_per_kernel=config["bits_per_kernel"],
+                    k_activate=config["k_activate"],
+                    kernel_strategy=config["kernel_strategy"],
                 )
 
-                classifier_results = {
-                    "rf": clf.evaluate(X, y, sample_ids=sample_ids)
-                }
+                sample_ids = np.arange(len(y))
 
-            elif classification_mode == "wisard":
-                clf = GraphClassifier(
-                    classifier_name="wisard"
-                )
+                # PARTE 3 -- Classificação dos vetores binários (X)
+                classification_mode = config["classification_mode"]
+                if classification_mode == "single_rf":
+                    clf = GraphClassifier(classifier_name="rf")
+                    classifier_results = {"rf": clf.evaluate(X, y, sample_ids=sample_ids)}
+                elif classification_mode == "wisard":
+                    clf = GraphClassifier(classifier_name="wisard")
+                    classifier_results = {"wisard": clf.evaluate(X, y, sample_ids=sample_ids)}
+                else: # "benchmark"
+                    classifier_results = benchmark_classifiers(X, y, sample_ids=sample_ids)
 
-                classifier_results = {
-                    "wisard": clf.evaluate(X, y, sample_ids=sample_ids)
-                }
-
-            else:
-                classifier_results = benchmark_classifiers(
-                    X,
-                    y,
-                    sample_ids=sample_ids
-                )
-
-            dataset_result = {
-                "run_id": run_id,
-                "dataset": {
-                    "name": dataset_name,
-                    "n_samples": int(len(y)),
-                    "n_features": int(X.shape[1]),
-                    "n_classes": int(len(np.unique(y))),
-                    "class_distribution": {
-                        str(label): int(count)
-                        for label, count in zip(*np.unique(y, return_counts=True))
+                dataset_result = {
+                    "run_id": run_id,
+                    "dataset": {
+                        "name": dataset_name,
+                        "n_samples": int(len(y)),
+                        "n_features_in": len(diagnostics), # Número de métricas de entrada
+                        "n_classes": int(len(np.unique(y))),
+                        "class_distribution": {str(label): int(count) for label, count in zip(*np.unique(y, return_counts=True))},
                     },
-                },
-                "representation": {
-                    "method": "KernelCanvasPP",
-                    "kernel_strategy": kernel_strategy,
-                    "n_kernels": 8,
-                    "bits_per_kernel": 4,
-                    "k_activate": 2,
-                    "diagnostics": diagnostics,
-                },
-                "classification_mode": classification_mode,
-                "classifiers": classifier_results,
-            }
-            results.append(dataset_result)
-            _save_results(results)
+                    "representation": {
+                        "method": "KernelCanvasPP",
+                        "kernel_strategy": config["kernel_strategy"],
+                        "n_kernels": config["n_kernels"],
+                        "bits_per_kernel": config["bits_per_kernel"],
+                        "k_activate": config["k_activate"],
+                        "n_features_out": int(X.shape[1]),
+                        "diagnostics": diagnostics,
+                    },
+                    "classification_mode": classification_mode,
+                    "classifiers": classifier_results,
+                }
+                results_for_config.append(dataset_result)
 
-            print(f"Resultados salvos em: {RESULTS_PATH}")
+                print(f"\nResultados para {dataset_name} com config {i+1} processados.")
+                print(f"Vetor binário resultante: {X.shape[0]} amostras x {X.shape[1]} features")
 
-            print("\nExemplo -- vetor binário do grafo 0:")
-            print(X[0])
-            print("Rótulo correspondente:", y[0])
+            except FileNotFoundError as e:
+                print(f"[ERRO] {dataset_name}: {e}")
+            except Exception as e:
+                print(f"[ERRO INESPERADO] ao processar {dataset_name}: {e}")
 
-        except FileNotFoundError as e:
-            print(f"[ERRO] {dataset_name}: {e}")
+        # Salva os resultados desta configuração no final do loop de datasets
+        if results_for_config:
+            _save_results(results_for_config)
+            print(f"\nResultados da configuração {i+1} salvos em: {RESULTS_PATH}")
 
     # ---- NOVO: Executa a análise de resultados ao final de todos os datasets ----
     print("\n\n" + "="*50)
