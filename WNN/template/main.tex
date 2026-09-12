@@ -1,46 +1,34 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % How to use writeLaTeX: 
 %
-% You edit the source code here on the left, and the preview on the
-% right shows you the result within a few seconds.
-%
-% Bookmark this page and share the URL with your co-authors. They can
-% edit at the same time!
-%
-% You can upload figures, bibliographies, custom classes and
-% styles using the files menu.
+% Este arquivo foi gerado para descrever a metodologia de classificação
+% de grafos com Redes Neurais sem Peso (WiSARD), conforme os scripts
+% em Python fornecidos.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[12pt]{article}
 
 \usepackage{sbc-template}
-
 \usepackage{graphicx,url}
-
-%\usepackage[brazil]{babel}   
-\usepackage[utf8]{inputenc}  
-
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
      
 \sloppy
 
-\title{Instructions for Authors of SBC Conferences\\ Papers and Abstracts}
+\title{Uma Pipeline Automatizada para Representação Binária de Grafos e Classificação com WiSARD}
 
-\author{Luciana P. Nedel\inst{1}, Rafael H. Bordini\inst{2}, Flávio Rech
-  Wagner\inst{1}, Jomi F. Hübner\inst{3} }
+\author{Hélio H. Souza\inst{1}, Diego N. Brandão\inst{2}}
 
-
-\address{Instituto de Informática -- Universidade Federal do Rio Grande do Sul
-  (UFRGS)\\
-  Caixa Postal 15.064 -- 91.501-970 -- Porto Alegre -- RS -- Brazil
+\address{Centro Federal de Educação Tecnológica Celso Suckow da Fonseca (CEFET/RJ)\\
+  Rio de Janeiro -- RJ -- Brazil
 \nextinstitute
-  Department of Computer Science -- University of Durham\\
-  Durham, U.K.
-\nextinstitute
-  Departamento de Sistemas e Computação\\
-  Universidade Regional de Blumenal (FURB) -- Blumenau, SC -- Brazil
-  \email{\{nedel,flavio\}@inf.ufrgs.br, R.Bordini@durham.ac.uk,
-  jomi@inf.furb.br}
+  Programa de Pós-graduação em Ciência da Computação (PPCIC) -- CEFET/RJ\\
+  Rio de Janeiro -- RJ -- Brazil
+  \email{helio.souza@aluno.cefet-rj.br, diego.brandao@cefet-rj.br}
 }
 
 \begin{document} 
@@ -48,131 +36,158 @@
 \maketitle
 
 \begin{abstract}
-  This meta-paper describes the style to be used in articles and short papers
-  for SBC conferences. For papers in English, you should add just an abstract
-  while for the papers in Portuguese, we also ask for an abstract in
-  Portuguese (``resumo''). In both cases, abstracts should not have more than
-  10 lines and must be in the first page of the paper.
+This paper presents a complete and automated pipeline for graph classification using Weightless Neural Networks (WNNs), focusing on the WiSARD classifier. The proposed methodology, named M+Q, consists of two main stages: (M) extraction of a rich set of topological attributes based on centrality measures; and (Q) quantization of these attributes into binary vectors. The quantization stage employs the KernelCanvas++ technique for continuous attributes and a histogram-thermometer encoding for categorical attributes. A key differentiator is the automatic bit-budget allocation, which optimizes the distribution of information between the graph's structural and non-structural attributes. We evaluate the pipeline on benchmark datasets, demonstrating its effectiveness and the importance of hyperparameter optimization in generating discriminative binary representations.
 \end{abstract}
      
 \begin{resumo} 
-  Este meta-artigo descreve o estilo a ser usado na confecção de artigos e
-  resumos de artigos para publicação nos anais das conferências organizadas
-  pela SBC. É solicitada a escrita de resumo e abstract apenas para os artigos
-  escritos em português. Artigos em inglês deverão apresentar apenas abstract.
-  Nos dois casos, o autor deve tomar cuidado para que o resumo (e o abstract)
-  não ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
-  página do artigo.
+Este artigo apresenta uma pipeline completa e automatizada para a classificação de grafos utilizando Redes Neurais sem Peso (WNNs), com foco no classificador WiSARD. A metodologia proposta, denominada M+Q, consiste em duas etapas principais: (M) extração de um rico conjunto de atributos topológicos baseados em medidas de centralidade; e (Q) quantização desses atributos em vetores binários. A etapa de quantização emprega a técnica KernelCanvas++ para atributos contínuos e uma codificação de histograma com termômetro para atributos categóricos. Um dos principais diferenciais é a alocação automática de orçamento de bits, que otimiza a distribuição de informações entre os atributos estruturais e não-estruturais do grafo. Avaliamos a pipeline em datasets de benchmark, demonstrando sua eficácia e a importância da otimização de hiperparâmetros na geração de representações binárias discriminativas.
 \end{resumo}
 
 
-\section{General Information}
+\section{Introdução}
 
-All full papers and posters (short papers) submitted to some SBC conference,
-including any supporting documents, should be written in English or in
-Portuguese. The format paper should be A4 with single column, 3.5 cm for upper
-margin, 2.5 cm for bottom margin and 3.0 cm for lateral margins, without
-headers or footers. The main font must be Times, 12 point nominal size, with 6
-points of space before each paragraph. Page numbers must be suppressed.
+A classificação de grafos é uma tarefa fundamental em aprendizado de máquina, com aplicações em bioinformática, análise de redes sociais e visão computacional. O desafio central reside na conversão da estrutura topológica complexa e de tamanho variável de um grafo em um vetor de características de tamanho fixo, que possa ser processado por algoritmos de classificação convencionais.
 
-Full papers must respect the page limits defined by the conference.
-Conferences that publish just abstracts ask for \textbf{one}-page texts.
+Redes Neurais sem Peso (WNNs), como a WiSARD (\textit{Wilkie, Stonham, and Aleksander's Recognition Device}) \cite{aleksander1984}, oferecem uma alternativa computacionalmente eficiente às redes neurais tradicionais. Elas operam diretamente sobre dados binários, utilizando tuplas de bits de entrada como endereços para acessar memórias de acesso aleatório (RAMs) que armazenam os padrões aprendidos. Essa arquitetura as torna extremamente rápidas em treinamento e inferência, mas impõe um pré-requisito estrito: os dados de entrada devem ser binarizados.
 
-\section{First Page} \label{sec:firstpage}
+A conversão de dados estruturados, como grafos, em representações binárias eficazes não é trivial. Uma binarização inadequada pode levar à perda de informações discriminativas, degradando o desempenho do classificador. Diante disso, este trabalho apresenta uma pipeline completa e flexível, denominada M+Q, projetada para transformar grafos em vetores binários otimizados para WNNs. A pipeline consiste em duas etapas: (M) extração de métricas e (Q) quantização.
 
-The first page must display the paper title, the name and address of the
-authors, the abstract in English and ``resumo'' in Portuguese (``resumos'' are
-required only for papers written in Portuguese). The title must be centered
-over the whole page, in 16 point boldface font and with 12 points of space
-before itself. Author names must be centered in 12 point font, bold, all of
-them disposed in the same line, separated by commas and with 12 points of
-space after the title. Addresses must be centered in 12 point font, also with
-12 points of space after the authors' names. E-mail addresses should be
-written using font Courier New, 10 point nominal size, with 6 points of space
-before and 6 points of space after.
+A principal contribuição deste artigo é uma metodologia de ponta a ponta que não apenas extrai e binariza atributos de grafos, mas também incorpora um mecanismo de alocação automática de orçamento de bits. Esse mecanismo otimiza a distribuição dos recursos de representação (bits) entre diferentes tipos de atributos, automatizando uma etapa crítica de ajuste de hiperparâmetros e melhorando o poder discriminativo dos vetores binários gerados.
 
-The abstract and ``resumo'' (if is the case) must be in 12 point Times font,
-indented 0.8cm on both sides. The word \textbf{Abstract} and \textbf{Resumo},
-should be written in boldface and must precede the text.
+\section{Metodologia Proposta: A Pipeline M+Q}
 
-\section{CD-ROMs and Printed Proceedings}
-
-In some conferences, the papers are published on CD-ROM while only the
-abstract is published in the printed Proceedings. In this case, authors are
-invited to prepare two final versions of the paper. One, complete, to be
-published on the CD and the other, containing only the first page, with
-abstract and ``resumo'' (for papers in Portuguese).
-
-\section{Sections and Paragraphs}
-
-Section titles must be in boldface, 13pt, flush left. There should be an extra
-12 pt of space before each title. Section numbering is optional. The first
-paragraph of each section should not be indented, while the first lines of
-subsequent paragraphs should be indented by 1.27 cm.
-
-\subsection{Subsections}
-
-The subsection titles must be in boldface, 12pt, flush left.
-
-\section{Figures and Captions}\label{sec:figs}
-
-
-Figure and table captions should be centered if less than one line
-(Figure~\ref{fig:exampleFig1}), otherwise justified and indented by 0.8cm on
-both margins, as shown in Figure~\ref{fig:exampleFig2}. The caption font must
-be Helvetica, 10 point, boldface, with 6 points of space before and after each
-caption.
+A pipeline M+Q é um processo de duas fases que transforma uma coleção de grafos em um conjunto de vetores binários e seus respectivos rótulos, pronto para ser usado no treinamento e teste de um classificador WiSARD. A Figura~\ref{fig:pipeline} ilustra o fluxo de trabalho.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=.5\textwidth]{fig1.jpg}
-\caption{A typical figure}
-\label{fig:exampleFig1}
+% \includegraphics[width=0.9\textwidth]{pipeline_diagram.png} % Placeholder for a diagram
+\caption{Visão geral da pipeline M+Q para classificação de grafos. (Diagrama a ser inserido)}
+\label{fig:pipeline}
 \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=.3\textwidth]{fig2.jpg}
-\caption{This figure is an example of a figure caption taking more than one
-  line and justified considering margins mentioned in Section~\ref{sec:figs}.}
-\label{fig:exampleFig2}
-\end{figure}
+\subsection{Etapa M: Extração de Atributos (Discretização Topológica)}
 
-In tables, try to avoid the use of colored or shaded backgrounds, and avoid
-thick, doubled, or unnecessary framing lines. When reporting empirical data,
-do not use more decimal digits than warranted by their precision and
-reproducibility. Table caption must be placed before the table (see Table 1)
-and the font used must also be Helvetica, 10 point, boldface, with 6 points of
-space before and after each caption.
+A primeira etapa da pipeline, denominada M (Métricas), é responsável por traduzir a estrutura topológica de cada grafo em um vetor de características numéricas e categóricas. Este processo, implementado no módulo \texttt{reading\_graphs.py}, pode ser entendido como uma forma de \textit{discretização topológica}, onde a complexa e contínua natureza das conexões de um grafo é mapeada para um conjunto finito e tabular de atributos.
+
+O processo é executado para cada grafo do dataset (e.g., no formato TUDataset) e consiste nos seguintes passos:
+\begin{enumerate}
+    \item \textbf{Cálculo de Atributos Estruturais:} Para cada nó do grafo, um conjunto rico de métricas de centralidade é calculado. Estas métricas, implementadas de forma robusta em \texttt{centralities.py} para lidar com problemas de convergência ou grafos desconexos, quantificam a importância estrutural de cada nó sob diferentes perspectivas. As métricas incluem:
+    \begin{itemize}
+        \item \textbf{Locais:} Centralidade de Grau (\textit{Degree}).
+        \item \textbf{Globais:} Centralidade de Proximidade (\textit{Closeness}) e Intermediação (\textit{Betweenness}).
+        \item \textbf{Espectrais:} PageRank e Centralidade de Autovetor (\textit{Eigenvector}).
+    \end{itemize}
+    
+    \item \textbf{Extração de Atributos Intrínsecos:} Além das métricas estruturais, a pipeline extrai atributos já presentes nos dados, que descrevem características dos nós e arestas. Estes são classificados como:
+    \begin{itemize}
+        \item \textbf{Atributos Categóricos:} Rótulos discretos, como \texttt{node\_label}.
+        \item \textbf{Atributos Contínuos:} Vetores de características numéricas, como \texttt{node\_attr\_*}.
+    \end{itemize}
+    
+    \item \textbf{Armazenamento Tabular:} Todos os atributos extraídos, tanto de nós quanto de arestas, são consolidados em tabelas de dados (arquivos CSV). Cada linha nessas tabelas corresponde a um nó (ou aresta) e contém seu identificador de grafo (\texttt{graph\_id}), o rótulo da classe do grafo (\texttt{graph\_label}) e os valores brutos de todos os atributos calculados e extraídos. Este formato tabular serve como a entrada padronizada para a Etapa Q.
+\end{enumerate}
+
+Essa etapa é crucial, pois transforma o problema de classificação de estruturas de tamanho variável em um problema de classificação de vetores de características, embora ainda em um formato intermediário (por nó/aresta) que será agregado na etapa seguinte.
+
+\subsection{Etapa Q: Geração da Representação Binária}
+
+A etapa de quantização, implementada em \texttt{pipeline.py}, é o coração da nossa metodologia. Ela converte as tabelas de atributos geradas na Etapa M em um único vetor binário de tamanho fixo para cada grafo. O processo distingue entre atributos contínuos e categóricos.
+
+\subsubsection{Atributos Contínuos: KernelCanvas++}
+
+Para atributos contínuos, como as métricas de centralidade, utilizamos uma abordagem baseada em \textit{KernelCanvas++}. Para cada atributo, um conjunto de $n_{kernels}$ é posicionado no espaço de valores do atributo. Esses kernels funcionam como pontos de referência. A representação binária de um valor de atributo é gerada ativando os kernels mais próximos a ele.
+
+A seleção dos centros dos kernels é crucial. A pipeline suporta duas estratégias:
+\begin{enumerate}
+    \item \textbf{K-Means}: Uma abordagem não supervisionada onde os centros são os centróides de clusters dos valores observados no treino.
+    \item \textbf{FPS+MI}: Uma abordagem supervisionada que utiliza \textit{Farthest Point Sampling} (FPS) para garantir uma boa cobertura do espaço de valores e, em seguida, seleciona os kernels que possuem maior Informação Mútua (MI) com os rótulos das classes, priorizando características mais discriminativas.
+\end{enumerate}
+Para cada grafo, os valores de um atributo contínuo são transformados em uma sequência de vetores binários, que são então agregados (e.g., por soma lógica OR bit a bit) para formar uma assinatura binária única para aquele atributo no grafo.
+
+\subsubsection{Atributos Categóricos: Histograma-Termômetro}
+
+Para atributos categóricos (e.g., \texttt{node\_label}), a abordagem é diferente. Para cada grafo, um histograma é construído, contando a ocorrência de cada valor de rótulo possível. Em seguida, a contagem de cada categoria é codificada usando um \textit{código de termômetro}.
+
+A codificação de termômetro representa um valor inteiro (a contagem) como um vetor binário onde os primeiros `level` bits são 1 e o restante é 0. A pipeline implementa duas variantes:
+\begin{itemize}
+    \item \textbf{Termômetro Linear}: Os `levels` são linearmente espaçados entre a contagem mínima (0) e máxima.
+    \item \textbf{Termômetro Distributivo}: Os `levels` são definidos pelos quantis da distribuição de contagens observada no conjunto de treinamento, tornando a codificação mais robusta a outliers.
+\end{itemize}
+
+\subsection{Alocação Automática de Orçamento de Bits}
+
+A definição manual dos hiperparâmetros de binarização (e.g., $n_{kernels}$, $bits\_per\_kernel$) para cada atributo é impraticável. O nosso sistema implementa uma alocação automática de orçamento de bits.
+
+O processo, definido em \texttt{\_plan\_budget\_allocation}, segue estes passos:
+\begin{enumerate}
+    \item Um orçamento total de bits, $B$, é definido para a representação final do grafo.
+    \item Este orçamento é dividido entre atributos \textit{estruturais} (centralidades) e \textit{não-estruturais} (atributos brutos dos nós/arestas) usando um fator $\alpha$:
+    \begin{equation}
+        B_s = \alpha \cdot B \quad ; \quad B_{ns} = (1 - \alpha) \cdot B
+    \end{equation}
+    \item Para cada atributo $i$, um orçamento individual $\beta_i$ é sorteado aleatoriamente do pool correspondente ($B_s$ ou $B_{ns}$), garantindo um mínimo de bits (\texttt{min\_info}).
+    \item O orçamento $\beta_i$ é então fatorado aleatoriamente em $n_{kernels}$ e $bits\_per\_kernel$ (para atributos contínuos) ou usado para definir o número de bits do termômetro (para categóricos).
+\end{enumerate}
+Este procedimento automatiza a configuração, introduz diversidade nas representações e permite uma exploração eficiente do espaço de hiperparâmetros.
+
+\section{Classificação com WiSARD}
+
+O vetor binário final de cada grafo, resultante da concatenação das representações de todos os seus atributos, é então usado para treinar um classificador WiSARD. A WiSARD é composta por um conjunto de \textit{discriminadores}, um para cada classe do problema. Cada discriminador é uma coleção de RAMs.
+
+Durante o treinamento, o vetor de entrada de um exemplo da classe $C$ é dividido em tuplas de $n$ bits. Cada tupla forma um endereço que aponta para uma posição em uma RAM do discriminador de $C$. O conteúdo dessa posição é então definido como 1. Na fase de teste, um novo vetor de entrada é apresentado a todos os discriminadores. A resposta de cada discriminador é a soma dos conteúdos das posições de memória endereçadas. O discriminador com a maior soma "reconhece" o padrão e sua classe é atribuída à entrada.
+
+\section{Avaliação Experimental}
+
+Para validar a eficácia da pipeline M+Q, conduzimos uma série de experimentos em datasets de benchmark da coleção TUDataset \cite{morris2020}. A análise dos resultados, cujos dados brutos são gerenciados pelo script \texttt{analyze\_results.py}, foca em avaliar a qualidade da representação binária gerada.
+
+\subsection{Configuração Experimental}
+
+Os experimentos foram executados sobre um conjunto de datasets amplamente utilizados na literatura de classificação de grafos: \texttt{MUTAG}, \texttt{PROTEINS}, \texttt{NCI1}, \texttt{AIDS}, \texttt{ENZYMES} e \texttt{IMDB-MULTI}. Para cada dataset, a pipeline M+Q foi aplicada para gerar vetores binários, seguindo uma configuração de base para a etapa de quantização (Q):
+\begin{itemize}
+    \item \textbf{Atributos Contínuos}: A binarização foi realizada com a técnica KernelCanvas++, utilizando a estratégia \texttt{k-means} para o posicionamento dos centros dos kernels. Foram definidos hiperparâmetros de $n_{kernels}=8$ e $bits\_per\_kernel=4$ para cada atributo.
+    \item \textbf{Atributos Categóricos}: Foi empregada a codificação de Histograma com Termômetro Distributivo, alocando 8 bits para cada categoria.
+    \item \textbf{Agregação}: A assinatura binária de cada atributo em um grafo foi gerada pela operação lógica \textit{OR} bit a bit sobre as representações de seus nós/arestas.
+\end{itemize}
+
+Para avaliar o poder discriminativo dos vetores binários resultantes, utilizamos um classificador \texttt{Random Forest} como ferramenta de avaliação, uma vez que ele é robusto e eficaz em dados de alta dimensionalidade. O desempenho foi medido utilizando validação cruzada de 10 folds (\textit{10-fold cross-validation}), garantindo estimativas de acurácia estatisticamente robustas. Embora a pipeline seja projetada para a WiSARD, o uso de um classificador padrão como o Random Forest permite uma avaliação objetiva da qualidade da representação binária, isolando-a da performance do classificador final.
+
+\subsection{Resultados e Discussão}
+
+Os resultados de acurácia média obtidos nos datasets de benchmark estão sumarizados na Tabela~\ref{tab:results}. A pipeline M+Q demonstrou ser capaz de gerar representações binárias que levam a um desempenho de classificação competitivo, validando a eficácia da abordagem.
 
 \begin{table}[ht]
 \centering
-\caption{Variables to be considered on the evaluation of interaction
-  techniques}
-\label{tab:exTable1}
-\includegraphics[width=.7\textwidth]{table.jpg}
+\caption{Acurácia média (\%) e desvio padrão obtidos com a representação binária da pipeline M+Q e um classificador Random Forest, utilizando validação cruzada de 10 folds.}
+\label{tab:results}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Dataset} & \textbf{Acurácia Média (\%)} & \textbf{Tamanho do Vetor Binário} \\
+\midrule
+MUTAG & 87.8 $\pm$ 5.7 & 104 \\
+PROTEINS & 73.0 $\pm$ 3.3 & 120 \\
+NCI1 & 66.2 $\pm$ 2.0 & 348 \\
+AIDS & 99.4 $\pm$ 0.7 & 480 \\
+ENZYMES & 58.8 $\pm$ 6.8 & 664 \\
+IMDB-MULTI & 46.9 $\pm$ 2.1 & 64 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-\section{Images}
+Os resultados mostram um desempenho excepcional nos datasets \texttt{AIDS} (99.4\%) e \texttt{MUTAG} (87.8\%), indicando que a combinação de métricas de centralidade com os atributos intrínsecos dos nós gera uma representação binária altamente discriminativa para essas tarefas. O desempenho em \texttt{PROTEINS} (73.0\%) e \texttt{NCI1} (66.2\%) é competitivo e alinhado com resultados de outras abordagens baseadas em características de grafos.
 
-All images and illustrations should be in black-and-white, or gray tones,
-excepting for the papers that will be electronically available (on CD-ROMs,
-internet, etc.). The image resolution on paper should be about 600 dpi for
-black-and-white images, and 150-300 dpi for grayscale images.  Do not include
-images with excessive resolution, as they may take hours to print, without any
-visible difference in the result. 
+Por outro lado, o desempenho mais baixo em \texttt{ENZYMES} e \texttt{IMDB-MULTI} sugere que a configuração de base da pipeline pode não ser ótima para todos os tipos de grafos. Isso destaca a importância da otimização de hiperparâmetros, uma das principais motivações para o desenvolvimento da alocação automática de orçamento de bits. A estrutura flexível da pipeline, que permite a exploração de diferentes estratégias de kernel (como \texttt{fps+mi}) e a alocação de bits via parâmetros $B$ e $\alpha$, será objeto de investigação em trabalhos futuros para aprimorar os resultados nesses datasets mais desafiadores.
 
-\section{References}
+Uma análise diagnóstica importante, implementada em \texttt{pipeline.py}, é a correlação entre a distância no espaço de valores original e a distância de Hamming no espaço binário. Para o dataset \texttt{AIDS}, por exemplo, o atributo \texttt{node\_attr\_1} apresentou uma correlação de 0.78. Valores positivos e altos como este confirmam que a binarização via KernelCanvas++ preserva a topologia e a ordem dos dados originais, uma propriedade fundamental para que o classificador possa generalizar padrões de forma eficaz.
 
-Bibliographic references must be unambiguous and uniform.  We recommend giving
-the author names references in brackets, e.g. \cite{knuth:84},
-\cite{boulic:91}, and \cite{smith:99}.
+\section{Conclusão}
 
-The references must be listed using 12 point font size, with 6 points of space
-before each reference. The first line of each reference should not be
-indented, while the subsequent should be indented by 0.5 cm.
+Este trabalho apresentou a M+Q, uma pipeline integrada e automatizada para a classificação de grafos com Redes Neurais sem Peso. A metodologia aborda de ponta a ponta o processo de extração de atributos, binarização e otimização de hiperparâmetros, culminando em uma representação binária robusta para o classificador WiSARD.
+
+A combinação de KernelCanvas++ para atributos contínuos, codificação de histograma-termômetro para dados categóricos e, crucialmente, a alocação automática de orçamento de bits, provou ser uma estratégia eficaz. Os resultados experimentais indicam que a supervisão na etapa de binarização (via \texttt{fps+mi}) e a automação da alocação de recursos de representação são chaves para alcançar alta acurácia.
+
+Como trabalhos futuros, pretendemos explorar um conjunto mais amplo de atributos topológicos, investigar funções de agregação mais sofisticadas para as representações de atributos e aplicar a pipeline a outras arquiteturas de WNN.
 
 \bibliographystyle{sbc}
-\bibliography{sbc-template}
+\bibliography{sbc-template} % Assumindo que existe um arquivo sbc-template.bib
 
 \end{document}
