@@ -27,6 +27,7 @@ except ImportError:
 BASE_DIR = os.path.join(os.getcwd(),"WNN", "data_sets")
 N_WORKERS = None  # None = usa todos os núcleos disponíveis
 RESULTS_PATH = os.path.join(os.path.dirname(__file__), "results", "experiments.json")
+RESULTS_DIR = os.path.dirname(RESULTS_PATH)
 
 
 def _jsonable(value):
@@ -46,9 +47,16 @@ def _jsonable(value):
     return value
 
 
-def _save_results(results):
-    """Carrega resultados existentes, anexa os novos e salva o arquivo JSON."""
-    os.makedirs(os.path.dirname(RESULTS_PATH), exist_ok=True)
+def _save_results(results, config_number, run_id):
+    """Salva a configuração individual e a acrescenta ao arquivo agregado."""
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+
+    config_path = os.path.join(
+        RESULTS_DIR,
+        f"experiments_config_{config_number:02d}_{run_id}.json",
+    )
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(_jsonable(results), f, indent=2, ensure_ascii=False, allow_nan=False)
     
     all_results = []
     if os.path.exists(RESULTS_PATH):
@@ -66,6 +74,8 @@ def _save_results(results):
 
     with open(RESULTS_PATH, "w", encoding="utf-8") as f:
         json.dump(_jsonable(all_results), f, indent=2, ensure_ascii=False, allow_nan=False)
+
+    return config_path
 
 
 if __name__ == "__main__":
@@ -159,8 +169,8 @@ if __name__ == "__main__":
 
         # Salva os resultados desta configuração no final do loop de datasets
         if results_for_config:
-            _save_results(results_for_config)
-            print(f"\nResultados da configuração {i+1} salvos em: {RESULTS_PATH}")
+            config_path = _save_results(results_for_config, i + 1, run_id)
+            print(f"\nResultados da configuração {i+1} salvos em: {config_path}")
 
     # ---- NOVO: Executa a análise de resultados ao final de todos os datasets ----
     print("\n\n" + "="*50)
