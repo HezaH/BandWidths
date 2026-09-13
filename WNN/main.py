@@ -72,17 +72,21 @@ if __name__ == "__main__":
     datasets_to_process = os.listdir(BASE_DIR)
     extra_centralities = None  # ex.: {"Eigenvector": nx.eigenvector_centrality}
 
-    # --- Definição das configurações de experimento para avaliação ---
-    # Cada dicionário define uma combinação de parâmetros a ser testada.
+    # --- Grid reduzido de representações ---
+    # O benchmark já avalia rf, svm, knn, mlp e wisard. Portanto, não é
+    # necessário repetir a mesma representação com modos de classificação
+    # isolados nesta etapa.
+    representation_grid = [
+        {"kernel_strategy": None, "n_kernels": 8, "bits_per_kernel": 4, "k_activate": 2},
+        {"kernel_strategy": None, "n_kernels": 16, "bits_per_kernel": 4, "k_activate": 3},
+        {"kernel_strategy": "fps", "n_kernels": 8, "bits_per_kernel": 4, "k_activate": 2},
+        {"kernel_strategy": "fps", "n_kernels": 16, "bits_per_kernel": 8, "k_activate": 4},
+        {"kernel_strategy": "fps", "n_kernels": 32, "bits_per_kernel": 8, "k_activate": 4},
+    ]
+
     experiment_configs = [
-        # Configuração 1: K-means (padrão) com parâmetros base e benchmark de classificadores
-        {"kernel_strategy": None, "n_kernels": 8, "bits_per_kernel": 4, "k_activate": 2, "classification_mode": "benchmark"},
-        # Configuração 2: K-means com mais kernels
-        {"kernel_strategy": None, "n_kernels": 16, "bits_per_kernel": 4, "k_activate": 3, "classification_mode": "benchmark"},
-        # Configuração 3: FPS (Farthest Point Sampling) com parâmetros base e benchmark
-        {"kernel_strategy": "fps", "n_kernels": 8, "bits_per_kernel": 4, "k_activate": 2, "classification_mode": "benchmark"},
-        # Configuração 4: FPS com mais kernels e apenas WiSARD
-        {"kernel_strategy": "fps", "n_kernels": 16, "bits_per_kernel": 8, "k_activate": 4, "classification_mode": "wisard"},
+        {**representation, "classification_mode": "benchmark"}
+        for representation in representation_grid
     ]
 
     for i, config in enumerate(experiment_configs):
