@@ -174,6 +174,90 @@ def load_tu_dataset(dataset_dir, dataset_name):
     return graphs, graph_labels
 
 
+def plot_graph(
+    graphs,
+    graph_index,
+    graph_labels=None,
+    layout_seed=42,
+    node_size=500,
+    with_labels=True,
+    show=True,
+    save_path=None,
+    figsize=(10, 8),
+):
+    """Representa visualmente um grafo da lista retornada por ``load_tu_dataset``.
+
+    Parameters
+    ----------
+    graphs : list[networkx.Graph]
+        Lista de grafos do dataset.
+    graph_index : int
+        Índice baseado em zero do grafo que será desenhado.
+    graph_labels : list, optional
+        Rótulos dos grafos, usados no título quando fornecidos.
+    layout_seed : int, optional
+        Semente do layout para gerar uma disposição reproduzível.
+    node_size : int, optional
+        Tamanho dos nós na figura.
+    with_labels : bool, optional
+        Se ``True``, exibe o índice de cada nó.
+    show : bool, optional
+        Se ``True``, chama ``matplotlib.pyplot.show()``.
+    save_path : str, optional
+        Caminho onde a figura será salva.
+    figsize : tuple, optional
+        Tamanho da figura em polegadas.
+
+    Returns
+    -------
+    tuple
+        ``(fig, ax)`` do Matplotlib, para permitir customizações posteriores.
+    """
+    if not isinstance(graph_index, int):
+        raise TypeError("graph_index deve ser um inteiro baseado em zero")
+    if graph_index < 0 or graph_index >= len(graphs):
+        raise IndexError(
+            f"graph_index={graph_index} fora do intervalo válido "
+            f"[0, {len(graphs) - 1}]"
+        )
+
+    graph = graphs[graph_index]
+    if not isinstance(graph, nx.Graph):
+        raise TypeError("O item selecionado não é um objeto networkx.Graph")
+
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=figsize)
+    positions = nx.spring_layout(graph, seed=layout_seed)
+    nx.draw_networkx(
+        graph,
+        pos=positions,
+        ax=ax,
+        with_labels=with_labels,
+        node_color="#4C78A8",
+        edge_color="#777777",
+        node_size=node_size,
+        font_color="white",
+        font_weight="bold",
+    )
+
+    title = f"Grafo {graph_index} | nós: {graph.number_of_nodes()} | arestas: {graph.number_of_edges()}"
+    if graph_labels is not None:
+        if len(graph_labels) != len(graphs):
+            raise ValueError("graph_labels deve ter o mesmo tamanho de graphs")
+        title += f" | rótulo: {graph_labels[graph_index]}"
+    ax.set_title(title)
+    ax.axis("off")
+    fig.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, bbox_inches="tight")
+    if show:
+        plt.show()
+
+    return fig, ax
+
+
 # --------------------------------------------------------------------------------
 # 2) Extração das métricas de centralidade (Seção 2.1.1) — roda em cada worker
 # --------------------------------------------------------------------------------
@@ -262,19 +346,34 @@ def _compute_metrics_worker(args):
 # --------------------------------------------------------------------------------
 def process_dataset(dataset_name, base_dir=BASE_DIR, save_csv=True, n_workers=N_WORKERS,
                      extra_centralities=None, verbose=True):
+    """Processa um dataset TUDataset e salva as métricas calculadas em CSV.
+
+        Etapas principais:
+            1. Localiza e carrega os grafos do dataset.
+            2. Cria tarefas independentes para processamento paralelo.
+            3. Calcula métricas de nós e arestas em múltiplos processos.
+            4. Escreve as linhas dos resultados incrementalmente nos CSVs.
+            5. Fecha os arquivos, remove uma saída de arestas vazia e retorna os caminhos.
+        """
+
+    # 1) Localiza a pasta do dataset e carrega os grafos e seus rótulos.
     dataset_dir = os.path.join(base_dir, dataset_name)
     print(f"\n=== [M] Extraindo métricas: {dataset_name} ===")
 
     t0 = time.time()
     graphs, graph_labels = load_tu_dataset(dataset_dir, dataset_name)
+    # plot_graph(graphs, graph_index=5, graph_labels=graph_labels)
     n_graphs = len(graphs)
     print(f"Total de grafos encontrados: {n_graphs} (leitura em {time.time() - t0:.1f}s)")
 
+    # 2) Monta uma tarefa por grafo. O índice e o rótulo acompanham o grafo
+    # para que os workers possam identificar cada resultado corretamente.
     tasks = [
         (g_idx, G, (graph_labels[g_idx] if graph_labels else "N/A"))
         for g_idx, G in enumerate(graphs)
     ]
 
+    # 3) Define os arquivos de saída: um CSV por nó e outro por aresta.
     out_path_nodes = os.path.join(dataset_dir, f"{dataset_name}_centrality_metrics.csv")
     out_path_edges = os.path.join(dataset_dir, f"{dataset_name}_edge_metrics.csv")
 
@@ -282,10 +381,13 @@ def process_dataset(dataset_name, base_dir=BASE_DIR, save_csv=True, n_workers=N_
     csv_file_nodes = open(out_path_nodes, "w", newline="") if save_csv else None
     csv_file_edges = open(out_path_edges, "w", newline="") if save_csv else None
 
+    # Contadores usados para acompanhar o progresso e gerar um resumo final.
     n_nodes_total = n_edges_total = processed = 0
     any_edge_rows = False
     t1 = time.time()
 
+    # 4) Distribui os grafos entre os processos. O initializer configura em
+    # cada worker as centralidades extras que serão usadas no cálculo.
     with ProcessPoolExecutor(
         max_workers=n_workers,
         initializer=_init_worker_centralities,
@@ -295,16 +397,21 @@ def process_dataset(dataset_name, base_dir=BASE_DIR, save_csv=True, n_workers=N_
         for g_idx, n_nodes, n_edges, rows, edge_rows in executor.map(
             _compute_metrics_worker, tasks, chunksize=chunksize
         ):
+            # Acumula estatísticas gerais do processamento.
             n_nodes_total += n_nodes
             n_edges_total += n_edges
             processed += 1
 
+            # 5) Cria o cabeçalho na primeira resposta e grava as métricas de nós
+            # sem manter todos os resultados na memória.
             if save_csv and rows:
                 if writer_nodes is None:
                     writer_nodes = csv.DictWriter(csv_file_nodes, fieldnames=rows[0].keys())
                     writer_nodes.writeheader()
                 writer_nodes.writerows(rows)
 
+            # Grava métricas de arestas apenas quando o grafo possui atributos
+            # de aresta. A flag evita manter um CSV vazio ao final.
             if save_csv and edge_rows:
                 any_edge_rows = True
                 if writer_edges is None:
@@ -315,15 +422,18 @@ def process_dataset(dataset_name, base_dir=BASE_DIR, save_csv=True, n_workers=N_
             if verbose and processed % max(1, n_graphs // 10) == 0:
                 print(f"  ... {processed}/{n_graphs} grafos processados")
 
+    # 6) Fecha os arquivos para garantir que todo o conteúdo seja persistido.
     if csv_file_nodes:
         csv_file_nodes.close()
     if csv_file_edges:
         csv_file_edges.close()
-    # se nenhum grafo tinha atributo de aresta, não faz sentido manter um CSV vazio
+
+    # Se nenhum grafo tinha atributos de aresta, remove o CSV criado sem dados.
     if save_csv and not any_edge_rows and os.path.exists(out_path_edges):
         os.remove(out_path_edges)
         out_path_edges = None
 
+    # 7) Exibe um resumo do processamento e retorna os caminhos das saídas.
     elapsed = time.time() - t1
     print(f"Total de nós: {n_nodes_total} | Total de arestas: {n_edges_total}")
     if elapsed > 0:
