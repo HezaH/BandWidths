@@ -138,46 +138,54 @@ Durante o treinamento, o vetor de entrada de um exemplo da classe $C$ é dividid
 
 \section{Avaliação Experimental}
 
-Para validar a eficácia da pipeline M+Q, conduzimos uma série de experimentos em datasets de benchmark da coleção TUDataset \cite{morris2020}. A análise dos resultados, cujos dados brutos são gerenciados pelo script \texttt{analyze\_results.py}, foca em avaliar a qualidade da representação binária gerada.
+Para validar a eficácia da pipeline M+Q, conduzimos uma série de experimentos em datasets de benchmark da coleção TUDataset \cite{morris2020}. O objetivo foi avaliar a qualidade da representação binária gerada pela pipeline, utilizando classificadores padrão como ferramenta de medição. A análise dos resultados, cujos dados brutos são gerenciados pelo script \texttt{analyze\_results.py}, é detalhada a seguir.
 
 \subsection{Configuração Experimental}
 
-Os experimentos foram executados sobre um conjunto de datasets amplamente utilizados na literatura de classificação de grafos: \texttt{MUTAG}, \texttt{PROTEINS}, \texttt{NCI1}, \texttt{AIDS}, \texttt{ENZYMES} e \texttt{IMDB-MULTI}. Para cada dataset, a pipeline M+Q foi aplicada para gerar vetores binários, seguindo uma configuração de base para a etapa de quantização (Q):
+Os experimentos foram executados sobre sete datasets da coleção TUDataset: \texttt{MUTAG}, \texttt{PROTEINS}, \texttt{NCI1}, \texttt{PTC\_MR}, \texttt{AIDS}, \texttt{ENZYMES} e \texttt{IMDB-MULTI}. O arquivo \texttt{experiments.json} contém 35 registros, correspondentes a cinco execuções da pipeline (uma por configuração de representação) e aos sete datasets processados em cada execução. O número de grafos varia de 188, no \texttt{PTC\_MR}, a 2.000, no \texttt{AIDS}; o número de classes varia de duas a seis.
+
+No arquivo de resultados, as configurações efetivamente registradas foram:
 \begin{itemize}
-    \item \textbf{Atributos Contínuos}: A binarização foi realizada com a técnica KernelCanvas++, utilizando a estratégia \texttt{k-means} para o posicionamento dos centros dos kernels. Foram definidos hiperparâmetros de $n_{kernels}=8$ e $bits\_per\_kernel=4$ para cada atributo.
-    \item \textbf{Atributos Categóricos}: Foi empregada a codificação de Histograma com Termômetro Distributivo, alocando 8 bits para cada categoria.
-    \item \textbf{Agregação}: A assinatura binária de cada atributo em um grafo foi gerada pela operação lógica \textit{OR} bit a bit sobre as representações de seus nós/arestas.
+    \item \textbf{Configuração C1}: $n_{kernels}=8$, $bits\_per\_kernel=4$ e $k_{activate}=2$;
+    \item \textbf{Configuração C2}: $n_{kernels}=16$, $bits\_per\_kernel=4$ e $k_{activate}=3$.
 \end{itemize}
 
-Para avaliar o poder discriminativo dos vetores binários resultantes, utilizamos um classificador \texttt{Random Forest} como ferramenta de avaliação, uma vez que ele é robusto e eficaz em dados de alta dimensionalidade. O desempenho foi medido utilizando validação cruzada de 10 folds (\textit{10-fold cross-validation}), garantindo estimativas de acurácia estatisticamente robustas. Embora a pipeline seja projetada para a WiSARD, o uso de um classificador padrão como o Random Forest permite uma avaliação objetiva da qualidade da representação binária, isolando-a da performance do classificador final.
+Em ambas, a estratégia de seleção de kernels registrada foi nula, o que corresponde ao caminho padrão baseado em ECDF e K-means no código da pipeline. Assim, embora o programa também implemente estratégias alternativas, como FPS, elas não foram utilizadas nos resultados analisados neste artigo. O parâmetro $k_{activate}$ define quantos kernels são ativados na transformação de cada valor contínuo. A dimensionalidade final depende do dataset e da configuração, variando de 64 a 1.280 bits nos registros válidos.
+
+Para avaliar o poder discriminativo dos vetores binários resultantes, o modo \texttt{benchmark} executou cinco classificadores: Random Forest (RF), Support Vector Machine (SVM), k-Nearest Neighbors (kNN), Multi-Layer Perceptron (MLP) e WiSARD. O desempenho foi medido por validação cruzada estratificada de 10 folds, reportando a acurácia média, o desvio padrão, o F1 médio e a matriz de confusão agregada. Essa comparação separa a qualidade da representação da capacidade de um único classificador e permite verificar especificamente o comportamento do WiSARD.
 
 \subsection{Resultados e Discussão}
 
-Os resultados de acurácia média obtidos nos datasets de benchmark estão sumarizados na Tabela~\ref{tab:results}. A pipeline M+Q demonstrou ser capaz de gerar representações binárias que levam a um desempenho de classificação competitivo, validando a eficácia da abordagem.
+Os melhores resultados de acurácia média por combinação de dataset e classificador estão sumarizados na Tabela~\ref{tab:results}. Para cada célula, foi selecionada a melhor entre C1 e C2; portanto, a tabela não representa uma única configuração global, mas o melhor resultado observado no pequeno grid experimental.
 
 \begin{table}[ht]
 \centering
-\caption{Acurácia média (\%) e desvio padrão obtidos com a representação binária da pipeline M+Q e um classificador Random Forest, utilizando validação cruzada de 10 folds.}
+\caption{Melhor acurácia média (\%) e desvio padrão entre C1 e C2 para cada dataset e classificador.}
 \label{tab:results}
-\begin{tabular}{lcc}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
 \toprule
-\textbf{Dataset} & \textbf{Acurácia Média (\%)} & \textbf{Tamanho do Vetor Binário} \\
+\textbf{Dataset} & \textbf{RF} & \textbf{SVM} & \textbf{kNN} & \textbf{MLP} & \textbf{WiSARD} \\
 \midrule
-MUTAG & 87.8 $\pm$ 5.7 & 104 \\
-PROTEINS & 73.0 $\pm$ 3.3 & 120 \\
-NCI1 & 66.2 $\pm$ 2.0 & 348 \\
-AIDS & 99.4 $\pm$ 0.7 & 480 \\
-ENZYMES & 58.8 $\pm$ 6.8 & 664 \\
-IMDB-MULTI & 46.9 $\pm$ 2.1 & 64 \\
+AIDS & 99.65 $\pm$ 0.63 & 99.50 $\pm$ 0.71 & 99.45 $\pm$ 0.61 & 99.55 $\pm$ 0.65 & 80.00 $\pm$ 0.00 \\
+MUTAG & 87.81 $\pm$ 5.74 & 86.75 $\pm$ 6.28 & 88.30 $\pm$ 3.99 & 89.42 $\pm$ 7.02 & 80.94 $\pm$ 6.60 \\
+PROTEINS & 74.76 $\pm$ 5.44 & \textbf{76.11 $\pm$ 4.07} & 73.68 $\pm$ 4.47 & 73.77 $\pm$ 5.26 & 63.43 $\pm$ 3.01 \\
+NCI1 & 67.62 $\pm$ 1.43 & 67.15 $\pm$ 1.94 & 66.89 $\pm$ 1.45 & 67.40 $\pm$ 1.17 & 57.74 $\pm$ 2.52 \\
+PTC\_MR & \textbf{60.78 $\pm$ 5.63} & 56.39 $\pm$ 6.13 & 59.10 $\pm$ 10.07 & 58.74 $\pm$ 4.81 & 56.40 $\pm$ 1.72 \\
+ENZYMES & \textbf{67.00 $\pm$ 5.15} & 55.00 $\pm$ 7.15 & 57.83 $\pm$ 3.66 & 60.67 $\pm$ 3.67 & 22.17 $\pm$ 3.80 \\
+IMDB-MULTI & \textbf{48.13 $\pm$ 3.24} & 46.93 $\pm$ 2.94 & 39.73 $\pm$ 4.78 & 47.47 $\pm$ 3.12 & 45.73 $\pm$ 2.43 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
-Os resultados mostram um desempenho excepcional nos datasets \texttt{AIDS} (99.4\%) e \texttt{MUTAG} (87.8\%), indicando que a combinação de métricas de centralidade com os atributos intrínsecos dos nós gera uma representação binária altamente discriminativa para essas tarefas. O desempenho em \texttt{PROTEINS} (73.0\%) e \texttt{NCI1} (66.2\%) é competitivo e alinhado com resultados de outras abordagens baseadas em características de grafos.
+Os resultados evidenciam três padrões. Primeiro, \texttt{AIDS} é o dataset mais separável: todos os classificadores convencionais ultrapassam 99\%, enquanto o WiSARD alcança 80\%. Segundo, \texttt{MUTAG} também apresenta desempenho elevado, com o MLP atingindo 89,42\% e kNN 88,30\%. Terceiro, \texttt{ENZYMES}, \texttt{IMDB-MULTI} e \texttt{PTC\_MR} permanecem mais difíceis, com melhores resultados de 67,00\%, 48,13\% e 60,78\%, respectivamente.
 
-Por outro lado, o desempenho mais baixo em \texttt{ENZYMES} e \texttt{IMDB-MULTI} sugere que a configuração de base da pipeline pode não ser ótima para todos os tipos de grafos. Isso destaca a importância da otimização de hiperparâmetros, uma das principais motivações para o desenvolvimento da alocação automática de orçamento de bits. A estrutura flexível da pipeline, que permite a exploração de diferentes estratégias de kernel (como \texttt{fps+mi}) e a alocação de bits via parâmetros $B$ e $\alpha$, será objeto de investigação em trabalhos futuros para aprimorar os resultados nesses datasets mais desafiadores.
+Considerando a média dos melhores resultados por dataset, RF obteve 72,25\%, seguido de MLP (71,00\%), SVM (69,69\%), kNN (69,28\%) e WiSARD (58,06\%). O RF foi o melhor classificador em quatro datasets; SVM foi superior em \texttt{PROTEINS}, MLP em \texttt{MUTAG} e RF voltou a liderar em \texttt{AIDS}, \texttt{ENZYMES}, \texttt{NCI1}, \texttt{PTC\_MR} e \texttt{IMDB-MULTI}. A vantagem do RF sobre o SVM em \texttt{ENZYMES} foi de 12 pontos percentuais, sugerindo que a representação agregada contém padrões não lineares ou interações entre atributos que são melhor explorados por conjuntos de árvores.
 
-Uma análise diagnóstica importante, implementada em \texttt{pipeline.py}, é a correlação entre a distância no espaço de valores original e a distância de Hamming no espaço binário. Para o dataset \texttt{AIDS}, por exemplo, o atributo \texttt{node\_attr\_1} apresentou uma correlação de 0.78. Valores positivos e altos como este confirmam que a binarização via KernelCanvas++ preserva a topologia e a ordem dos dados originais, uma propriedade fundamental para que o classificador possa generalizar padrões de forma eficaz.
+Uma análise diagnóstica importante, implementada em \texttt{pipeline.py}, é a correlação entre a distância no espaço de valores original e a distância de Hamming no espaço binário. No \texttt{AIDS}, o atributo \texttt{node\_attr\_1} apresentou correlação de 0,781, o maior valor observado entre os atributos desse dataset; \texttt{degree} e \texttt{pagerank} apresentaram 0,603 e 0,451, respectivamente. Esses valores indicam que a codificação preserva parcialmente a ordem métrica dos dados, mas não de forma uniforme para todos os atributos. No \texttt{ENZYMES}, por exemplo, as correlações variaram de 0,145 a 0,586, o que é compatível com a maior dificuldade de classificação desse conjunto.
+
+Também há uma diferença relevante entre aumentar a resolução da representação e melhorar a acurácia. A configuração C2, com 16 kernels, foi a melhor para a maioria dos classificadores e datasets, mas C1 permaneceu competitiva em casos como \texttt{AIDS}, \texttt{MUTAG} e \texttt{PTC\_MR}. Portanto, o aumento do vetor não garante ganho monotônico: a representação precisa ser avaliada junto ao classificador e ao conjunto de grafos. Além disso, como o arquivo agregado contém execuções de configurações distintas e não repetições independentes de uma mesma configuração, os desvios padrão reportados são os obtidos nos folds da validação cruzada, e não uma estimativa de variabilidade entre execuções completas.
 
 \section{Conclusão}
 
@@ -185,7 +193,7 @@ Este trabalho apresentou a M+Q, uma pipeline integrada e automatizada para a cla
 
 A combinação de KernelCanvas++ para atributos contínuos, codificação de histograma-termômetro para dados categóricos e, crucialmente, a alocação automática de orçamento de bits, provou ser uma estratégia eficaz. Os resultados experimentais indicam que a supervisão na etapa de binarização (via \texttt{fps+mi}) e a automação da alocação de recursos de representação são chaves para alcançar alta acurácia.
 
-Como trabalhos futuros, pretendemos explorar um conjunto mais amplo de atributos topológicos, investigar funções de agregação mais sofisticadas para as representações de atributos e aplicar a pipeline a outras arquiteturas de WNN.
+Como trabalhos futuros, pretendemos explorar sistematicamente as estratégias FPS e FPS+MI, comparar a alocação automática de orçamento de bits com o grid fixo utilizado nos resultados atuais e investigar funções de agregação mais sofisticadas. Também será necessário repetir as configurações com sementes controladas e avaliar a WiSARD com uma seleção de hiperparâmetros própria, pois o benchmark atual mostra que a representação já é útil para classificadores convencionais, mas ainda não produz desempenho equivalente no classificador-alvo em todos os datasets.
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template} % Assumindo que existe um arquivo sbc-template.bib
