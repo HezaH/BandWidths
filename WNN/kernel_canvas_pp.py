@@ -699,6 +699,47 @@ class KernelCanvasPP:
         )[::-1][:n_keep]
 
         return kernels[idxs]
+
+    def remove_redundant_kernels(self, kernels, max_kernels=None):
+        """Remove kernels repetidos ou excessivamente próximos.
+
+        A seleção é feita por amostragem do ponto mais distante: começa no
+        primeiro kernel e, a cada passo, mantém o candidato cuja distância ao
+        conjunto já selecionado é máxima. Assim, quando há mais candidatos do
+        que o orçamento, os kernels finais ficam espalhados pelo espaço
+        normalizado em vez de se concentrarem em regiões redundantes.
+        """
+        kernels = np.asarray(kernels, dtype=float)
+        if kernels.ndim == 1:
+            kernels = kernels.reshape(-1, 1)
+        if kernels.size == 0:
+            return kernels.reshape(0, kernels.shape[1] if kernels.ndim == 2 else 0)
+
+        # Remove duplicatas exatas antes da seleção geométrica.
+        kernels = np.unique(kernels, axis=0)
+        target = self.n_kernels if max_kernels is None else max_kernels
+        target = max(1, min(int(target), len(kernels)))
+
+        if len(kernels) <= target:
+            return kernels
+
+        distances = cdist(kernels, kernels, metric="euclidean")
+        selected = [0]
+        available = np.ones(len(kernels), dtype=bool)
+        available[0] = False
+        min_distances = distances[:, 0]
+
+        while len(selected) < target:
+            min_distances[~available] = -np.inf
+            next_idx = int(np.argmax(min_distances))
+            selected.append(next_idx)
+            available[next_idx] = False
+            min_distances = np.minimum(
+                min_distances,
+                distances[:, next_idx]
+            )
+
+        return kernels[selected]
     
     # Remover kernels redundantes (mantendo apenas os mais distantes)
     def fit_fps_pipeline(
