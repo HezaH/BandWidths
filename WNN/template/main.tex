@@ -138,54 +138,57 @@ Durante o treinamento, o vetor de entrada de um exemplo da classe $C$ é dividid
 
 \section{Avaliação Experimental}
 
-Para validar a eficácia da pipeline M+Q, conduzimos uma série de experimentos em datasets de benchmark da coleção TUDataset \cite{morris2020}. O objetivo foi avaliar a qualidade da representação binária gerada pela pipeline, utilizando classificadores padrão como ferramenta de medição. A análise dos resultados, cujos dados brutos são gerenciados pelo script \texttt{analyze\_results.py}, é detalhada a seguir.
+Para avaliar a representação binária produzida pela pipeline M+Q, foram realizados experimentos em sete datasets da coleção TUDataset \cite{morris2020}. O arquivo \texttt{experiments.json} registra os resultados por execução, dataset, representação e classificador. Nesta seção, são analisados os 35 registros correspondentes às cinco configurações de benchmark descritas nos arquivos \texttt{experiments\_config\_01} a \texttt{experiments\_config\_05}. Os sete registros adicionais em modo \texttt{single\_rf} são mantidos separados, pois avaliam somente o Random Forest e não são diretamente comparáveis ao benchmark com cinco classificadores.
 
 \subsection{Configuração Experimental}
 
-Os experimentos foram executados sobre sete datasets da coleção TUDataset: \texttt{MUTAG}, \texttt{PROTEINS}, \texttt{NCI1}, \texttt{PTC\_MR}, \texttt{AIDS}, \texttt{ENZYMES} e \texttt{IMDB-MULTI}. O arquivo \texttt{experiments.json} contém 35 registros, correspondentes a cinco execuções da pipeline (uma por configuração de representação) e aos sete datasets processados em cada execução. O número de grafos varia de 188, no \texttt{PTC\_MR}, a 2.000, no \texttt{AIDS}; o número de classes varia de duas a seis.
+Os datasets utilizados foram \texttt{AIDS} (2.000 grafos, 2 classes), \texttt{ENZYMES} (600, 6 classes), \texttt{IMDB-MULTI} (1.500, 3 classes), \texttt{MUTAG} (188, 2 classes), \texttt{NCI1} (4.110, 2 classes), \texttt{PROTEINS} (1.113, 2 classes) e \texttt{PTC\_MR} (344, 2 classes). O número de atributos de entrada varia conforme o dataset, e a representação final possui dimensionalidade específica para cada combinação de dataset e configuração.
 
-No arquivo de resultados, as configurações efetivamente registradas foram:
+As cinco configurações efetivamente avaliadas no benchmark foram:
 \begin{itemize}
-    \item \textbf{Configuração C1}: $n_{kernels}=8$, $bits\_per\_kernel=4$ e $k_{activate}=2$;
-    \item \textbf{Configuração C2}: $n_{kernels}=16$, $bits\_per\_kernel=4$ e $k_{activate}=3$.
+    \item \textbf{C1}: $n_{kernels}=8$, $bits\_per\_kernel=4$, $k_{activate}=2$ e seleção padrão de kernels;
+    \item \textbf{C2}: $n_{kernels}=16$, $bits\_per\_kernel=4$, $k_{activate}=3$ e seleção padrão de kernels;
+    \item \textbf{C3}: $n_{kernels}=8$, $bits\_per\_kernel=4$, $k_{activate}=2$ e estratégia FPS;
+    \item \textbf{C4}: $n_{kernels}=16$, $bits\_per\_kernel=8$, $k_{activate}=4$ e estratégia FPS;
+    \item \textbf{C5}: $n_{kernels}=32$, $bits\_per\_kernel=8$, $k_{activate}=4$ e estratégia FPS.
 \end{itemize}
 
-Em ambas, a estratégia de seleção de kernels registrada foi nula, o que corresponde ao caminho padrão baseado em ECDF e K-means no código da pipeline. Assim, embora o programa também implemente estratégias alternativas, como FPS, elas não foram utilizadas nos resultados analisados neste artigo. O parâmetro $k_{activate}$ define quantos kernels são ativados na transformação de cada valor contínuo. A dimensionalidade final depende do dataset e da configuração, variando de 64 a 1.280 bits nos registros válidos.
+Nas configurações C1 e C2, o campo de estratégia é nulo, correspondendo ao caminho padrão da implementação. Nas configurações C3--C5, a estratégia registrada é FPS. O parâmetro $k_{activate}$ define quantos kernels são ativados na transformação de cada valor contínuo. Como a agregação depende do número e do tipo de atributos disponíveis em cada dataset, a dimensionalidade final não é constante: nos cinco arquivos de configuração, ela varia de 64 a 2.640 bits.
 
-Para avaliar o poder discriminativo dos vetores binários resultantes, o modo \texttt{benchmark} executou cinco classificadores: Random Forest (RF), Support Vector Machine (SVM), k-Nearest Neighbors (kNN), Multi-Layer Perceptron (MLP) e WiSARD. O desempenho foi medido por validação cruzada estratificada de 10 folds, reportando a acurácia média, o desvio padrão, o F1 médio e a matriz de confusão agregada. Essa comparação separa a qualidade da representação da capacidade de um único classificador e permite verificar especificamente o comportamento do WiSARD.
+Para avaliar o poder discriminativo dos vetores binários, o modo \texttt{benchmark} executou cinco classificadores: Random Forest (RF), Support Vector Machine (SVM), k-Nearest Neighbors (kNN), Multi-Layer Perceptron (MLP) e WiSARD. O desempenho foi estimado por validação cruzada estratificada em 10 folds. Para cada classificador, os JSON registram a acurácia média, o desvio padrão entre folds, precisão, revocação, F1 e a matriz de confusão agregada. Assim, a comparação avalia a representação em mais de um modelo e permite observar separadamente o comportamento do WiSARD.
 
 \subsection{Resultados e Discussão}
 
-Os melhores resultados de acurácia média por combinação de dataset e classificador estão sumarizados na Tabela~\ref{tab:results}. Para cada célula, foi selecionada a melhor entre C1 e C2; portanto, a tabela não representa uma única configuração global, mas o melhor resultado observado no pequeno grid experimental.
+A Tabela~\ref{tab:results} apresenta, para cada dataset e classificador, a maior acurácia média observada entre C1 e C5. Portanto, cada coluna pode ter sido obtida com uma configuração diferente; a tabela resume o melhor resultado do grid e não representa uma única configuração global. Os valores após $\pm$ são os desvios padrão reportados na validação cruzada.
 
 \begin{table}[ht]
 \centering
-\caption{Melhor acurácia média (\%) e desvio padrão entre C1 e C2 para cada dataset e classificador.}
+\caption{Melhor acurácia média (\%) e desvio padrão entre C1 e C5 para cada dataset e classificador.}
 \label{tab:results}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Dataset} & \textbf{RF} & \textbf{SVM} & \textbf{kNN} & \textbf{MLP} & \textbf{WiSARD} \\
 \midrule
-AIDS & 99.65 $\pm$ 0.63 & 99.50 $\pm$ 0.71 & 99.45 $\pm$ 0.61 & 99.55 $\pm$ 0.65 & 80.00 $\pm$ 0.00 \\
-MUTAG & 87.81 $\pm$ 5.74 & 86.75 $\pm$ 6.28 & 88.30 $\pm$ 3.99 & 89.42 $\pm$ 7.02 & 80.94 $\pm$ 6.60 \\
-PROTEINS & 74.76 $\pm$ 5.44 & \textbf{76.11 $\pm$ 4.07} & 73.68 $\pm$ 4.47 & 73.77 $\pm$ 5.26 & 63.43 $\pm$ 3.01 \\
-NCI1 & 67.62 $\pm$ 1.43 & 67.15 $\pm$ 1.94 & 66.89 $\pm$ 1.45 & 67.40 $\pm$ 1.17 & 57.74 $\pm$ 2.52 \\
-PTC\_MR & \textbf{60.78 $\pm$ 5.63} & 56.39 $\pm$ 6.13 & 59.10 $\pm$ 10.07 & 58.74 $\pm$ 4.81 & 56.40 $\pm$ 1.72 \\
+AIDS & 99.65 $\pm$ 0.63 & 99.50 $\pm$ 0.71 & 99.45 $\pm$ 0.61 & 99.55 $\pm$ 0.65 & 80.15 $\pm$ 0.45 \\
+MUTAG & 87.81 $\pm$ 5.74 & 88.33 $\pm$ 5.11 & 88.30 $\pm$ 3.99 & 89.42 $\pm$ 7.02 & 80.94 $\pm$ 6.60 \\
+PROTEINS & 74.76 $\pm$ 5.44 & \textbf{76.11 $\pm$ 4.07} & 73.68 $\pm$ 4.47 & 75.75 $\pm$ 4.29 & 64.77 $\pm$ 5.16 \\
+NCI1 & \textbf{69.88 $\pm$ 2.35} & 67.15 $\pm$ 1.94 & 66.89 $\pm$ 1.45 & 67.83 $\pm$ 2.10 & 62.00 $\pm$ 2.28 \\
+PTC\_MR & \textbf{60.78 $\pm$ 5.63} & 59.29 $\pm$ 9.87 & 59.10 $\pm$ 10.07 & 58.74 $\pm$ 4.81 & 56.39 $\pm$ 1.72 \\
 ENZYMES & \textbf{67.00 $\pm$ 5.15} & 55.00 $\pm$ 7.15 & 57.83 $\pm$ 3.66 & 60.67 $\pm$ 3.67 & 22.17 $\pm$ 3.80 \\
-IMDB-MULTI & \textbf{48.13 $\pm$ 3.24} & 46.93 $\pm$ 2.94 & 39.73 $\pm$ 4.78 & 47.47 $\pm$ 3.12 & 45.73 $\pm$ 2.43 \\
+IMDB-MULTI & 48.33 $\pm$ 3.31 & \textbf{48.60 $\pm$ 3.02} & 41.07 $\pm$ 2.67 & \textbf{48.60 $\pm$ 2.97} & 45.80 $\pm$ 1.86 \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-Os resultados evidenciam três padrões. Primeiro, \texttt{AIDS} é o dataset mais separável: todos os classificadores convencionais ultrapassam 99\%, enquanto o WiSARD alcança 80\%. Segundo, \texttt{MUTAG} também apresenta desempenho elevado, com o MLP atingindo 89,42\% e kNN 88,30\%. Terceiro, \texttt{ENZYMES}, \texttt{IMDB-MULTI} e \texttt{PTC\_MR} permanecem mais difíceis, com melhores resultados de 67,00\%, 48,13\% e 60,78\%, respectivamente.
+Os resultados evidenciam que \texttt{AIDS} é o dataset mais separável: os classificadores convencionais atingem pelo menos 99,45\%, enquanto o WiSARD chega a 80,15\%. Em \texttt{MUTAG}, o MLP obtém o maior valor entre os modelos avaliados (89,42\%), seguido de SVM (88,33\%) e kNN (88,30\%). Já \texttt{ENZYMES}, \texttt{IMDB-MULTI} e \texttt{PTC\_MR} permanecem mais difíceis, com melhores acurácias de 67,00\%, 48,60\% e 60,78\%, respectivamente.
 
-Considerando a média dos melhores resultados por dataset, RF obteve 72,25\%, seguido de MLP (71,00\%), SVM (69,69\%), kNN (69,28\%) e WiSARD (58,06\%). O RF foi o melhor classificador em quatro datasets; SVM foi superior em \texttt{PROTEINS}, MLP em \texttt{MUTAG} e RF voltou a liderar em \texttt{AIDS}, \texttt{ENZYMES}, \texttt{NCI1}, \texttt{PTC\_MR} e \texttt{IMDB-MULTI}. A vantagem do RF sobre o SVM em \texttt{ENZYMES} foi de 12 pontos percentuais, sugerindo que a representação agregada contém padrões não lineares ou interações entre atributos que são melhor explorados por conjuntos de árvores.
+Considerando a média simples das melhores acurácias por dataset, RF alcança 72,61\%, seguido de MLP (71,80\%), SVM (70,28\%), kNN (69,62\%) e WiSARD (58,89\%). O RF é o melhor em quatro datasets: \texttt{AIDS}, \texttt{ENZYMES}, \texttt{NCI1} e \texttt{PTC\_MR}; o SVM lidera em \texttt{PROTEINS} e \texttt{IMDB-MULTI}, enquanto o MLP lidera em \texttt{MUTAG}. Essa média é apenas descritiva, pois atribui o mesmo peso a datasets com tamanhos bastante diferentes.
 
-Uma análise diagnóstica importante, implementada em \texttt{pipeline.py}, é a correlação entre a distância no espaço de valores original e a distância de Hamming no espaço binário. No \texttt{AIDS}, o atributo \texttt{node\_attr\_1} apresentou correlação de 0,781, o maior valor observado entre os atributos desse dataset; \texttt{degree} e \texttt{pagerank} apresentaram 0,603 e 0,451, respectivamente. Esses valores indicam que a codificação preserva parcialmente a ordem métrica dos dados, mas não de forma uniforme para todos os atributos. No \texttt{ENZYMES}, por exemplo, as correlações variaram de 0,145 a 0,586, o que é compatível com a maior dificuldade de classificação desse conjunto.
+Ao comparar as configurações, C2 apresenta a maior média das 35 combinações dataset-classificador (67,46\%), seguida de C5 (66,89\%), C1 (66,14\%), C3 (66,10\%) e C4 (65,97\%). Esse resultado sugere que aumentar o número de kernels de 8 para 16, mantendo 4 bits por kernel e $k_{activate}=3$, foi uma escolha competitiva nesta grade. Entretanto, a conclusão não é monotônica: C5 melhora o RF em \texttt{NCI1}, mas não supera C2 em todos os datasets; além disso, C4, apesar de usar mais bits por kernel, apresenta a menor média geral.
 
-Também há uma diferença relevante entre aumentar a resolução da representação e melhorar a acurácia. A configuração C2, com 16 kernels, foi a melhor para a maioria dos classificadores e datasets, mas C1 permaneceu competitiva em casos como \texttt{AIDS}, \texttt{MUTAG} e \texttt{PTC\_MR}. Portanto, o aumento do vetor não garante ganho monotônico: a representação precisa ser avaliada junto ao classificador e ao conjunto de grafos. Além disso, como o arquivo agregado contém execuções de configurações distintas e não repetições independentes de uma mesma configuração, os desvios padrão reportados são os obtidos nos folds da validação cruzada, e não uma estimativa de variabilidade entre execuções completas.
+Os resultados também mostram que a qualidade da representação depende do classificador. O WiSARD fica abaixo dos demais em seis dos sete datasets e apresenta seu melhor resultado em \texttt{NCI1} (62,00\%) e \texttt{PROTEINS} (64,77\%). Portanto, os vetores binários contêm informação útil para modelos convencionais, mas a grade avaliada não permite concluir que a mesma representação esteja otimizada para a arquitetura WiSARD. Por fim, os desvios padrão registrados correspondem à variação entre folds; eles não medem a variabilidade entre execuções independentes, uma vez que cada configuração foi registrada uma vez nos arquivos analisados.
 
 \section{Conclusão}
 
