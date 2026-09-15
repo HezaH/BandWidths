@@ -1,5 +1,7 @@
 # lendo todas as instancias de uma classe
 
+print("[INFO] Iniciando imports do main_survey.py", flush=True)
+
 import os
 import time
 import logging
@@ -13,6 +15,8 @@ from modules.graph.Grafo import GrafoListaAdj, RedutorGrafo
 from agent import Agent
 from enviroment import Env
 from modules.utils import read_Instances
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from modules.utils.handle_labels import set_bandwidth_fast
 import json
@@ -45,7 +49,7 @@ def configure_logger(log_file_path: str) -> logging.Logger:
     return logger
 
 
-def _worker_load_and_centralities(instancia_path, centralities, out_queue):
+def _worker_load_and_centralities(instancia_path, centralities, out_pipe):
     """Worker rodado em processo separado para permitir timeout (Windows-friendly)."""
     try:
         nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance_fast(instancia_path)
@@ -59,14 +63,16 @@ def _worker_load_and_centralities(instancia_path, centralities, out_queue):
         for centrality_key, centrality in centralities.items():
             centralities_maps[centrality_key] = centrality["func"](G, **centrality["args"])
 
-        out_queue.put({
+        out_pipe.send({
             "ok": True,
             "nnodes": nnodes,
             "edges": edges,
             "centralities_maps": centralities_maps,
         })
     except Exception as e:
-        out_queue.put({"ok": False, "error": repr(e)})
+        out_pipe.send({"ok": False, "error": repr(e)})
+    finally:
+        out_pipe.close()
 
 
 def load_graph_and_centralities_with_timeout(instancia_path, centralities, timeout_seconds):
@@ -79,23 +85,24 @@ def load_graph_and_centralities_with_timeout(instancia_path, centralities, timeo
       - error (when not ok)
     """
     ctx = mp.get_context("spawn")
-    q = ctx.Queue(maxsize=1)
-    p = ctx.Process(target=_worker_load_and_centralities, args=(instancia_path, centralities, q))
+    parent_pipe, child_pipe = ctx.Pipe(duplex=False)
+    p = ctx.Process(target=_worker_load_and_centralities, args=(instancia_path, centralities, child_pipe))
     p.start()
+    child_pipe.close()
+
     if math.isinf(timeout_seconds):
-        p.join()
+        resp = parent_pipe.recv()
     else:
-        p.join(timeout_seconds)
+        if not parent_pipe.poll(timeout_seconds):
+            if p.is_alive():
+                p.terminate()
+            p.join()
+            parent_pipe.close()
+            return {"ok": False, "timed_out": True, "error": f"timeout after {timeout_seconds}s"}
+        resp = parent_pipe.recv()
 
-    if p.is_alive():
-        p.terminate()
-        p.join()
-        return {"ok": False, "timed_out": True, "error": f"timeout after {timeout_seconds}s"}
-
-    if q.empty():
-        return {"ok": False, "timed_out": False, "error": "worker returned no data"}
-
-    resp = q.get()
+    p.join()
+    parent_pipe.close()
     resp.setdefault("timed_out", False)
     return resp
 
@@ -110,7 +117,7 @@ def plot_sparse_matrix(matrix, title, file_name="saida.png"):
 if __name__ == "__main__":
     base_dir = os.path.dirname(__file__)  # diretorio do script
     run_timestamp = time.strftime("%Y%m%d_%H%M%S")
-    print(f"[INFO] Inicio da execucao do main_survey.py ({run_timestamp})")
+    print(f"[INFO] Inicio da execucao do main_survey.py ({run_timestamp})", flush=True)
 
     list_instance, list_band, list_time, global_iteration = [], [], [], []
 
@@ -179,12 +186,12 @@ if __name__ == "__main__":
     
     dir_list = [nome for nome in os.listdir(survey_file) 
                     if os.path.isdir(os.path.join(survey_file, nome))]
-    print(f"[INFO] Total de classes no survey: {len(dir_list)}")
+    print(f"[INFO] Total de classes no survey: {len(dir_list)}", flush=True)
     
     for kind in dir_list:
         path = os.path.join(survey_file, kind)
         list_path = readFilesInDict(path, ".mtx")
-        print(f"[INFO] Classe {kind} com {len(list_path)} instancias")
+        print(f"[INFO] Classe {kind} com {len(list_path)} instancias", flush=True)
 
         for instancia in list_path:
             results = {}
@@ -209,9 +216,11 @@ if __name__ == "__main__":
 
             logger.info("Inicio da instancia: %s", instancia)
             logger.info("Arquivo de log salvo em: %s", log_file_path)
+            logger.info("Calculando centralidades (timeout: %ss)", TIMEOUT_SECONDS)
 
             # 1) Tenta ler grafo + centralidades dentro do timeout
             resp = load_graph_and_centralities_with_timeout(instancia, centralities, TIMEOUT_SECONDS)
+            logger.info("Leitura e centralidades finalizadas: ok=%s timed_out=%s", resp.get("ok"), resp.get("timed_out"))
             
             if resp.get("ok"):
                 nnodes = resp["nnodes"]
@@ -364,7 +373,7 @@ if __name__ == "__main__":
             # print("Banda Final multicetrality: ", custo_s)
     df_global = pd.DataFrame(global_iteration)
     df_global.to_csv(filename, index=False)
-    print(f"[INFO] Resultado global salvo em: {filename}")
-    print(f"[INFO] Total de registros globais: {len(df_global)}")
-    print("[INFO] Execucao finalizada com sucesso.")
+    print(f"[INFO] Resultado global salvo em: {filename}", flush=True)
+    print(f"[INFO] Total de registros globais: {len(df_global)}", flush=True)
+    print("[INFO] Execucao finalizada com sucesso.", flush=True)
 
