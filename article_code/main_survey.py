@@ -22,7 +22,7 @@ from modules.utils.handle_labels import set_bandwidth_fast
 import json
 import math
 
-TIMEOUT_SECONDS = 90  # tempo maximo (s) para ler grafo + computar centralidades
+TIMEOUT_SECONDS = 3  # tempo maximo (s) para ler grafo + computar centralidades
 
 # if 'C:\\Temp\\C##\\BandWidths' not in os.getcwd() :
 #     TIMEOUT_SECONDS = np.inf  # desabilitar timeout se não estiver rodando no servidor
