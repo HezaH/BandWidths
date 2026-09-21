@@ -22,7 +22,7 @@ from modules.utils.handle_labels import set_bandwidth_fast
 import json
 import math
 
-TIMEOUT_SECONDS = 90  # tempo maximo (s) para ler grafo + computar centralidades
+TIMEOUT_SECONDS = np.inf  # tempo maximo (s) para ler grafo + computar centralidades
 
 # if 'C:\\Temp\\C##\\BandWidths' not in os.getcwd() :
 #     TIMEOUT_SECONDS = np.inf  # desabilitar timeout se não estiver rodando no servidor
@@ -139,11 +139,11 @@ if __name__ == "__main__":
             "reverse": True
         },
 
-        "Harmonic Centrality": {
-            "func": nx.harmonic_centrality,
-            "args": {},
-            "reverse": True
-        },
+        # "Harmonic Centrality": {
+        #     "func": nx.harmonic_centrality,
+        #     "args": {},
+        #     "reverse": True
+        # },
 
         # Betweenness aproximada (100× mais rápida)
         "Betweenness": {
@@ -159,12 +159,12 @@ if __name__ == "__main__":
             "reverse": True
         },
 
-        # Katz acelerado
-        "Katz Centrality": {
-            "func": nx.katz_centrality,
-            "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 200, "tol": 1e-2},
-            "reverse": True
-        },
+        # # Katz acelerado
+        # "Katz Centrality": {
+        #     "func": nx.katz_centrality,
+        #     "args": {"alpha": 0.005, "beta": 1.0, "max_iter": 200, "tol": 1e-2},
+        #     "reverse": True
+        # },
 
         # PageRank acelerado
         "PageRank": {
