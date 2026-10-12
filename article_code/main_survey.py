@@ -23,7 +23,7 @@ import json
 import math
 
 TIMEOUT_SECONDS = np.inf  # tempo maximo (s) para ler grafo + computar centralidades
-
+TIMEOUT_SECONDS = 25
 # if 'C:\\Temp\\C##\\BandWidths' not in os.getcwd() :
 #     TIMEOUT_SECONDS = np.inf  # desabilitar timeout se não estiver rodando no servidor
 
@@ -182,10 +182,10 @@ if __name__ == "__main__":
     centralities_list = list(centralities.keys())
 
     filename = os.path.join(base_dir, "result_output_survey.csv")
-    survey_file = os.path.join(base_dir, "data", "survey", )
-    
-    dir_list = [nome for nome in os.listdir(survey_file) 
-                    if os.path.isdir(os.path.join(survey_file, nome))]
+    survey_file = os.path.join(base_dir, "data", "survey", ) # dados do artigo de survey
+    survey_file = os.path.join(base_dir, "data", "newdata") # dados do artigo
+
+    dir_list = [nome for nome in os.listdir(survey_file) if os.path.isdir(os.path.join(survey_file, nome))]
     print(f"[INFO] Total de classes no survey: {len(dir_list)}", flush=True)
     
     for kind in dir_list:
