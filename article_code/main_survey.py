@@ -53,6 +53,38 @@ def _connected_graph_with_mapping(edges, nnodes):
     return connected_graph, node_mapping, inverse_mapping
 
 
+def _save_best_graph_configuration(
+    filename,
+    bandwidth,
+    graph,
+    solution,
+    inverse_mapping,
+    centrality=None,
+):
+    """Persist the graph ordering that produced the best bandwidth."""
+    reordered_graph = nx.relabel_nodes(graph, solution)
+    original_labels = {
+        str(inverse_mapping.get(node, node)): int(label)
+        for node, label in solution.items()
+    }
+    configuration = {
+        "bandwidth": float(bandwidth),
+        "centrality": centrality,
+        "nodes": int(graph.number_of_nodes()),
+        "edges": [sorted(edge) for edge in reordered_graph.edges()],
+        "vertex_labels": original_labels,
+        "internal_vertex_labels": {
+            str(node): int(label) for node, label in solution.items()
+        },
+        "internal_to_original": {
+            str(node): int(original)
+            for node, original in inverse_mapping.items()
+        },
+    }
+    with open(filename, "w", encoding="utf-8") as configuration_file:
+        json.dump(configuration, configuration_file, indent=4, sort_keys=True)
+
+
 def configure_logger(log_file_path: str) -> logging.Logger:
     """Configure logger to write both to console and file."""
     logger = logging.getLogger(log_file_path)
@@ -227,6 +259,7 @@ if __name__ == "__main__":
             results = {} 
             instance_path = os.path.basename(instancia).replace(".mtx", "")
             path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}")
+            best_graph_path = os.path.join(path_name, f"best_graph_{instance_path}.json")
             log_file_path = os.path.join(os.path.dirname(__file__), "logs",f"{instance_path}.log")
 
             # criar o diretório se não existir
@@ -297,6 +330,15 @@ if __name__ == "__main__":
 
             temp_bandwidth = set_bandwidth_fast(G)
             logger.info("Bandwidth original: %s", temp_bandwidth)
+            best_solution = {node: node for node in G.nodes()}
+            best_centrality = None
+            _save_best_graph_configuration(
+                best_graph_path,
+                temp_bandwidth,
+                G,
+                best_solution,
+                inverse_mapping,
+            )
 
             start_time = time.time()
 
@@ -371,11 +413,35 @@ if __name__ == "__main__":
                     # salvar a melhor solução
                     temp_bandwidth = bandwidth
                     grafo = grafo_solution
+                    best_solution = solution.copy()
+                    best_centrality = centrality
 
                     G_reordered = nx.relabel_nodes(G, solution)
                     adj_matrix_reordered = nx.to_numpy_array(G_reordered) 
                     plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
+                    _save_best_graph_configuration(
+                        best_graph_path,
+                        temp_bandwidth,
+                        G,
+                        solution,
+                        inverse_mapping,
+                        centrality,
+                    )
                     logger.info("Melhor solução atualizada. Plot salvo: %s", os.path.join(path_name, file_name))
+
+            _save_best_graph_configuration(
+                best_graph_path,
+                temp_bandwidth,
+                G,
+                best_solution,
+                inverse_mapping,
+                best_centrality,
+            )
+            logger.info(
+                "Melhor configuração salva: %s (bandwidth=%s)",
+                best_graph_path,
+                temp_bandwidth,
+            )
 
             end_time = time.time()
             global_time = end_time - start_time
