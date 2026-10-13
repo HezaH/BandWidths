@@ -83,7 +83,12 @@ def _worker_load_and_centralities(instancia_path, centralities, out_pipe):
         # Centralities (cache)
         centralities_maps = {}
         for centrality_key, centrality in centralities.items():
-            centralities_maps[centrality_key] = centrality["func"](G_connected, **centrality["args"])
+            args = dict(centrality["args"])  # cópia, para não alterar o dicionário original
+
+            if "k" in args and args["k"] is not None and args["k"] >= len(G_connected):
+                args["k"] = None  # grafo pequeno: calcula exato
+
+            centralities_maps[centrality_key] = centrality["func"](G_connected, **args)
 
         out_pipe.send({
             "ok": True,
@@ -219,7 +224,7 @@ if __name__ == "__main__":
         print(f"[INFO] Classe {kind} com {len(list_path)} instancias", flush=True)
 
         for instancia in list_path:
-            results = {}
+            results = {} 
             instance_path = os.path.basename(instancia).replace(".mtx", "")
             path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}")
             log_file_path = os.path.join(os.path.dirname(__file__), "logs",f"{instance_path}.log")
@@ -373,15 +378,6 @@ if __name__ == "__main__":
             df_iteration["Instance"] = instance_path
             df_iteration["Edges"] = nedges
             df_iteration["Nodes"] = nnodes
-            # df_iteration["NumOfComp"] = num_components
-            # df_iteration["LargestCompSize"] = largest_size
-            # df_iteration["Diameter"] = diameter
-            # df_iteration["Node Connectivity"] = results.get("Node Connectivity", None)
-            # df_iteration["Edge Connectivity"] = results.get("Edge Connectivity", None)
-            # df_iteration["Algebraic Connectivity"] = results.get("Algebraic Connectivity", None)
-            # df_iteration["Average Node Connectivity"] = results.get("Average Node Connectivity", None)
-            # df_iteration["Graph Density"] = results.get("Graph Density", None)
-            # df_iteration["Average Shortest Path Length"] = results.get("Average Shortest Path Length", None)
             df_iteration['Global Time (s)'] = global_time
             df_iteration_dict = df_iteration.to_dict(orient='records')
             
