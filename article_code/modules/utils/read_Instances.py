@@ -36,44 +36,52 @@ def load_instance_fast(filename):
     neighbours = defaultdict(list)
     edges = []
 
-    with open(filename, 'r') as f:
-        # lê primeira linha útil
+    with open(filename, "r") as f:
+        # Lê as dimensões da matriz
         for line in f:
             parts = line.split()
-            if parts and not parts[0].startswith('%'):
+            if parts and not parts[0].startswith("%"):
                 nnodes, value, nedges = _parse_mtx_dimensions(parts)
                 break
+        else:
+            raise ValueError("Não foi encontrada a linha de dimensões.")
 
-        # lê arestas
+        # Inicializa todos os nós, incluindo os isolados
+        for node in range(1, nnodes + 1):
+            neighbours[node] = []
+
+        # Lê as arestas
         for line in f:
             parts = line.split()
-            if not parts or parts[0].startswith('%'):
+            if not parts or parts[0].startswith("%"):
                 continue
 
             e1, e2 = _parse_mtx_edge(parts)
 
+            if e1 == e2:
+                continue
+
+            # Grafo não direcionado: uma única aresta por par
+            edge = (min(e1, e2), max(e1, e2))
+            edges.append(edge)
+
             neighbours[e1].append(e2)
+            neighbours[e2].append(e1)
 
-            if e1 != e2:
-                edges.append((min(e1, e2), max(e1, e2)))
-                neighbours[e1].append(e2)
-                neighbours[e2].append(e1)
-            else:
-                nedges -= 1
-
-    # cria lista de adjacência
-    nodes = sorted(neighbours.keys())
+    # Lista de adjacência com todos os nós
+    nodes = list(range(1, nnodes + 1))
     lista_adj = [neighbours[n] for n in nodes]
 
-    # cria matriz esparsa diretamente com COO (muito mais rápido)
+    # Matriz de adjacência (índices começam em zero)
     row = []
     col = []
-    for u, adj in neighbours.items():
-        for v in adj:
+
+    for u in nodes:
+        for v in neighbours[u]:
             row.append(u - 1)
             col.append(v - 1)
 
-    matrix = coo_matrix(( [1]*len(row), (row, col) ), shape=(nnodes, nnodes))
+    matrix = coo_matrix(([1] * len(row), (row, col)),shape=(nnodes, nnodes)).tocsr()
 
     return nnodes, nedges, edges, neighbours, lista_adj, matrix
 

@@ -1,30 +1,21 @@
 ### Regular Import
-import numpy as np
-import pandas as pd
-import random 
 import time
-import csv
-from itertools import permutations
-from collections import defaultdict
 
 ### Import to run the graph lib
 import networkx as nx
-from networkx.utils import cuthill_mckee_ordering
-from networkx.utils import reverse_cuthill_mckee_ordering
 
 ### Import from own-code
-from modules.utils import read_Instances
 from modules.utils.handle_labels import *
 from modules.utils.read_Instances import * 
 from modules.utils.read_filenames import *
-from modules.graph.Grafo import Grafo, GrafoListaAdj
+from modules.graph.Grafo import GrafoListaAdj
 from modules.centralities.heuristics import *
 from modules.components import constructive
 
 def get_centrality_node(graph: nx.Graph, centrality: dict) -> dict:
     return dict(centrality["func"](graph, **centrality["args"]))
 
-def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:str,  alpha:float,  iter_max:int, centralities:dict )->int:
+def centrality_heuristic(graph:GrafoListaAdj, centrality_values:dict, cent_str:str, alpha:float, iter_max:int, centralities:dict )->int:
 
     bandwidth = float("inf")
     solution = None

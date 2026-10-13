@@ -224,24 +224,23 @@ def init_Solution_Centrality_lcr(graph: GrafoListaAdj, nodes_centrality:dict,
     V = list(graph.V())
     n = len(V)
 
-    # f e mark mais rápidos
-    f = {v: None for v in V}
-    mark = {v: False for v in V}
-
-    # cache de vizinhos (opcional, mas acelera muito)
-    neighbors = {v: graph.N(v) for v in V}
-
-    # probabilidades
-    values = list(nodes_centrality.values())
+    # pesos alinhados com V (vértice sem centralidade vira 0)
+    values = [nodes_centrality.get(v, 0) for v in V]
     sum_values = sum(values)
 
     if sum_values == 0:
-        probs = [1/n] * n
+        probs = [1 / n] * n
     else:
-        probs = [v / sum_values for v in values]
+        probs = [x / sum_values for x in values]
 
-    # sorteio
-    k = random.choices(V, probs)[0]
+    k = random.choices(V, weights=probs)[0]
+    
+    # cache de vizinhos (opcional, mas acelera muito)
+    neighbors = {v: graph.N(v) for v in V}
+
+    # f e mark mais rápidos
+    f = {v: None for v in V}
+    mark = {v: False for v in V}
 
     mark[k] = True
     queue = [k]

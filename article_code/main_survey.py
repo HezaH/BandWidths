@@ -23,12 +23,34 @@ import json
 import math
 
 TIMEOUT_SECONDS = np.inf  # tempo maximo (s) para ler grafo + computar centralidades
-TIMEOUT_SECONDS = 25
+# TIMEOUT_SECONDS = 25
 # if 'C:\\Temp\\C##\\BandWidths' not in os.getcwd() :
 #     TIMEOUT_SECONDS = np.inf  # desabilitar timeout se não estiver rodando no servidor
 
 MAX_NODES_REDUCED = 2000  # tamanho do subgrafo caso estoure o timeout
 REDUCTION_STRATEGY = "bfs"  # 'bfs' ou 'random'
+
+
+def _connected_graph_with_mapping(edges, nnodes):
+    """Return the largest component with safe internal labels.
+
+    MatrixMarket vertex identifiers are preserved in ``original_nodes`` and
+    ``node_mapping``.  The graph used by the algorithms is relabeled to
+    ``1..n`` because ``GrafoListaAdj`` stores adjacency lists by index.
+    """
+    graph = nx.Graph()
+    graph.add_nodes_from(range(1, int(nnodes) + 1))
+    graph.add_edges_from(edges)
+
+    largest_cc = max(nx.connected_components(graph), key=len)
+    original_nodes = sorted(largest_cc)
+    node_mapping = {old: new for new, old in enumerate(original_nodes, start=1)}
+    inverse_mapping = {new: old for old, new in node_mapping.items()}
+    connected_graph = nx.relabel_nodes(
+        graph.subgraph(largest_cc).copy(),
+        node_mapping,
+    )
+    return connected_graph, node_mapping, inverse_mapping
 
 
 def configure_logger(log_file_path: str) -> logging.Logger:
@@ -54,20 +76,22 @@ def _worker_load_and_centralities(instancia_path, centralities, out_pipe):
     try:
         nnodes, nedges, edges, neighbours, lista_adj, matrix = read_Instances.load_instance_fast(instancia_path)
 
-        # NetworkX graph
-        G = nx.Graph()
-        G.add_edges_from(edges)
+        G_connected, node_mapping, inverse_mapping = _connected_graph_with_mapping(
+            edges, nnodes
+        )
 
         # Centralities (cache)
         centralities_maps = {}
         for centrality_key, centrality in centralities.items():
-            centralities_maps[centrality_key] = centrality["func"](G, **centrality["args"])
+            centralities_maps[centrality_key] = centrality["func"](G_connected, **centrality["args"])
 
         out_pipe.send({
             "ok": True,
-            "nnodes": nnodes,
-            "edges": edges,
+            "nnodes": G_connected.number_of_nodes(),
+            "edges": list(G_connected.edges()),
             "centralities_maps": centralities_maps,
+            "node_mapping": node_mapping,
+            "inverse_mapping": inverse_mapping,
         })
     except Exception as e:
         out_pipe.send({"ok": False, "error": repr(e)})
@@ -82,6 +106,7 @@ def load_graph_and_centralities_with_timeout(instancia_path, centralities, timeo
       - ok: bool
       - timed_out: bool
       - nnodes, edges, centralities_maps (when ok)
+      - node_mapping, inverse_mapping (when ok)
       - error (when not ok)
     """
     ctx = mp.get_context("spawn")
@@ -195,7 +220,6 @@ if __name__ == "__main__":
 
         for instancia in list_path:
             results = {}
-
             instance_path = os.path.basename(instancia).replace(".mtx", "")
             path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}")
             log_file_path = os.path.join(os.path.dirname(__file__), "logs",f"{instance_path}.log")
@@ -207,9 +231,7 @@ if __name__ == "__main__":
             instance_timestamp = time.strftime("%Y%m%d_%H%M%S")
             
             logger = configure_logger(log_file_path)
-            torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
-            json_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'analysis_inputs_{instance_path}.json')
-            
+
             # if os.path.exists(torch_save_path):
             #     print(f"Modelo já treinado para a instância {instance_path}, pulando...")
             #     continue
@@ -226,6 +248,8 @@ if __name__ == "__main__":
                 nnodes = resp["nnodes"]
                 edges = resp["edges"]
                 centralities_maps = resp["centralities_maps"]
+                node_mapping = resp["node_mapping"]
+                inverse_mapping = resp["inverse_mapping"]
                 nedges = len(edges)
             else:
                 # 2) Fallback: reduz o grafo e recomputa centralidades no subgrafo
@@ -242,6 +266,8 @@ if __name__ == "__main__":
                     estrategia=REDUCTION_STRATEGY,
                     seed=0,
                 )
+                node_mapping = mapa
+                inverse_mapping = inv
                 nedges = len(edges)
 
                 # NetworkX graph reduzido
@@ -358,7 +384,10 @@ if __name__ == "__main__":
             # df_iteration["Average Shortest Path Length"] = results.get("Average Shortest Path Length", None)
             df_iteration['Global Time (s)'] = global_time
             df_iteration_dict = df_iteration.to_dict(orient='records')
-
+            
+            torch_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'trained_model_{instance_path}.pth')
+            json_save_path = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}", f'analysis_inputs_{instance_path}.json')
+            
             with open(json_save_path, 'w') as f:
                 json.dump(df_iteration_dict, f, indent=4)
             logger.info("Analise por instancia salva em: %s", json_save_path)
@@ -376,4 +405,3 @@ if __name__ == "__main__":
     print(f"[INFO] Resultado global salvo em: {filename}", flush=True)
     print(f"[INFO] Total de registros globais: {len(df_global)}", flush=True)
     print("[INFO] Execucao finalizada com sucesso.", flush=True)
-
