@@ -281,7 +281,12 @@ if __name__ == "__main__":
 
                 centralities_maps = {}
                 for centrality_key, centrality in centralities.items():
-                    centralities_maps[centrality_key] = centrality["func"](G_reduced, **centrality["args"])
+                    args = dict(centrality["args"])  # cópia, para não alterar o dicionário original
+
+                    if "k" in args and args["k"] is not None and args["k"] >= len(G_reduced):
+                        args["k"] = None  # grafo pequeno: calcula exato
+
+                    centralities_maps[centrality_key] = centrality["func"](G_reduced, **args)
             
             #parametros
             max_iter = 30
