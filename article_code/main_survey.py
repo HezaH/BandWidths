@@ -85,6 +85,58 @@ def _save_best_graph_configuration(
         json.dump(configuration, configuration_file, indent=4, sort_keys=True)
 
 
+def _load_saved_bandwidth(bandwidth_path, best_graph_path):
+    """Load the persisted bandwidth without reading the large configuration."""
+    if os.path.exists(bandwidth_path):
+        with open(bandwidth_path, "r", encoding="utf-8") as bandwidth_file:
+            saved_bandwidth = json.load(bandwidth_file)
+        if isinstance(saved_bandwidth, (int, float)) and math.isfinite(saved_bandwidth):
+            return float(saved_bandwidth)
+        raise ValueError(f"Valor inválido no arquivo de bandwidth: {bandwidth_path}")
+
+    # Backward compatibility for configurations created before the compact file.
+    if os.path.exists(best_graph_path):
+        with open(best_graph_path, "r", encoding="utf-8") as configuration_file:
+            configuration = json.load(configuration_file)
+        saved_bandwidth = configuration.get("bandwidth")
+        if isinstance(saved_bandwidth, (int, float)) and math.isfinite(saved_bandwidth):
+            return float(saved_bandwidth)
+
+    return None
+
+
+def _save_bandwidth_value(filename, bandwidth):
+    """Persist only the best bandwidth for fast comparisons on later runs."""
+    with open(filename, "w", encoding="utf-8") as bandwidth_file:
+        json.dump(float(bandwidth), bandwidth_file)
+
+
+def _save_if_better(
+    bandwidth,
+    persisted_bandwidth,
+    best_graph_path,
+    bandwidth_path,
+    graph,
+    solution,
+    inverse_mapping,
+    centrality=None,
+):
+    """Save the full configuration and compact value only when the result improves."""
+    if persisted_bandwidth is not None and bandwidth >= persisted_bandwidth:
+        return persisted_bandwidth, False
+
+    _save_best_graph_configuration(
+        best_graph_path,
+        bandwidth,
+        graph,
+        solution,
+        inverse_mapping,
+        centrality,
+    )
+    _save_bandwidth_value(bandwidth_path, bandwidth)
+    return float(bandwidth), True
+
+
 def configure_logger(log_file_path: str) -> logging.Logger:
     """Configure logger to write both to console and file."""
     logger = logging.getLogger(log_file_path)
@@ -245,7 +297,7 @@ if __name__ == "__main__":
 
     filename = os.path.join(base_dir, "result_output_survey.csv")
     survey_file = os.path.join(base_dir, "data", "survey", ) # dados do artigo de survey
-    survey_file = os.path.join(base_dir, "data", "newdata") # dados do artigo
+    survey_file = os.path.join(base_dir, "data", "newdata") # dados do artigo e alguns outros novos
 
     dir_list = [nome for nome in os.listdir(survey_file) if os.path.isdir(os.path.join(survey_file, nome))]
     print(f"[INFO] Total de classes no survey: {len(dir_list)}", flush=True)
@@ -260,6 +312,7 @@ if __name__ == "__main__":
             instance_path = os.path.basename(instancia).replace(".mtx", "")
             path_name = os.path.join(os.path.dirname(os.path.dirname(instancia)), "plots", f"{instance_path}")
             best_graph_path = os.path.join(path_name, f"best_graph_{instance_path}.json")
+            bandwidth_path = os.path.join(path_name, f"best_bandwidth_{instance_path}.json")
             log_file_path = os.path.join(os.path.dirname(__file__), "logs",f"{instance_path}.log")
 
             # criar o diretório se não existir
@@ -332,13 +385,24 @@ if __name__ == "__main__":
             logger.info("Bandwidth original: %s", temp_bandwidth)
             best_solution = {node: node for node in G.nodes()}
             best_centrality = None
-            _save_best_graph_configuration(
+            persisted_bandwidth = _load_saved_bandwidth(
+                bandwidth_path,
                 best_graph_path,
+            )
+            if persisted_bandwidth is not None and not os.path.exists(bandwidth_path):
+                _save_bandwidth_value(bandwidth_path, persisted_bandwidth)
+                logger.info("Arquivo compacto de bandwidth criado a partir do resultado existente.")
+            persisted_bandwidth, saved = _save_if_better(
                 temp_bandwidth,
+                persisted_bandwidth,
+                best_graph_path,
+                bandwidth_path,
                 G,
                 best_solution,
                 inverse_mapping,
             )
+            if saved:
+                logger.info("Configuração inicial persistida como melhor resultado.")
 
             start_time = time.time()
 
@@ -419,28 +483,34 @@ if __name__ == "__main__":
                     G_reordered = nx.relabel_nodes(G, solution)
                     adj_matrix_reordered = nx.to_numpy_array(G_reordered) 
                     plot_sparse_matrix(adj_matrix_reordered, name_matrix, file_name=os.path.join(path_name, file_name))
-                    _save_best_graph_configuration(
-                        best_graph_path,
+                    persisted_bandwidth, saved = _save_if_better(
                         temp_bandwidth,
+                        persisted_bandwidth,
+                        best_graph_path,
+                        bandwidth_path,
                         G,
                         solution,
                         inverse_mapping,
                         centrality,
                     )
+                    if saved:
+                        logger.info("Melhor configuração persistida.")
                     logger.info("Melhor solução atualizada. Plot salvo: %s", os.path.join(path_name, file_name))
 
-            _save_best_graph_configuration(
-                best_graph_path,
+            persisted_bandwidth, saved = _save_if_better(
                 temp_bandwidth,
+                persisted_bandwidth,
+                best_graph_path,
+                bandwidth_path,
                 G,
                 best_solution,
                 inverse_mapping,
                 best_centrality,
             )
             logger.info(
-                "Melhor configuração salva: %s (bandwidth=%s)",
-                best_graph_path,
+                "Melhor configuração da rodada: bandwidth=%s; persistida=%s",
                 temp_bandwidth,
+                saved,
             )
 
             end_time = time.time()
