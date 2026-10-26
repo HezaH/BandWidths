@@ -297,7 +297,7 @@ if __name__ == "__main__":
 
     filename = os.path.join(base_dir, "result_output_survey.csv")
     survey_file = os.path.join(base_dir, "data", "survey", ) # dados do artigo de survey
-    # survey_file = os.path.join(base_dir, "data", "newdata") # dados do artigo e alguns outros novos
+    survey_file = os.path.join(base_dir, "data", "newdata") # dados do artigo e alguns outros novos
 
     dir_list = [nome for nome in os.listdir(survey_file) if os.path.isdir(os.path.join(survey_file, nome))]
     print(f"[INFO] Total de classes no survey: {len(dir_list)}", flush=True)
