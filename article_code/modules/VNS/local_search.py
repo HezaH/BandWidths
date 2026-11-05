@@ -158,3 +158,103 @@ def improved_hill_climbing_two(graph: GrafoListaAdj, solution_f: dict)->dict:
                     break
     return solution_f
 
+
+
+def local_search_band(graph: GrafoListaAdj, solution_f: dict, max_passes: int = 100,
+                      max_candidates: int = 50, time_limit: float = None) -> dict:
+    '''
+    Busca local do VNS-band (Mladenovic et al., 2010), baseada em Lim et al. (2006).
+
+    Para cada vertice critico v (|f(v) - f(w)| = banda para algum vizinho w), calcula
+    mid(v) = (menor rotulo vizinho + maior rotulo vizinho) // 2 e tenta trocar o rotulo de v
+    com o de um vertice u cujo rotulo esteja mais proximo de mid(v) do que f(v)
+    (candidatos ordenados pela distancia a mid(v), no maximo max_candidates).
+    A troca e aceita se nenhuma aresta passa a exceder a banda e o numero de arestas
+    criticas diminui; quando chega a zero, a banda caiu e o processo continua com a nova banda.
+
+    Avaliacao incremental: cada troca so recalcula as arestas incidentes a v e u
+    (as funcoes hill_climbing / improved_hill_climbing acima recalculam a banda inteira
+    a cada candidato e trocam rotulos sobre a solucao original).
+
+    Retorna uma nova solucao (dicionario vertice -> rotulo); solution_f nao e alterada.
+    '''
+    from ..components.constructive import get_neighbors_cache
+
+    start_time = time.time()
+    neighbors = get_neighbors_cache(graph)
+    n = graph.n
+    f = [0] * (n + 1)      # vertice -> rotulo
+    inv = [0] * (n + 1)    # rotulo -> vertice
+    for v in graph.V():
+        f[v] = solution_f[v]
+        inv[f[v]] = v
+
+    edges_u, edges_v = handle_labels.get_edges_cache(graph)
+    if len(edges_u) == 0:
+        return dict(solution_f)
+
+    def global_band():
+        labels = np.asarray(f)
+        diffs = np.abs(labels[edges_u + 1] - labels[edges_v + 1])
+        band = int(diffs.max())
+        critical = diffs == band
+        critical_nodes = set((edges_u[critical] + 1).tolist()) | set((edges_v[critical] + 1).tolist())
+        return band, int(critical.sum()), critical_nodes
+
+    def swap_delta(v, u, band):
+        '''(viola, criticas_antes, criticas_depois) considerando so as arestas de v e u.'''
+        fv, fu = f[v], f[u]
+        before = after = 0
+        for w in neighbors[v]:
+            before += abs(fv - f[w]) == band
+            d = abs(fu - (fv if w == u else f[w]))
+            if d > band:
+                return True, 0, 0
+            after += d == band
+        for w in neighbors[u]:
+            if w == v:
+                continue  # aresta uv ja contada
+            before += abs(fu - f[w]) == band
+            d = abs(fv - f[w])
+            if d > band:
+                return True, 0, 0
+            after += d == band
+        return False, before, after
+
+    band, n_critical, critical_nodes = global_band()
+    for _ in range(max_passes):
+        improved = False
+        for v in list(critical_nodes):
+            if time_limit is not None and time.time() - start_time > time_limit:
+                return {v: f[v] for v in graph.V()}
+            labels_nb = [f[w] for w in neighbors[v]]
+            if max(abs(f[v] - l) for l in labels_nb) != band:
+                continue  # deixou de ser critico apos trocas anteriores
+            mid = (min(labels_nb) + max(labels_nb)) // 2
+            dist_v = abs(mid - f[v])
+            # rotulos mais proximos de mid(v) do que f(v), do mais proximo para o mais distante
+            candidates = []
+            for d in range(dist_v):
+                for label in (mid - d, mid + d) if d else (mid,):
+                    if 1 <= label <= n and inv[label] != v:
+                        candidates.append(inv[label])
+                if len(candidates) >= max_candidates:
+                    break
+            for u in candidates[:max_candidates]:
+                violates, before, after = swap_delta(v, u, band)
+                if violates or after >= before:
+                    continue
+                f[v], f[u] = f[u], f[v]
+                inv[f[v]], inv[f[u]] = v, u
+                n_critical += after - before
+                improved = True
+                break
+            if n_critical <= 0:
+                break  # banda caiu: recalcula antes de continuar
+        if n_critical <= 0 or improved:
+            # banda caiu (ou o conjunto de criticos mudou): recalcula o estado global
+            band, n_critical, critical_nodes = global_band()
+        if not improved:
+            break
+
+    return {v: f[v] for v in graph.V()}

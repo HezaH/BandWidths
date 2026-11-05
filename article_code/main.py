@@ -233,7 +233,8 @@ for loop in range(1,2):
                     
                     # salvar a melhor solução
                     temp_bandwidth = bandwidth
-                    grafo = grafo_solution
+                    # `grafo` NAO e substituido pelo grafo reetiquetado: as centralidades e a
+                    # solucao sao indexadas pelos vertices originais (ver main_survey.py)
 
                     G_reordered = nx.relabel_nodes(G, solution)
                     adj_matrix_reordered = nx.to_numpy_array(G_reordered) 

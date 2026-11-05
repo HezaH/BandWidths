@@ -36,14 +36,28 @@ def Bf_graph(graph: GrafoListaAdj, F_labels: dict)->int:
     return: - inteiro representando a largura de banda
 
     Funcao que calcula a largura de banda de um grafo
+
+    As arestas sao convertidas para vetores numpy uma unica vez por grafo
+    (get_edges_cache); depois disso, cada avaliacao e uma operacao vetorizada
+    O(m) em vez de percorrer as listas encadeadas em Python.
     '''
-    width = 0
-    for v in graph.V():
-        for u in graph.N(v):
-           temp = abs(F_labels[v] - F_labels[u])
-           if temp > width:
-                width = temp      
-    return width
+    edges_u, edges_v = get_edges_cache(graph)
+    if len(edges_u) == 0:
+        return 0
+    labels = np.fromiter((F_labels[v] for v in graph.V()), dtype=np.int64, count=graph.n)
+    return int(np.abs(labels[edges_u] - labels[edges_v]).max())
+
+def get_edges_cache(graph: GrafoListaAdj) -> tuple:
+    '''
+    Vetores (0-based) com as extremidades de cada aresta, guardados no proprio grafo.
+    O cache e invalidado quando o numero de arestas muda.
+    '''
+    cache = getattr(graph, "_edges_cache", None)
+    if cache is None or cache[0] != graph.m:
+        edges = np.array(list(graph.E()), dtype=np.int64).reshape(-1, 2) - 1
+        cache = (graph.m, edges[:, 0].copy(), edges[:, 1].copy())
+        graph._edges_cache = cache
+    return cache[1], cache[2]
 
 def Bf_node(graph: GrafoListaAdj, F_labels: dict, node_v: int)->int:
     ''''
