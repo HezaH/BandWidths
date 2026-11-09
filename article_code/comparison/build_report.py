@@ -22,6 +22,7 @@ PLOTS = {
     "newdata": os.path.join(BASE_DIR, "data", "newdata", "plots"),
     "survey": os.path.join(BASE_DIR, "data", "survey", "plots"),
 }
+RUN_TAG = "centrality"  # resultados de main_survey.py: analysis_inputs_<inst>_<tag>.json (Q-MCH original)
 OUT_HTML = os.path.join(HERE, "report_comparacao.html")
 OUT_TABLES = os.path.join(HERE, "tabelas")
 
@@ -150,17 +151,24 @@ def load_runs():
     summaries, iterations = [], []
     for dataset, root in PLOTS.items():
         for inst in sorted(os.listdir(root)):
-            run_file = os.path.join(root, inst, f"analysis_inputs_{inst}.json")
+            run_file = os.path.join(root, inst, f"analysis_inputs_{inst}_{RUN_TAG}.json")
             if not os.path.exists(run_file):
+                if os.path.exists(os.path.join(root, inst, f"analysis_inputs_{inst}.json")):
+                    print(f"[WARN] {dataset}/{inst}: so ha resultado antigo (sem sufixo _{RUN_TAG}); ignorado")
                 continue
             with open(run_file, encoding="utf-8") as f:
                 df = pd.DataFrame(json.load(f))
+            if "Run" in df.columns:  # varias execucoes independentes: as analises por construcao usam a primeira
+                df = df[df["Run"] == df["Run"].min()].reset_index(drop=True)
             df["dataset"] = dataset
             df["instance"] = inst
             df["step"] = np.arange(len(df))
-            df["episode"] = df["step"] // 15  # 5 chamadas x 3 construcoes por episodio
+            if "Episode" in df.columns:
+                df["episode"] = df["Episode"] - 1
+            else:
+                df["episode"] = df["step"] // 15  # 5 chamadas x 3 construcoes por episodio
             iterations.append(df)
-            best_file = os.path.join(root, inst, f"best_bandwidth_{inst}.json")
+            best_file = os.path.join(root, inst, f"best_bandwidth_{inst}_{RUN_TAG}.json")
             hist_best = None
             if os.path.exists(best_file):
                 with open(best_file, encoding="utf-8") as f:
@@ -674,6 +682,9 @@ def main():
     med_vs_art = (100 * (sbpo["run_best"] - sbpo["art_qmch"]) / sbpo["art_qmch"]).median()
     s_cov = cov["status"].value_counts()
     surv = df[df["dataset"] == "survey"]
+    surv_reduced = sorted(surv.loc[surv["reduced_subgraph"].astype(bool), "instance"])
+    centrality_names = sorted(iters["centrality"].dropna().unique())
+    n_centralities = len(centrality_names)
     over_timeout = df.loc[df["global_time_s"] > SURVEY_TIMEOUT_S, "instance"].tolist()
     sbpo_time_ratio = (sbpo["global_time_s"] / sbpo["n_constructions"] * 100).mean() / SBPO_TABLE5["Q-MCH"]
     w_rcm_ours_sbpo = count_wtl(sbpo["run_best"], sbpo["rcm_bw"])
@@ -794,11 +805,11 @@ def main():
         "Q7 · O agente aprende?",
         "Com ε inicial = 1 e decaimento de 0,995 por passo, o agente chega a explorar menos e convergir para uma "
         "centralidade em 30 episódios?",
-        "<code>Agent.learn()</code> é chamado uma vez por episódio, então após 30 episódios ε ≈ 0,995³⁰ ≈ 0,86: "
-        "86% das escolhas ainda são aleatórias. Nos episódios 21–30, nenhuma centralidade passa de "
-        f"{max_late:.0f}% das escolhas. Além disso, <code>main_survey.py</code> cria um <b>Agent novo por instância</b> "
-        "(não há aprendizado por classe, que é a premissa do SBPO), e o estado [passo, gap, recompensa, β] entra na "
-        "rede sem normalização (β na casa dos milhares; gap calculado com opt = 100000).",
+        "Na versão atual de <code>main_survey.py</code>, o decaimento de ε é calculado para que ε chegue a 0,01 "
+        "após 80% dos episódios, o estado [passo, gap, recompensa, β] é normalizado antes de entrar na rede e o gap "
+        "é medido contra o limite inferior da instância. Nos episódios 21–30, nenhuma centralidade passa de "
+        f"{max_late:.0f}% das escolhas. O script continua criando um <b>Agent novo por instância</b> "
+        "(não há aprendizado por classe, que é a premissa do SBPO).",
         fig_selection_over_time(iters)))
     html_parts.append(section(
         "Q8 · Quantas construções são necessárias?",
@@ -830,8 +841,9 @@ def main():
         f"Nas {sum(w_rcm_surv)} instâncias do survey, o Q-MCH vence o RCM em <b>{w_rcm_surv[0]}</b>, empata em "
         f"{w_rcm_surv[1]} e perde em <b>{w_rcm_surv[2]}</b>. Contra a ordem aleatória, vence {w_rand_surv[0]}, empata "
         f"{w_rand_surv[1]} e perde {w_rand_surv[2]}. Os ganhos sobre o RCM aparecem em grafos de redes "
-        "complexas/VSP, onde o RCM é fraco; mesmo nesses casos, a ordem aleatória é melhor. Em boyd1 e lp1, o subgrafo "
-        "BFS de 2000 nós é dominado por um hub (⌈Δ/2⌉ ≈ 1000) e todos os métodos ficam em β ≈ n.",
+        "complexas/VSP, onde o RCM é fraco." + (
+            " Instâncias marcadas com * ainda vêm de subgrafos BFS de 2000 nós: " + ", ".join(surv_reduced) + "."
+            if surv_reduced else " Todas as instâncias do survey rodaram no grafo completo (maior componente)."),
         fig_survey_quality(df)))
     html_parts.append(section(None, "Visão geral: diferença percentual para o RCM em todas as instâncias.",
                               "Pontos abaixo da linha indicam Q-MCH melhor que RCM.", fig_ratio_rcm(df)))
@@ -847,10 +859,10 @@ def main():
         "O survey destaca que, para acelerar solvers, a heurística precisa ter custo baixo (Seção 3.1), sugere "
         "1500 s como timeout para matrizes grandes e lembra que o tempo depende mais de |E| do que de |V|.",
         ("Execuções acima de 1500 s: " + (", ".join(over_timeout) if over_timeout else "nenhuma") +
-         ". O tempo cresce aproximadamente como uma potência de |E| (reta no log-log). As execuções do survey "
-         "ficam acima da nuvem do newdata para o mesmo |E| porque calculam 7 centralidades (inclui Katz e Harmonic). "
-         "O cálculo das centralidades domina nos grafos maiores e motivou o fallback de 2000 nós. Para comparação, "
-         "o RCM leva menos de 1 s mesmo no maior grafo."),
+         ". O tempo cresce aproximadamente como uma potência de |E| (reta no log-log). Cada execução calcula "
+         f"{n_centralities} centralidades ({', '.join(centrality_names)}), com Closeness aproximada por amostragem; "
+         "esse cálculo domina o tempo nos grafos maiores. Para comparação, o RCM leva menos de 1 s mesmo no maior "
+         "grafo."),
         fig_runtime_scaling(df)))
     html_parts.append(section(
         "S6 · Quão longe do ótimo?",
@@ -858,8 +870,8 @@ def main():
         "Para grafos esparsos, o limite de Lam fica perto de 0. Por isso o limite inferior usado aqui é o máximo entre "
         "Lam, ⌈Δ/2⌉ e ⌈(n−1)/diâmetro⌉ (este último só para n ≤ 5000). Gaps altos (" +
         ", ".join(hub["instance"]) + ") indicam sobretudo que o limite inferior é fraco nessas instâncias, e não "
-        "necessariamente que a solução seja ruim. Note ainda que o <code>Env</code> não usa nenhum limite: o gap do "
-        "estado do agente é calculado contra opt = 100000 fixo.",
+        "necessariamente que a solução seja ruim. O gap do estado do agente (<code>Env</code>) usa o máximo entre "
+        "Lam e ⌈Δ/2⌉ calculado em <code>main_survey.py</code>.",
         fig_gap_lb(df)))
     html_parts.append(section(
         "S7 · Estatísticas recomendadas pelo survey",

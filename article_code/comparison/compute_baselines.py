@@ -10,6 +10,11 @@
 #   - baseline aleatorio: construtivo do VNS-band (BFS com rotacao aleatoria),
 #     mesmo orcamento de construcoes da execucao (450)
 #
+# Le os resultados de main_survey.py em plots/<inst>/analysis_inputs_<inst>_<tag>.json
+# (tag padrao: "centrality", o Q-MCH original sem busca local).
+# Linhas ja existentes em baselines.csv sao recalculadas quando o grafo da execucao
+# mudou (outro numero de nos/arestas ou grafo completo vs subgrafo).
+#
 # Saida: comparison/baselines.csv (reaproveitado por build_report.py)
 
 import os
@@ -40,6 +45,21 @@ DATASETS = {
     "survey": os.path.join(BASE_DIR, "data", "survey"),
 }
 MAX_NODES_REDUCED = 2000
+RUN_TAG = "centrality"  # sufixo dos arquivos de main_survey.py (condicao, '_ls' com busca local)
+
+
+def run_file_path(plots_dir, instance, tag=RUN_TAG):
+    """Arquivo de resultados por construcao gravado por main_survey.py."""
+    return os.path.join(plots_dir, instance, f"analysis_inputs_{instance}_{tag}.json")
+
+
+def run_graph_info(first_row):
+    """(nos, arestas, subgrafo?) do grafo usado na execucao."""
+    nodes, edges = int(first_row["Nodes"]), int(first_row["Edges"])
+    reduced = first_row.get("Reduced Subgraph")
+    if reduced is None:  # arquivos antigos sem a coluna
+        reduced = nodes == MAX_NODES_REDUCED
+    return nodes, edges, bool(reduced)
 DIAMETER_MAX_NODES = 5000
 
 
@@ -52,7 +72,7 @@ def find_mtx(dataset_dir, instance):
     return None
 
 
-def build_run_graph(mtx_path, run_nodes):
+def build_run_graph(mtx_path, reduced):
     """Reproduz o grafo efetivamente usado pela execucao."""
     nnodes, _, edges, *_ = read_Instances.load_instance_fast(mtx_path)
     full = nx.Graph()
@@ -61,7 +81,7 @@ def build_run_graph(mtx_path, run_nodes):
     lcc = max(nx.connected_components(full), key=len)
     full_info = {"full_nodes": nnodes, "full_edges": full.number_of_edges(), "lcc_nodes": len(lcc)}
 
-    if run_nodes == MAX_NODES_REDUCED and len(lcc) > MAX_NODES_REDUCED:
+    if reduced and len(lcc) > MAX_NODES_REDUCED:
         k, red_edges, _, _ = RedutorGrafo.ReduzirArestas(
             nnodes, edges, max_nodes=MAX_NODES_REDUCED, estrategia="bfs", seed=0
         )
@@ -128,28 +148,40 @@ def main():
     parser.add_argument("--max-random-nodes", type=int, default=60000,
                         help="nao roda o baseline aleatorio acima deste numero de nos")
     parser.add_argument("--only", nargs="*", help="restringe a estas instancias")
+    parser.add_argument("--tag", default=RUN_TAG,
+                        help="sufixo dos resultados de main_survey.py (ex.: centrality, centrality_ls, alpha)")
+    parser.add_argument("--force", action="store_true", help="recalcula todas as instancias")
     args = parser.parse_args()
 
-    done = pd.read_csv(OUT_FILE) if os.path.exists(OUT_FILE) else pd.DataFrame()
-    done_keys = set(zip(done.get("dataset", []), done.get("instance", [])))
-    rows = done.to_dict("records")
+    done = pd.read_csv(OUT_FILE) if os.path.exists(OUT_FILE) and not args.force else pd.DataFrame()
+    cached = {(r["dataset"], r["instance"]): r for r in done.to_dict("records")}
 
     for dataset, ddir in DATASETS.items():
         plots = os.path.join(ddir, "plots")
         for instance in sorted(os.listdir(plots)):
-            run_file = os.path.join(plots, instance, f"analysis_inputs_{instance}.json")
-            if not os.path.exists(run_file) or (dataset, instance) in done_keys:
+            run_file = run_file_path(plots, instance, args.tag)
+            if not os.path.exists(run_file):
                 continue
             if args.only and instance not in args.only:
                 continue
+            with open(run_file, encoding="utf-8") as f:
+                first = json.load(f)[0]
+            run_nodes, run_edges, run_reduced = run_graph_info(first)
+            old = cached.get((dataset, instance))
+            if old is not None:
+                if (int(old["run_nodes"]), int(old["run_edges"]), bool(old["reduced_subgraph"])) ==                         (run_nodes, run_edges, run_reduced):
+                    continue  # baseline ja calculado sobre o mesmo grafo
+                print(f"[INFO] {dataset}/{instance}: grafo da execucao mudou "
+                      f"({int(old['run_nodes'])} -> {run_nodes} nos) - recalculando", flush=True)
             mtx = find_mtx(ddir, instance)
             if mtx is None:
                 print(f"[WARN] .mtx nao encontrado: {instance}", flush=True)
                 continue
-            with open(run_file, encoding="utf-8") as f:
-                first = json.load(f)[0]
             t0 = time.perf_counter()
-            graph, reduced, full_info = build_run_graph(mtx, int(first["Nodes"]))
+            graph, reduced, full_info = build_run_graph(mtx, run_reduced)
+            if graph.number_of_nodes() != run_nodes:
+                print(f"[WARN] {dataset}/{instance}: grafo reconstruido tem {graph.number_of_nodes()} nos, "
+                      f"execucao usou {run_nodes}", flush=True)
             e = np.array(list(graph.edges()), dtype=np.int64)
             row = {
                 "dataset": dataset,
@@ -158,8 +190,8 @@ def main():
                 "reduced_subgraph": reduced,
                 "nodes": graph.number_of_nodes(),
                 "edges": graph.number_of_edges(),
-                "run_nodes": int(first["Nodes"]),
-                "run_edges": int(first["Edges"]),
+                "run_nodes": run_nodes,
+                "run_edges": run_edges,
                 **full_info,
                 "original_bw": bandwidth_of(e),
             }
@@ -167,8 +199,8 @@ def main():
             row.update(lower_bounds(graph))
             if graph.number_of_nodes() <= args.max_random_nodes:
                 row.update(random_order_baseline(graph, n_constructions=450))
-            rows.append(row)
-            pd.DataFrame(rows).to_csv(OUT_FILE, index=False)
+            cached[(dataset, instance)] = row  # substitui a linha antiga, se houver
+            pd.DataFrame(list(cached.values())).to_csv(OUT_FILE, index=False)
             print(f"[OK] {dataset}/{instance} n={row['nodes']} m={row['edges']} "
                   f"orig={row['original_bw']} rcm={row['rcm_bw']} "
                   f"rand={row.get('random_best')} lb={row['lower_bound']} "
