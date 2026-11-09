@@ -702,6 +702,24 @@ def process_instance(instancia, centralities, conditions=("centrality",), local_
     return results
 
 
+DATASETS = {"survey": "survey", "artigo": "newdata", "newdata": "newdata"}  # opção -> pasta em data/
+
+
+def ask_dataset():
+    """Pergunta no terminal se a execução é do survey ou do artigo; devolve a pasta em data/."""
+    options = {"1": "survey", "2": "newdata"}
+    print("\nQual conjunto de instancias deseja rodar?")
+    print("  [1] Survey  (data/survey)")
+    print("  [2] Artigo  (data/newdata - matrizes do artigo SBPO e outras)")
+    while True:
+        answer = input("Escolha 1 ou 2: ").strip().lower()
+        if answer in options:
+            return options[answer]
+        if answer in DATASETS:
+            return DATASETS[answer]
+        print("Opcao invalida. Digite 1 (survey) ou 2 (artigo).")
+
+
 def append_csv(rows, filename, first_write):
     """Grava os resultados de uma instância assim que ela termina (uma falha
     no meio da execução não perde as instâncias já concluídas)."""
@@ -777,7 +795,8 @@ if __name__ == "__main__":
     # LOOP PRINCIPAL — uma tarefa por instância (sequencial ou em paralelo)
     # ------------------------------------------------------------
     # Exemplos:
-    #   python main_survey.py                                         -> condição "centrality", sem busca local
+    #   python main_survey.py                                         -> pergunta survey/artigo; condição "centrality", sem busca local
+    #   python main_survey.py --dataset artigo                        -> não pergunta (survey | artigo | newdata)
     #   python main_survey.py --condition alpha --local-search on
     #   python main_survey.py --condition all --local-search both --dataset newdata
     #   python main_survey.py --condition start --instances bp_0 power
@@ -787,12 +806,15 @@ if __name__ == "__main__":
                         help="o que o agente escolhe a cada episódio (pode passar mais de uma ou 'all')")
     parser.add_argument("--local-search", choices=["off", "on", "both"], default="on" if LOCAL_SEARCH else "off",
                         help="busca local do VNS-band após cada construção ('both' roda com e sem)")
-    parser.add_argument("--dataset", choices=["survey", "newdata"], default="survey",
-                        help="survey = matrizes do survey; newdata = matrizes do artigo SBPO e outras")
+    parser.add_argument("--dataset", choices=list(DATASETS), default=None,
+                        help="survey = matrizes do survey; artigo/newdata = matrizes do artigo SBPO e outras. "
+                             "Se omitido, a escolha é perguntada no terminal")
     parser.add_argument("--instances", nargs="*", default=None, help="restringe às instâncias com estes nomes (sem .mtx)")
     parser.add_argument("--workers", type=int, default=N_WORKERS_INSTANCES, help="instâncias processadas em paralelo")
     args = parser.parse_args()
     N_WORKERS_INSTANCES = args.workers
+    args.dataset = DATASETS[args.dataset] if args.dataset else ask_dataset()
+    print(f"[INFO] Dataset selecionado: {args.dataset}", flush=True)
 
     conditions = list(CONDITIONS) if "all" in args.condition else args.condition
     local_search_options = {"off": (False,), "on": (True,), "both": (False, True)}[args.local_search]
