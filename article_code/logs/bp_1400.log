@@ -1,222 +1,41 @@
-2026-11-04 22:49:54,365 | INFO | Inicio da instancia: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\trash\bp_1400.mtx
-2026-11-04 22:49:54,366 | INFO | Arquivo de log salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\logs\bp_1400.log
-2026-11-04 22:49:54,366 | INFO | Condicoes: ['centrality', 'alpha', 'start'] | busca local: [False, True]
-2026-11-04 22:49:54,367 | INFO | Calculando centralidades (timeout: infs)
-2026-11-04 22:49:55,361 | INFO | Leitura e centralidades finalizadas: ok=True timed_out=False
-2026-11-04 22:49:55,361 | INFO | Tempo por centralidade (s): {'Degree': 0.0, 'Closeness': 0.43, 'Betweenness': 0.38, 'Eigenvector': 0.02, 'PageRank': 0.02}
-2026-11-04 22:49:55,410 | INFO | Bandwidth original: 820 | RCM: 548 | limite inferior: 155
-2026-11-04 22:49:55,568 | INFO | >> [centrality] Run 0 Episode 1 Gap: 0.6925 Reward: 10 Score: 10 Action: Degree Bandwidth: 504 Epsilon: 0.825
-2026-11-04 22:49:55,569 | INFO | Melhor solução atualizada: bandwidth=504 (centrality=Degree)
-2026-11-04 22:49:55,669 | INFO | >> [centrality] Run 0 Episode 2 Gap: 0.6973 Reward: -2 Score: 8 Action: Eigenvector Bandwidth: 512 Epsilon: 0.681
-2026-11-04 22:49:55,779 | INFO | >> [centrality] Run 0 Episode 3 Gap: 0.7042 Reward: -2 Score: 6 Action: Closeness Bandwidth: 524 Epsilon: 0.562
-2026-11-04 22:49:55,893 | INFO | >> [centrality] Run 0 Episode 4 Gap: 0.7103 Reward: -2 Score: 4 Action: Closeness Bandwidth: 535 Epsilon: 0.464
-2026-11-04 22:49:55,997 | INFO | >> [centrality] Run 0 Episode 5 Gap: 0.7108 Reward: -2 Score: 2 Action: Degree Bandwidth: 536 Epsilon: 0.383
-2026-11-04 22:49:56,108 | INFO | >> [centrality] Run 0 Episode 6 Gap: 0.7070 Reward: 5 Score: 7 Action: Closeness Bandwidth: 529 Epsilon: 0.316
-2026-11-04 22:49:56,213 | INFO | >> [centrality] Run 0 Episode 7 Gap: 0.7025 Reward: 5 Score: 12 Action: Closeness Bandwidth: 521 Epsilon: 0.261
-2026-11-04 22:49:56,306 | INFO | >> [centrality] Run 0 Episode 8 Gap: 0.7097 Reward: -2 Score: 10 Action: Closeness Bandwidth: 534 Epsilon: 0.215
-2026-11-04 22:49:56,418 | INFO | >> [centrality] Run 0 Episode 9 Gap: 0.7130 Reward: -2 Score: 8 Action: Closeness Bandwidth: 540 Epsilon: 0.178
-2026-11-04 22:49:56,528 | INFO | >> [centrality] Run 0 Episode 10 Gap: 0.7075 Reward: 5 Score: 13 Action: Closeness Bandwidth: 530 Epsilon: 0.147
-2026-11-04 22:49:56,647 | INFO | >> [centrality] Run 0 Episode 11 Gap: 0.7053 Reward: 5 Score: 18 Action: Closeness Bandwidth: 526 Epsilon: 0.121
-2026-11-04 22:49:56,763 | INFO | >> [centrality] Run 0 Episode 12 Gap: 0.7086 Reward: -2 Score: 16 Action: Closeness Bandwidth: 532 Epsilon: 0.100
-2026-11-04 22:49:56,852 | INFO | >> [centrality] Run 0 Episode 13 Gap: 0.7042 Reward: 5 Score: 21 Action: Closeness Bandwidth: 524 Epsilon: 0.083
-2026-11-04 22:49:56,948 | INFO | >> [centrality] Run 0 Episode 14 Gap: 0.7036 Reward: 5 Score: 26 Action: Closeness Bandwidth: 523 Epsilon: 0.068
-2026-11-04 22:49:57,028 | INFO | >> [centrality] Run 0 Episode 15 Gap: 0.7097 Reward: -2 Score: 24 Action: Closeness Bandwidth: 534 Epsilon: 0.056
-2026-11-04 22:49:57,111 | INFO | >> [centrality] Run 0 Episode 16 Gap: 0.7081 Reward: 5 Score: 29 Action: Closeness Bandwidth: 531 Epsilon: 0.046
-2026-11-04 22:49:57,196 | INFO | >> [centrality] Run 0 Episode 17 Gap: 0.7075 Reward: 5 Score: 34 Action: Closeness Bandwidth: 530 Epsilon: 0.038
-2026-11-04 22:49:57,277 | INFO | >> [centrality] Run 0 Episode 18 Gap: 0.7097 Reward: -2 Score: 32 Action: Closeness Bandwidth: 534 Epsilon: 0.032
-2026-11-04 22:49:57,357 | INFO | >> [centrality] Run 0 Episode 19 Gap: 0.7161 Reward: -2 Score: 30 Action: Closeness Bandwidth: 546 Epsilon: 0.026
-2026-11-04 22:49:57,452 | INFO | >> [centrality] Run 0 Episode 20 Gap: 0.7019 Reward: 5 Score: 35 Action: Closeness Bandwidth: 520 Epsilon: 0.022
-2026-11-04 22:49:57,539 | INFO | >> [centrality] Run 0 Episode 21 Gap: 0.7135 Reward: -2 Score: 33 Action: Closeness Bandwidth: 541 Epsilon: 0.018
-2026-11-04 22:49:57,625 | INFO | >> [centrality] Run 0 Episode 22 Gap: 0.7207 Reward: -2 Score: 31 Action: Closeness Bandwidth: 555 Epsilon: 0.015
-2026-11-04 22:49:57,707 | INFO | >> [centrality] Run 0 Episode 23 Gap: 0.7097 Reward: 5 Score: 36 Action: Closeness Bandwidth: 534 Epsilon: 0.012
-2026-11-04 22:49:57,790 | INFO | >> [centrality] Run 0 Episode 24 Gap: 0.7103 Reward: -2 Score: 34 Action: Closeness Bandwidth: 535 Epsilon: 0.010
-2026-11-04 22:49:57,867 | INFO | >> [centrality] Run 0 Episode 25 Gap: 0.7124 Reward: -2 Score: 32 Action: Closeness Bandwidth: 539 Epsilon: 0.010
-2026-11-04 22:49:57,950 | INFO | >> [centrality] Run 0 Episode 26 Gap: 0.7119 Reward: 5 Score: 37 Action: Closeness Bandwidth: 538 Epsilon: 0.010
-2026-11-04 22:49:58,037 | INFO | >> [centrality] Run 0 Episode 27 Gap: 0.7108 Reward: 5 Score: 42 Action: Closeness Bandwidth: 536 Epsilon: 0.010
-2026-11-04 22:49:58,112 | INFO | >> [centrality] Run 0 Episode 28 Gap: 0.7059 Reward: 5 Score: 47 Action: Closeness Bandwidth: 527 Epsilon: 0.010
-2026-11-04 22:49:58,183 | INFO | >> [centrality] Run 0 Episode 29 Gap: 0.6996 Reward: 5 Score: 52 Action: Closeness Bandwidth: 516 Epsilon: 0.010
-2026-11-04 22:49:58,255 | INFO | >> [centrality] Run 0 Episode 30 Gap: 0.7119 Reward: -2 Score: 50 Action: Closeness Bandwidth: 538 Epsilon: 0.010
-2026-11-04 22:49:58,260 | INFO | Melhor configuração [centrality] rodada 0: bandwidth=504; persistida=False
-2026-11-04 22:49:58,365 | INFO | Analise por instancia salva em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\analysis_inputs_bp_1400_centrality.json
-2026-11-04 22:49:58,371 | INFO | Modelo salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\trained_model_bp_1400_centrality.pth
-2026-11-04 22:49:59,184 | INFO | >> [centrality_ls] Run 0 Episode 1 Gap: 0.6925 Reward: 10 Score: 10 Action: Degree Bandwidth: 504 Epsilon: 0.825
-2026-11-04 22:49:59,185 | INFO | Melhor solução atualizada: bandwidth=504 (centrality=Degree)
-2026-11-04 22:49:59,983 | INFO | >> [centrality_ls] Run 0 Episode 2 Gap: 0.6943 Reward: -2 Score: 8 Action: Eigenvector Bandwidth: 507 Epsilon: 0.681
-2026-11-04 22:50:00,793 | INFO | >> [centrality_ls] Run 0 Episode 3 Gap: 0.6906 Reward: 10 Score: 18 Action: Closeness Bandwidth: 501 Epsilon: 0.562
-2026-11-04 22:50:00,794 | INFO | Melhor solução atualizada: bandwidth=501 (centrality=Closeness)
-2026-11-04 22:50:01,564 | INFO | >> [centrality_ls] Run 0 Episode 4 Gap: 0.7048 Reward: -2 Score: 16 Action: Closeness Bandwidth: 525 Epsilon: 0.464
-2026-11-04 22:50:02,455 | INFO | >> [centrality_ls] Run 0 Episode 5 Gap: 0.7048 Reward: 5 Score: 21 Action: Degree Bandwidth: 525 Epsilon: 0.383
-2026-11-04 22:50:03,325 | INFO | >> [centrality_ls] Run 0 Episode 6 Gap: 0.7002 Reward: 5 Score: 26 Action: Closeness Bandwidth: 517 Epsilon: 0.316
-2026-11-04 22:50:04,394 | INFO | >> [centrality_ls] Run 0 Episode 7 Gap: 0.6925 Reward: 5 Score: 31 Action: Closeness Bandwidth: 504 Epsilon: 0.261
-2026-11-04 22:50:05,227 | INFO | >> [centrality_ls] Run 0 Episode 8 Gap: 0.6990 Reward: -2 Score: 29 Action: Closeness Bandwidth: 515 Epsilon: 0.215
-2026-11-04 22:50:06,402 | INFO | >> [centrality_ls] Run 0 Episode 9 Gap: 0.7013 Reward: -2 Score: 27 Action: Closeness Bandwidth: 519 Epsilon: 0.178
-2026-11-04 22:50:07,455 | INFO | >> [centrality_ls] Run 0 Episode 10 Gap: 0.6912 Reward: 5 Score: 32 Action: Closeness Bandwidth: 502 Epsilon: 0.147
-2026-11-04 22:50:08,612 | INFO | >> [centrality_ls] Run 0 Episode 11 Gap: 0.6979 Reward: -2 Score: 30 Action: Closeness Bandwidth: 513 Epsilon: 0.121
-2026-11-04 22:50:09,600 | INFO | >> [centrality_ls] Run 0 Episode 12 Gap: 0.7031 Reward: -2 Score: 28 Action: Closeness Bandwidth: 522 Epsilon: 0.100
-2026-11-04 22:50:10,551 | INFO | >> [centrality_ls] Run 0 Episode 13 Gap: 0.6955 Reward: 5 Score: 33 Action: Closeness Bandwidth: 509 Epsilon: 0.083
-2026-11-04 22:50:11,397 | INFO | >> [centrality_ls] Run 0 Episode 14 Gap: 0.7013 Reward: -2 Score: 31 Action: Closeness Bandwidth: 519 Epsilon: 0.068
-2026-11-04 22:50:12,393 | INFO | >> [centrality_ls] Run 0 Episode 15 Gap: 0.6967 Reward: 5 Score: 36 Action: Closeness Bandwidth: 511 Epsilon: 0.056
-2026-11-04 22:50:13,380 | INFO | >> [centrality_ls] Run 0 Episode 16 Gap: 0.6996 Reward: -2 Score: 34 Action: Degree Bandwidth: 516 Epsilon: 0.046
-2026-11-04 22:50:14,370 | INFO | >> [centrality_ls] Run 0 Episode 17 Gap: 0.7002 Reward: -2 Score: 32 Action: Closeness Bandwidth: 517 Epsilon: 0.038
-2026-11-04 22:50:15,470 | INFO | >> [centrality_ls] Run 0 Episode 18 Gap: 0.7070 Reward: -2 Score: 30 Action: Closeness Bandwidth: 529 Epsilon: 0.032
-2026-11-04 22:50:16,653 | INFO | >> [centrality_ls] Run 0 Episode 19 Gap: 0.7013 Reward: 5 Score: 35 Action: Closeness Bandwidth: 519 Epsilon: 0.026
-2026-11-04 22:50:17,485 | INFO | >> [centrality_ls] Run 0 Episode 20 Gap: 0.6996 Reward: 5 Score: 40 Action: Closeness Bandwidth: 516 Epsilon: 0.022
-2026-11-04 22:50:18,261 | INFO | >> [centrality_ls] Run 0 Episode 21 Gap: 0.7070 Reward: -2 Score: 38 Action: Closeness Bandwidth: 529 Epsilon: 0.018
-2026-11-04 22:50:19,159 | INFO | >> [centrality_ls] Run 0 Episode 22 Gap: 0.7013 Reward: 5 Score: 43 Action: Closeness Bandwidth: 519 Epsilon: 0.015
-2026-11-04 22:50:20,119 | INFO | >> [centrality_ls] Run 0 Episode 23 Gap: 0.7053 Reward: -2 Score: 41 Action: Closeness Bandwidth: 526 Epsilon: 0.012
-2026-11-04 22:50:21,214 | INFO | >> [centrality_ls] Run 0 Episode 24 Gap: 0.7053 Reward: 5 Score: 46 Action: Closeness Bandwidth: 526 Epsilon: 0.010
-2026-11-04 22:50:22,546 | INFO | >> [centrality_ls] Run 0 Episode 25 Gap: 0.6912 Reward: 5 Score: 51 Action: Closeness Bandwidth: 502 Epsilon: 0.010
-2026-11-04 22:50:23,634 | INFO | >> [centrality_ls] Run 0 Episode 26 Gap: 0.6943 Reward: -2 Score: 49 Action: Closeness Bandwidth: 507 Epsilon: 0.010
-2026-11-04 22:50:24,755 | INFO | >> [centrality_ls] Run 0 Episode 27 Gap: 0.6955 Reward: -2 Score: 47 Action: Closeness Bandwidth: 509 Epsilon: 0.010
-2026-11-04 22:50:25,804 | INFO | >> [centrality_ls] Run 0 Episode 28 Gap: 0.7019 Reward: -2 Score: 45 Action: Closeness Bandwidth: 520 Epsilon: 0.010
-2026-11-04 22:50:26,835 | INFO | >> [centrality_ls] Run 0 Episode 29 Gap: 0.7008 Reward: 5 Score: 50 Action: Closeness Bandwidth: 518 Epsilon: 0.010
-2026-11-04 22:50:27,714 | INFO | >> [centrality_ls] Run 0 Episode 30 Gap: 0.6990 Reward: 5 Score: 55 Action: Closeness Bandwidth: 515 Epsilon: 0.010
-2026-11-04 22:50:27,719 | INFO | Melhor configuração [centrality_ls] rodada 0: bandwidth=501; persistida=False
-2026-11-04 22:50:27,819 | INFO | Analise por instancia salva em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\analysis_inputs_bp_1400_centrality_ls.json
-2026-11-04 22:50:27,827 | INFO | Modelo salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\trained_model_bp_1400_centrality_ls.pth
-2026-11-04 22:50:27,914 | INFO | >> [alpha] Run 0 Episode 1 Gap: 0.7019 Reward: 10 Score: 10 Action: 0.0 Bandwidth: 520 Epsilon: 0.825
-2026-11-04 22:50:27,914 | INFO | Melhor solução atualizada: bandwidth=520 (alpha=0.0)
-2026-11-04 22:50:28,008 | INFO | >> [alpha] Run 0 Episode 2 Gap: 0.6967 Reward: 10 Score: 20 Action: 0.5 Bandwidth: 511 Epsilon: 0.681
-2026-11-04 22:50:28,008 | INFO | Melhor solução atualizada: bandwidth=511 (alpha=0.5)
-2026-11-04 22:50:28,085 | INFO | >> [alpha] Run 0 Episode 3 Gap: 0.7119 Reward: -2 Score: 18 Action: 0.1 Bandwidth: 538 Epsilon: 0.562
-2026-11-04 22:50:28,165 | INFO | >> [alpha] Run 0 Episode 4 Gap: 0.7114 Reward: 5 Score: 23 Action: 0.1 Bandwidth: 537 Epsilon: 0.464
-2026-11-04 22:50:28,236 | INFO | >> [alpha] Run 0 Episode 5 Gap: 0.7081 Reward: 5 Score: 28 Action: 0.0 Bandwidth: 531 Epsilon: 0.383
-2026-11-04 22:50:28,331 | INFO | >> [alpha] Run 0 Episode 6 Gap: 0.6996 Reward: 5 Score: 33 Action: 0.5 Bandwidth: 516 Epsilon: 0.316
-2026-11-04 22:50:28,462 | INFO | >> [alpha] Run 0 Episode 7 Gap: 0.7053 Reward: -2 Score: 31 Action: 0.5 Bandwidth: 526 Epsilon: 0.261
-2026-11-04 22:50:28,537 | INFO | >> [alpha] Run 0 Episode 8 Gap: 0.7135 Reward: -2 Score: 29 Action: 0.1 Bandwidth: 541 Epsilon: 0.215
-2026-11-04 22:50:28,634 | INFO | >> [alpha] Run 0 Episode 9 Gap: 0.7145 Reward: -2 Score: 27 Action: 0.1 Bandwidth: 543 Epsilon: 0.178
-2026-11-04 22:50:28,755 | INFO | >> [alpha] Run 0 Episode 10 Gap: 0.7103 Reward: 5 Score: 32 Action: 0.1 Bandwidth: 535 Epsilon: 0.147
-2026-11-04 22:50:28,889 | INFO | >> [alpha] Run 0 Episode 11 Gap: 0.7042 Reward: 5 Score: 37 Action: 0.5 Bandwidth: 524 Epsilon: 0.121
-2026-11-04 22:50:28,997 | INFO | >> [alpha] Run 0 Episode 12 Gap: 0.7042 Reward: 5 Score: 42 Action: 0.1 Bandwidth: 524 Epsilon: 0.100
-2026-11-04 22:50:29,100 | INFO | >> [alpha] Run 0 Episode 13 Gap: 0.7059 Reward: -2 Score: 40 Action: 0.5 Bandwidth: 527 Epsilon: 0.083
-2026-11-04 22:50:29,219 | INFO | >> [alpha] Run 0 Episode 14 Gap: 0.7124 Reward: -2 Score: 38 Action: 0.1 Bandwidth: 539 Epsilon: 0.068
-2026-11-04 22:50:29,307 | INFO | >> [alpha] Run 0 Episode 15 Gap: 0.7092 Reward: 5 Score: 43 Action: 0.1 Bandwidth: 533 Epsilon: 0.056
-2026-11-04 22:50:29,383 | INFO | >> [alpha] Run 0 Episode 16 Gap: 0.7130 Reward: -2 Score: 41 Action: 0.0 Bandwidth: 540 Epsilon: 0.046
-2026-11-04 22:50:29,463 | INFO | >> [alpha] Run 0 Episode 17 Gap: 0.7130 Reward: 5 Score: 46 Action: 0.1 Bandwidth: 540 Epsilon: 0.038
-2026-11-04 22:50:29,540 | INFO | >> [alpha] Run 0 Episode 18 Gap: 0.6984 Reward: 5 Score: 51 Action: 0.0 Bandwidth: 514 Epsilon: 0.032
-2026-11-04 22:50:29,616 | INFO | >> [alpha] Run 0 Episode 19 Gap: 0.7048 Reward: -2 Score: 49 Action: 0.1 Bandwidth: 525 Epsilon: 0.026
-2026-11-04 22:50:29,693 | INFO | >> [alpha] Run 0 Episode 20 Gap: 0.7081 Reward: -2 Score: 47 Action: 0.1 Bandwidth: 531 Epsilon: 0.022
-2026-11-04 22:50:29,775 | INFO | >> [alpha] Run 0 Episode 21 Gap: 0.7075 Reward: 5 Score: 52 Action: 0.1 Bandwidth: 530 Epsilon: 0.018
-2026-11-04 22:50:29,853 | INFO | >> [alpha] Run 0 Episode 22 Gap: 0.7092 Reward: -2 Score: 50 Action: 0.1 Bandwidth: 533 Epsilon: 0.015
-2026-11-04 22:50:29,928 | INFO | >> [alpha] Run 0 Episode 23 Gap: 0.7059 Reward: 5 Score: 55 Action: 0.1 Bandwidth: 527 Epsilon: 0.012
-2026-11-04 22:50:30,005 | INFO | >> [alpha] Run 0 Episode 24 Gap: 0.7097 Reward: -2 Score: 53 Action: 0.1 Bandwidth: 534 Epsilon: 0.010
-2026-11-04 22:50:30,083 | INFO | >> [alpha] Run 0 Episode 25 Gap: 0.7064 Reward: 5 Score: 58 Action: 0.1 Bandwidth: 528 Epsilon: 0.010
-2026-11-04 22:50:30,163 | INFO | >> [alpha] Run 0 Episode 26 Gap: 0.7097 Reward: -2 Score: 56 Action: 0.1 Bandwidth: 534 Epsilon: 0.010
-2026-11-04 22:50:30,245 | INFO | >> [alpha] Run 0 Episode 27 Gap: 0.7081 Reward: 5 Score: 61 Action: 0.1 Bandwidth: 531 Epsilon: 0.010
-2026-11-04 22:50:30,327 | INFO | >> [alpha] Run 0 Episode 28 Gap: 0.7036 Reward: 5 Score: 66 Action: 0.1 Bandwidth: 523 Epsilon: 0.010
-2026-11-04 22:50:30,402 | INFO | >> [alpha] Run 0 Episode 29 Gap: 0.6984 Reward: 5 Score: 71 Action: 0.1 Bandwidth: 514 Epsilon: 0.010
-2026-11-04 22:50:30,481 | INFO | >> [alpha] Run 0 Episode 30 Gap: 0.7059 Reward: -2 Score: 69 Action: 0.1 Bandwidth: 527 Epsilon: 0.010
-2026-11-04 22:50:30,485 | INFO | Melhor configuração [alpha] rodada 0: bandwidth=511; persistida=False
-2026-11-04 22:50:30,588 | INFO | Analise por instancia salva em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\analysis_inputs_bp_1400_alpha.json
-2026-11-04 22:50:30,598 | INFO | Modelo salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\trained_model_bp_1400_alpha.pth
-2026-11-04 22:50:31,560 | INFO | >> [alpha_ls] Run 0 Episode 1 Gap: 0.6943 Reward: 10 Score: 10 Action: 0.0 Bandwidth: 507 Epsilon: 0.825
-2026-11-04 22:50:31,561 | INFO | Melhor solução atualizada: bandwidth=507 (alpha=0.0)
-2026-11-04 22:50:32,645 | INFO | >> [alpha_ls] Run 0 Episode 2 Gap: 0.6949 Reward: -2 Score: 8 Action: 0.5 Bandwidth: 508 Epsilon: 0.681
-2026-11-04 22:50:33,493 | INFO | >> [alpha_ls] Run 0 Episode 3 Gap: 0.7042 Reward: -2 Score: 6 Action: 0.1 Bandwidth: 524 Epsilon: 0.562
-2026-11-04 22:50:34,363 | INFO | >> [alpha_ls] Run 0 Episode 4 Gap: 0.7048 Reward: -2 Score: 4 Action: 0.1 Bandwidth: 525 Epsilon: 0.464
-2026-11-04 22:50:34,957 | INFO | >> [alpha_ls] Run 0 Episode 5 Gap: 0.7013 Reward: 5 Score: 9 Action: 0.0 Bandwidth: 519 Epsilon: 0.383
-2026-11-04 22:50:35,696 | INFO | >> [alpha_ls] Run 0 Episode 6 Gap: 0.7036 Reward: -2 Score: 7 Action: 0.1 Bandwidth: 523 Epsilon: 0.316
-2026-11-04 22:50:36,694 | INFO | >> [alpha_ls] Run 0 Episode 7 Gap: 0.6967 Reward: 5 Score: 12 Action: 0.1 Bandwidth: 511 Epsilon: 0.261
-2026-11-04 22:50:37,691 | INFO | >> [alpha_ls] Run 0 Episode 8 Gap: 0.6949 Reward: 5 Score: 17 Action: 0.1 Bandwidth: 508 Epsilon: 0.215
-2026-11-04 22:50:38,510 | INFO | >> [alpha_ls] Run 0 Episode 9 Gap: 0.6979 Reward: -2 Score: 15 Action: 0.1 Bandwidth: 513 Epsilon: 0.178
-2026-11-04 22:50:39,281 | INFO | >> [alpha_ls] Run 0 Episode 10 Gap: 0.6955 Reward: 5 Score: 20 Action: 0.1 Bandwidth: 509 Epsilon: 0.147
-2026-11-04 22:50:40,059 | INFO | >> [alpha_ls] Run 0 Episode 11 Gap: 0.7053 Reward: -2 Score: 18 Action: 0.1 Bandwidth: 526 Epsilon: 0.121
-2026-11-04 22:50:40,843 | INFO | >> [alpha_ls] Run 0 Episode 12 Gap: 0.6961 Reward: 5 Score: 23 Action: 0.1 Bandwidth: 510 Epsilon: 0.100
-2026-11-04 22:50:41,647 | INFO | >> [alpha_ls] Run 0 Episode 13 Gap: 0.7025 Reward: -2 Score: 21 Action: 0.1 Bandwidth: 521 Epsilon: 0.083
-2026-11-04 22:50:42,419 | INFO | >> [alpha_ls] Run 0 Episode 14 Gap: 0.6943 Reward: 10 Score: 31 Action: 0.1 Bandwidth: 507 Epsilon: 0.068
-2026-11-04 22:50:43,389 | INFO | >> [alpha_ls] Run 0 Episode 15 Gap: 0.6961 Reward: -2 Score: 29 Action: 0.3 Bandwidth: 510 Epsilon: 0.056
-2026-11-04 22:50:44,081 | INFO | >> [alpha_ls] Run 0 Episode 16 Gap: 0.6984 Reward: -2 Score: 27 Action: 0.1 Bandwidth: 514 Epsilon: 0.046
-2026-11-04 22:50:44,867 | INFO | >> [alpha_ls] Run 0 Episode 17 Gap: 0.7013 Reward: -2 Score: 25 Action: 0.1 Bandwidth: 519 Epsilon: 0.038
-2026-11-04 22:50:45,674 | INFO | >> [alpha_ls] Run 0 Episode 18 Gap: 0.6943 Reward: 10 Score: 35 Action: 0.1 Bandwidth: 507 Epsilon: 0.032
-2026-11-04 22:50:46,381 | INFO | >> [alpha_ls] Run 0 Episode 19 Gap: 0.6937 Reward: 10 Score: 45 Action: 0.1 Bandwidth: 506 Epsilon: 0.026
-2026-11-04 22:50:46,382 | INFO | Melhor solução atualizada: bandwidth=506 (alpha=0.1)
-2026-11-04 22:50:47,026 | INFO | >> [alpha_ls] Run 0 Episode 20 Gap: 0.7031 Reward: -2 Score: 43 Action: 0.1 Bandwidth: 522 Epsilon: 0.022
-2026-11-04 22:50:47,814 | INFO | >> [alpha_ls] Run 0 Episode 21 Gap: 0.6949 Reward: 5 Score: 48 Action: 0.1 Bandwidth: 508 Epsilon: 0.018
-2026-11-04 22:50:48,564 | INFO | >> [alpha_ls] Run 0 Episode 22 Gap: 0.6979 Reward: -2 Score: 46 Action: 0.1 Bandwidth: 513 Epsilon: 0.015
-2026-11-04 22:50:49,362 | INFO | >> [alpha_ls] Run 0 Episode 23 Gap: 0.6949 Reward: 5 Score: 51 Action: 0.1 Bandwidth: 508 Epsilon: 0.012
-2026-11-04 22:50:50,612 | INFO | >> [alpha_ls] Run 0 Episode 24 Gap: 0.6961 Reward: -2 Score: 49 Action: 0.1 Bandwidth: 510 Epsilon: 0.010
-2026-11-04 22:50:51,441 | INFO | >> [alpha_ls] Run 0 Episode 25 Gap: 0.6894 Reward: 10 Score: 59 Action: 0.1 Bandwidth: 499 Epsilon: 0.010
-2026-11-04 22:50:51,441 | INFO | Melhor solução atualizada: bandwidth=499 (alpha=0.1)
-2026-11-04 22:50:52,383 | INFO | >> [alpha_ls] Run 0 Episode 26 Gap: 0.7070 Reward: -2 Score: 57 Action: 0.1 Bandwidth: 529 Epsilon: 0.010
-2026-11-04 22:50:53,511 | INFO | >> [alpha_ls] Run 0 Episode 27 Gap: 0.6996 Reward: 5 Score: 62 Action: 0.1 Bandwidth: 516 Epsilon: 0.010
-2026-11-04 22:50:54,394 | INFO | >> [alpha_ls] Run 0 Episode 28 Gap: 0.7059 Reward: -2 Score: 60 Action: 0.1 Bandwidth: 527 Epsilon: 0.010
-2026-11-04 22:50:55,557 | INFO | >> [alpha_ls] Run 0 Episode 29 Gap: 0.6875 Reward: 10 Score: 70 Action: 0.1 Bandwidth: 496 Epsilon: 0.010
-2026-11-04 22:50:55,557 | INFO | Melhor solução atualizada: bandwidth=496 (alpha=0.1)
-2026-11-04 22:50:56,543 | INFO | >> [alpha_ls] Run 0 Episode 30 Gap: 0.7008 Reward: -2 Score: 68 Action: 0.1 Bandwidth: 518 Epsilon: 0.010
-2026-11-04 22:50:56,548 | INFO | Melhor configuração [alpha_ls] rodada 0: bandwidth=496; persistida=False
-2026-11-04 22:50:56,662 | INFO | Analise por instancia salva em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\analysis_inputs_bp_1400_alpha_ls.json
-2026-11-04 22:50:56,673 | INFO | Modelo salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\trained_model_bp_1400_alpha_ls.pth
-2026-11-04 22:50:56,791 | INFO | >> [start] Run 0 Episode 1 Gap: 0.7103 Reward: 10 Score: 10 Action: inverse_centrality Bandwidth: 535 Epsilon: 0.825
-2026-11-04 22:50:56,791 | INFO | Melhor solução atualizada: bandwidth=535 (start=inverse_centrality)
-2026-11-04 22:50:56,898 | INFO | >> [start] Run 0 Episode 2 Gap: 0.7172 Reward: -2 Score: 8 Action: inverse_centrality Bandwidth: 548 Epsilon: 0.681
-2026-11-04 22:50:56,992 | INFO | >> [start] Run 0 Episode 3 Gap: 0.7064 Reward: 10 Score: 18 Action: inverse_centrality Bandwidth: 528 Epsilon: 0.562
-2026-11-04 22:50:56,993 | INFO | Melhor solução atualizada: bandwidth=528 (start=inverse_centrality)
-2026-11-04 22:50:57,098 | INFO | >> [start] Run 0 Episode 4 Gap: 0.7081 Reward: -2 Score: 16 Action: inverse_centrality Bandwidth: 531 Epsilon: 0.464
-2026-11-04 22:50:57,205 | INFO | >> [start] Run 0 Episode 5 Gap: 0.7108 Reward: -2 Score: 14 Action: inverse_centrality Bandwidth: 536 Epsilon: 0.383
-2026-11-04 22:50:57,292 | INFO | >> [start] Run 0 Episode 6 Gap: 0.7108 Reward: 5 Score: 19 Action: inverse_centrality Bandwidth: 536 Epsilon: 0.316
-2026-11-04 22:50:57,379 | INFO | >> [start] Run 0 Episode 7 Gap: 0.7119 Reward: -2 Score: 17 Action: centrality Bandwidth: 538 Epsilon: 0.261
-2026-11-04 22:50:57,462 | INFO | >> [start] Run 0 Episode 8 Gap: 0.7114 Reward: 5 Score: 22 Action: inverse_centrality Bandwidth: 537 Epsilon: 0.215
-2026-11-04 22:50:57,542 | INFO | >> [start] Run 0 Episode 9 Gap: 0.7156 Reward: -2 Score: 20 Action: inverse_centrality Bandwidth: 545 Epsilon: 0.178
-2026-11-04 22:50:57,618 | INFO | >> [start] Run 0 Episode 10 Gap: 0.7108 Reward: 5 Score: 25 Action: inverse_centrality Bandwidth: 536 Epsilon: 0.147
-2026-11-04 22:50:57,702 | INFO | >> [start] Run 0 Episode 11 Gap: 0.7070 Reward: 5 Score: 30 Action: inverse_centrality Bandwidth: 529 Epsilon: 0.121
-2026-11-04 22:50:57,787 | INFO | >> [start] Run 0 Episode 12 Gap: 0.7124 Reward: -2 Score: 28 Action: inverse_centrality Bandwidth: 539 Epsilon: 0.100
-2026-11-04 22:50:57,869 | INFO | >> [start] Run 0 Episode 13 Gap: 0.7075 Reward: 5 Score: 33 Action: inverse_centrality Bandwidth: 530 Epsilon: 0.083
-2026-11-04 22:50:57,947 | INFO | >> [start] Run 0 Episode 14 Gap: 0.7097 Reward: -2 Score: 31 Action: inverse_centrality Bandwidth: 534 Epsilon: 0.068
-2026-11-04 22:50:58,028 | INFO | >> [start] Run 0 Episode 15 Gap: 0.7130 Reward: -2 Score: 29 Action: inverse_centrality Bandwidth: 540 Epsilon: 0.056
-2026-11-04 22:50:58,112 | INFO | >> [start] Run 0 Episode 16 Gap: 0.7135 Reward: -2 Score: 27 Action: inverse_centrality Bandwidth: 541 Epsilon: 0.046
-2026-11-04 22:50:58,191 | INFO | >> [start] Run 0 Episode 17 Gap: 0.7081 Reward: 5 Score: 32 Action: inverse_centrality Bandwidth: 531 Epsilon: 0.038
-2026-11-04 22:50:58,271 | INFO | >> [start] Run 0 Episode 18 Gap: 0.7092 Reward: -2 Score: 30 Action: inverse_centrality Bandwidth: 533 Epsilon: 0.032
-2026-11-04 22:50:58,349 | INFO | >> [start] Run 0 Episode 19 Gap: 0.7108 Reward: -2 Score: 28 Action: inverse_centrality Bandwidth: 536 Epsilon: 0.026
-2026-11-04 22:50:58,427 | INFO | >> [start] Run 0 Episode 20 Gap: 0.6996 Reward: 10 Score: 38 Action: inverse_centrality Bandwidth: 516 Epsilon: 0.022
-2026-11-04 22:50:58,428 | INFO | Melhor solução atualizada: bandwidth=516 (start=inverse_centrality)
-2026-11-04 22:50:58,550 | INFO | >> [start] Run 0 Episode 21 Gap: 0.7053 Reward: -2 Score: 36 Action: peripheral Bandwidth: 526 Epsilon: 0.018
-2026-11-04 22:50:58,630 | INFO | >> [start] Run 0 Episode 22 Gap: 0.7103 Reward: -2 Score: 34 Action: inverse_centrality Bandwidth: 535 Epsilon: 0.015
-2026-11-04 22:50:58,709 | INFO | >> [start] Run 0 Episode 23 Gap: 0.7086 Reward: 5 Score: 39 Action: inverse_centrality Bandwidth: 532 Epsilon: 0.012
-2026-11-04 22:50:58,793 | INFO | >> [start] Run 0 Episode 24 Gap: 0.7108 Reward: -2 Score: 37 Action: inverse_centrality Bandwidth: 536 Epsilon: 0.010
-2026-11-04 22:50:58,876 | INFO | >> [start] Run 0 Episode 25 Gap: 0.7151 Reward: -2 Score: 35 Action: inverse_centrality Bandwidth: 544 Epsilon: 0.010
-2026-11-04 22:50:58,965 | INFO | >> [start] Run 0 Episode 26 Gap: 0.7097 Reward: 5 Score: 40 Action: inverse_centrality Bandwidth: 534 Epsilon: 0.010
-2026-11-04 22:50:59,049 | INFO | >> [start] Run 0 Episode 27 Gap: 0.7097 Reward: 5 Score: 45 Action: inverse_centrality Bandwidth: 534 Epsilon: 0.010
-2026-11-04 22:50:59,132 | INFO | >> [start] Run 0 Episode 28 Gap: 0.7036 Reward: 5 Score: 50 Action: inverse_centrality Bandwidth: 523 Epsilon: 0.010
-2026-11-04 22:50:59,216 | INFO | >> [start] Run 0 Episode 29 Gap: 0.7053 Reward: -2 Score: 48 Action: inverse_centrality Bandwidth: 526 Epsilon: 0.010
-2026-11-04 22:50:59,296 | INFO | >> [start] Run 0 Episode 30 Gap: 0.7119 Reward: -2 Score: 46 Action: inverse_centrality Bandwidth: 538 Epsilon: 0.010
-2026-11-04 22:50:59,301 | INFO | Melhor configuração [start] rodada 0: bandwidth=516; persistida=False
-2026-11-04 22:50:59,405 | INFO | Analise por instancia salva em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\analysis_inputs_bp_1400_start.json
-2026-11-04 22:50:59,414 | INFO | Modelo salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\trained_model_bp_1400_start.pth
-2026-11-04 22:51:00,722 | INFO | >> [start_ls] Run 0 Episode 1 Gap: 0.7036 Reward: 10 Score: 10 Action: inverse_centrality Bandwidth: 523 Epsilon: 0.825
-2026-11-04 22:51:00,722 | INFO | Melhor solução atualizada: bandwidth=523 (start=inverse_centrality)
-2026-11-04 22:51:01,888 | INFO | >> [start_ls] Run 0 Episode 2 Gap: 0.7081 Reward: -2 Score: 8 Action: inverse_centrality Bandwidth: 531 Epsilon: 0.681
-2026-11-04 22:51:02,825 | INFO | >> [start_ls] Run 0 Episode 3 Gap: 0.7019 Reward: 10 Score: 18 Action: inverse_centrality Bandwidth: 520 Epsilon: 0.562
-2026-11-04 22:51:02,826 | INFO | Melhor solução atualizada: bandwidth=520 (start=inverse_centrality)
-2026-11-04 22:51:03,749 | INFO | >> [start_ls] Run 0 Episode 4 Gap: 0.6955 Reward: 10 Score: 28 Action: inverse_centrality Bandwidth: 509 Epsilon: 0.464
-2026-11-04 22:51:03,750 | INFO | Melhor solução atualizada: bandwidth=509 (start=inverse_centrality)
-2026-11-04 22:51:04,659 | INFO | >> [start_ls] Run 0 Episode 5 Gap: 0.7036 Reward: -2 Score: 26 Action: inverse_centrality Bandwidth: 523 Epsilon: 0.383
-2026-11-04 22:51:05,748 | INFO | >> [start_ls] Run 0 Episode 6 Gap: 0.7008 Reward: 5 Score: 31 Action: inverse_centrality Bandwidth: 518 Epsilon: 0.316
-2026-11-04 22:51:06,696 | INFO | >> [start_ls] Run 0 Episode 7 Gap: 0.7002 Reward: 5 Score: 36 Action: centrality Bandwidth: 517 Epsilon: 0.261
-2026-11-04 22:51:07,680 | INFO | >> [start_ls] Run 0 Episode 8 Gap: 0.7059 Reward: -2 Score: 34 Action: inverse_centrality Bandwidth: 527 Epsilon: 0.215
-2026-11-04 22:51:08,472 | INFO | >> [start_ls] Run 0 Episode 9 Gap: 0.7108 Reward: -2 Score: 32 Action: inverse_centrality Bandwidth: 536 Epsilon: 0.178
-2026-11-04 22:51:09,376 | INFO | >> [start_ls] Run 0 Episode 10 Gap: 0.7019 Reward: 5 Score: 37 Action: inverse_centrality Bandwidth: 520 Epsilon: 0.147
-2026-11-04 22:51:10,226 | INFO | >> [start_ls] Run 0 Episode 11 Gap: 0.7031 Reward: -2 Score: 35 Action: inverse_centrality Bandwidth: 522 Epsilon: 0.121
-2026-11-04 22:51:11,156 | INFO | >> [start_ls] Run 0 Episode 12 Gap: 0.6931 Reward: 10 Score: 45 Action: inverse_centrality Bandwidth: 505 Epsilon: 0.100
-2026-11-04 22:51:11,156 | INFO | Melhor solução atualizada: bandwidth=505 (start=inverse_centrality)
-2026-11-04 22:51:11,930 | INFO | >> [start_ls] Run 0 Episode 13 Gap: 0.7008 Reward: -2 Score: 43 Action: peripheral Bandwidth: 518 Epsilon: 0.083
-2026-11-04 22:51:12,754 | INFO | >> [start_ls] Run 0 Episode 14 Gap: 0.7092 Reward: -2 Score: 41 Action: inverse_centrality Bandwidth: 533 Epsilon: 0.068
-2026-11-04 22:51:13,626 | INFO | >> [start_ls] Run 0 Episode 15 Gap: 0.6943 Reward: 5 Score: 46 Action: inverse_centrality Bandwidth: 507 Epsilon: 0.056
-2026-11-04 22:51:14,447 | INFO | >> [start_ls] Run 0 Episode 16 Gap: 0.7025 Reward: -2 Score: 44 Action: inverse_centrality Bandwidth: 521 Epsilon: 0.046
-2026-11-04 22:51:15,230 | INFO | >> [start_ls] Run 0 Episode 17 Gap: 0.7008 Reward: 5 Score: 49 Action: inverse_centrality Bandwidth: 518 Epsilon: 0.038
-2026-11-04 22:51:16,001 | INFO | >> [start_ls] Run 0 Episode 18 Gap: 0.7048 Reward: -2 Score: 47 Action: inverse_centrality Bandwidth: 525 Epsilon: 0.032
-2026-11-04 22:51:16,661 | INFO | >> [start_ls] Run 0 Episode 19 Gap: 0.6990 Reward: 5 Score: 52 Action: inverse_centrality Bandwidth: 515 Epsilon: 0.026
-2026-11-04 22:51:17,385 | INFO | >> [start_ls] Run 0 Episode 20 Gap: 0.7036 Reward: -2 Score: 50 Action: inverse_centrality Bandwidth: 523 Epsilon: 0.022
-2026-11-04 22:51:18,007 | INFO | >> [start_ls] Run 0 Episode 21 Gap: 0.7002 Reward: 5 Score: 55 Action: inverse_centrality Bandwidth: 517 Epsilon: 0.018
-2026-11-04 22:51:18,735 | INFO | >> [start_ls] Run 0 Episode 22 Gap: 0.7042 Reward: -2 Score: 53 Action: inverse_centrality Bandwidth: 524 Epsilon: 0.015
-2026-11-04 22:51:19,544 | INFO | >> [start_ls] Run 0 Episode 23 Gap: 0.7086 Reward: -2 Score: 51 Action: inverse_centrality Bandwidth: 532 Epsilon: 0.012
-2026-11-04 22:51:20,510 | INFO | >> [start_ls] Run 0 Episode 24 Gap: 0.6943 Reward: 5 Score: 56 Action: inverse_centrality Bandwidth: 507 Epsilon: 0.010
-2026-11-04 22:51:21,366 | INFO | >> [start_ls] Run 0 Episode 25 Gap: 0.7008 Reward: -2 Score: 54 Action: inverse_centrality Bandwidth: 518 Epsilon: 0.010
-2026-11-04 22:51:22,077 | INFO | >> [start_ls] Run 0 Episode 26 Gap: 0.6990 Reward: 5 Score: 59 Action: inverse_centrality Bandwidth: 515 Epsilon: 0.010
-2026-11-04 22:51:22,832 | INFO | >> [start_ls] Run 0 Episode 27 Gap: 0.6961 Reward: 5 Score: 64 Action: centrality Bandwidth: 510 Epsilon: 0.010
-2026-11-04 22:51:23,714 | INFO | >> [start_ls] Run 0 Episode 28 Gap: 0.6961 Reward: 5 Score: 69 Action: centrality Bandwidth: 510 Epsilon: 0.010
-2026-11-04 22:51:24,657 | INFO | >> [start_ls] Run 0 Episode 29 Gap: 0.6925 Reward: 10 Score: 79 Action: centrality Bandwidth: 504 Epsilon: 0.010
-2026-11-04 22:51:24,657 | INFO | Melhor solução atualizada: bandwidth=504 (start=centrality)
-2026-11-04 22:51:25,385 | INFO | >> [start_ls] Run 0 Episode 30 Gap: 0.6973 Reward: -2 Score: 77 Action: centrality Bandwidth: 512 Epsilon: 0.010
-2026-11-04 22:51:25,390 | INFO | Melhor configuração [start_ls] rodada 0: bandwidth=504; persistida=False
-2026-11-04 22:51:25,484 | INFO | Analise por instancia salva em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\analysis_inputs_bp_1400_start_ls.json
-2026-11-04 22:51:25,490 | INFO | Modelo salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\bp_1400\trained_model_bp_1400_start_ls.pth
+2026-11-09 21:21:34,828 | INFO | Inicio da instancia: /hdd/home/hsouza/BandWidths/article_code/data/newdata/optimization/bp_1400.mtx
+2026-11-09 21:21:34,828 | INFO | Arquivo de log salvo em: /hdd/home/hsouza/BandWidths/article_code/logs/bp_1400.log
+2026-11-09 21:21:34,828 | INFO | Condicoes: ['centrality'] | busca local: [False]
+2026-11-09 21:21:34,828 | INFO | Calculando centralidades (timeout: infs)
+2026-11-09 21:21:35,400 | INFO | Leitura e centralidades finalizadas: ok=True timed_out=False
+2026-11-09 21:21:35,400 | INFO | Tempo por centralidade (s): {'Degree': 0.0, 'Closeness': 0.16, 'Betweenness': 0.35, 'Eigenvector': 0.01, 'PageRank': 0.01}
+2026-11-09 21:21:35,417 | INFO | Bandwidth original: 820 | RCM: 536 | limite inferior: 155
+2026-11-09 21:21:35,472 | INFO | >> [centrality] Run 0 Episode 1 Gap: 0.6925 Reward: 10 Score: 10 Action: Degree Bandwidth: 504 Epsilon: 0.825
+2026-11-09 21:21:35,472 | INFO | Melhor solução atualizada: bandwidth=504 (centrality=Degree)
+2026-11-09 21:21:35,508 | INFO | >> [centrality] Run 0 Episode 2 Gap: 0.6973 Reward: -2 Score: 8 Action: Eigenvector Bandwidth: 512 Epsilon: 0.681
+2026-11-09 21:21:35,543 | INFO | >> [centrality] Run 0 Episode 3 Gap: 0.7042 Reward: -2 Score: 6 Action: Closeness Bandwidth: 524 Epsilon: 0.562
+2026-11-09 21:21:35,589 | INFO | >> [centrality] Run 0 Episode 4 Gap: 0.7103 Reward: -2 Score: 4 Action: Closeness Bandwidth: 535 Epsilon: 0.464
+2026-11-09 21:21:35,624 | INFO | >> [centrality] Run 0 Episode 5 Gap: 0.7108 Reward: -2 Score: 2 Action: Degree Bandwidth: 536 Epsilon: 0.383
+2026-11-09 21:21:35,662 | INFO | >> [centrality] Run 0 Episode 6 Gap: 0.7070 Reward: 5 Score: 7 Action: Closeness Bandwidth: 529 Epsilon: 0.316
+2026-11-09 21:21:35,701 | INFO | >> [centrality] Run 0 Episode 7 Gap: 0.7025 Reward: 5 Score: 12 Action: Closeness Bandwidth: 521 Epsilon: 0.261
+2026-11-09 21:21:35,739 | INFO | >> [centrality] Run 0 Episode 8 Gap: 0.7097 Reward: -2 Score: 10 Action: Closeness Bandwidth: 534 Epsilon: 0.215
+2026-11-09 21:21:35,775 | INFO | >> [centrality] Run 0 Episode 9 Gap: 0.7130 Reward: -2 Score: 8 Action: Closeness Bandwidth: 540 Epsilon: 0.178
+2026-11-09 21:21:35,813 | INFO | >> [centrality] Run 0 Episode 10 Gap: 0.7075 Reward: 5 Score: 13 Action: Closeness Bandwidth: 530 Epsilon: 0.147
+2026-11-09 21:21:35,847 | INFO | >> [centrality] Run 0 Episode 11 Gap: 0.7053 Reward: 5 Score: 18 Action: Closeness Bandwidth: 526 Epsilon: 0.121
+2026-11-09 21:21:35,882 | INFO | >> [centrality] Run 0 Episode 12 Gap: 0.7086 Reward: -2 Score: 16 Action: Closeness Bandwidth: 532 Epsilon: 0.100
+2026-11-09 21:21:35,918 | INFO | >> [centrality] Run 0 Episode 13 Gap: 0.7042 Reward: 5 Score: 21 Action: Closeness Bandwidth: 524 Epsilon: 0.083
+2026-11-09 21:21:35,952 | INFO | >> [centrality] Run 0 Episode 14 Gap: 0.7036 Reward: 5 Score: 26 Action: Closeness Bandwidth: 523 Epsilon: 0.068
+2026-11-09 21:21:35,992 | INFO | >> [centrality] Run 0 Episode 15 Gap: 0.7097 Reward: -2 Score: 24 Action: Closeness Bandwidth: 534 Epsilon: 0.056
+2026-11-09 21:21:36,032 | INFO | >> [centrality] Run 0 Episode 16 Gap: 0.7081 Reward: 5 Score: 29 Action: Closeness Bandwidth: 531 Epsilon: 0.046
+2026-11-09 21:21:36,069 | INFO | >> [centrality] Run 0 Episode 17 Gap: 0.7075 Reward: 5 Score: 34 Action: Closeness Bandwidth: 530 Epsilon: 0.038
+2026-11-09 21:21:36,102 | INFO | >> [centrality] Run 0 Episode 18 Gap: 0.7097 Reward: -2 Score: 32 Action: Closeness Bandwidth: 534 Epsilon: 0.032
+2026-11-09 21:21:36,140 | INFO | >> [centrality] Run 0 Episode 19 Gap: 0.7161 Reward: -2 Score: 30 Action: Closeness Bandwidth: 546 Epsilon: 0.026
+2026-11-09 21:21:36,175 | INFO | >> [centrality] Run 0 Episode 20 Gap: 0.7019 Reward: 5 Score: 35 Action: Closeness Bandwidth: 520 Epsilon: 0.022
+2026-11-09 21:21:36,210 | INFO | >> [centrality] Run 0 Episode 21 Gap: 0.7135 Reward: -2 Score: 33 Action: Closeness Bandwidth: 541 Epsilon: 0.018
+2026-11-09 21:21:36,250 | INFO | >> [centrality] Run 0 Episode 22 Gap: 0.7207 Reward: -2 Score: 31 Action: Closeness Bandwidth: 555 Epsilon: 0.015
+2026-11-09 21:21:36,286 | INFO | >> [centrality] Run 0 Episode 23 Gap: 0.7097 Reward: 5 Score: 36 Action: Closeness Bandwidth: 534 Epsilon: 0.012
+2026-11-09 21:21:36,319 | INFO | >> [centrality] Run 0 Episode 24 Gap: 0.7103 Reward: -2 Score: 34 Action: Closeness Bandwidth: 535 Epsilon: 0.010
+2026-11-09 21:21:36,357 | INFO | >> [centrality] Run 0 Episode 25 Gap: 0.7124 Reward: -2 Score: 32 Action: Closeness Bandwidth: 539 Epsilon: 0.010
+2026-11-09 21:21:36,391 | INFO | >> [centrality] Run 0 Episode 26 Gap: 0.7119 Reward: 5 Score: 37 Action: Closeness Bandwidth: 538 Epsilon: 0.010
+2026-11-09 21:21:36,426 | INFO | >> [centrality] Run 0 Episode 27 Gap: 0.7108 Reward: 5 Score: 42 Action: Closeness Bandwidth: 536 Epsilon: 0.010
+2026-11-09 21:21:36,466 | INFO | >> [centrality] Run 0 Episode 28 Gap: 0.7059 Reward: 5 Score: 47 Action: Closeness Bandwidth: 527 Epsilon: 0.010
+2026-11-09 21:21:36,501 | INFO | >> [centrality] Run 0 Episode 29 Gap: 0.6996 Reward: 5 Score: 52 Action: Closeness Bandwidth: 516 Epsilon: 0.010
+2026-11-09 21:21:36,535 | INFO | >> [centrality] Run 0 Episode 30 Gap: 0.7119 Reward: -2 Score: 50 Action: Closeness Bandwidth: 538 Epsilon: 0.010
+2026-11-09 21:21:36,537 | INFO | Melhor configuração [centrality] rodada 0: bandwidth=504; persistida=False
+2026-11-09 21:21:36,560 | INFO | Analise por instancia salva em: /hdd/home/hsouza/BandWidths/article_code/data/newdata/plots/bp_1400/analysis_inputs_bp_1400_centrality.json
+2026-11-09 21:21:36,561 | INFO | Modelo salvo em: /hdd/home/hsouza/BandWidths/article_code/data/newdata/plots/bp_1400/trained_model_bp_1400_centrality.pth
