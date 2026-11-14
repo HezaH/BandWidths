@@ -56,7 +56,13 @@ CONDITIONS = {
     "centrality": None,  # acoes = centralidades do dicionario `centralities` (Q-MCH original)
     "alpha": [0.0, 0.1, 0.3, 0.5, 1.0],  # acoes = alpha da LCR (0 = sem lista restrita, 1 = ordena todos pela centralidade)
     "start": ["centrality", "inverse_centrality", "uniform", "peripheral"],  # acoes = estrategia de inicio (constructive.START_STRATEGIES)
+    # Experimento de referencia ("oraculo"): mesmas acoes da condicao "centrality", mas cada execucao
+    # usa uma POLITICA de escolha: o DQN, escolha uniforme aleatoria ou uma centralidade fixa.
+    # Mede quanto um agente pode ganhar escolhendo a centralidade (ver comparison/oracle_report.py).
+    "oracle": None,
 }
+STRATEGY_CONDITIONS = ["centrality", "alpha", "start"]  # o que '--condition all' roda (o oraculo e caro)
+ORACLE_N_RUNS = 3  # sementes por politica no oraculo (mesmas sementes para todas as politicas)
 DEFAULT_CENTRALITY = "Degree"   # centralidade fixa quando a acao nao e a centralidade
 START_STRATEGY = "centrality"   # estrategia de inicio fixa quando a acao nao e a estrategia
 LOCAL_SEARCH = False            # busca local do VNS-band apos cada construcao (sobrescrito por --local-search)
@@ -464,7 +470,7 @@ def get_condition_actions(condition, centralities_list):
 def decode_action(condition, action_value):
     """Traduz o valor da ação para os parâmetros do construtivo.
     Retorna (centralidade, alpha, estratégia de início)."""
-    if condition == "centrality":
+    if condition in ("centrality", "oracle"):
         return action_value, ALPHA, START_STRATEGY
     if condition == "alpha":
         return DEFAULT_CENTRALITY, float(action_value), START_STRATEGY
@@ -473,17 +479,24 @@ def decode_action(condition, action_value):
     raise ValueError(f"Condição inválida: {condition}")
 
 
+def oracle_policies(centralities_list):
+    """Políticas do oráculo: DQN, escolha uniforme e cada centralidade fixa."""
+    return ["dqn", "random"] + [f"fixed:{c}" for c in centralities_list]
+
+
 def condition_tag(condition, local_search):
     """Sufixo usado nos arquivos de saída, ex.: 'alpha' ou 'alpha_ls'."""
     return f"{condition}_ls" if local_search else condition
 
 
 def run_agent(grafo, centralities_maps, centralities, condition, local_search, initial_bandwidth,
-              lower_bound, nnodes, max_iter, logger, run_id, seed):
+              lower_bound, nnodes, max_iter, logger, run_id, seed, policy="dqn"):
     """Uma execução do Q-MCH (max_iter episódios do agente) na condição `condition`.
 
-    condition    -> o que o agente escolhe a cada episódio: "centrality", "alpha" ou "start".
+    condition    -> o que o agente escolhe a cada episódio: "centrality", "alpha", "start" ou "oracle".
     local_search -> aplica a busca local do VNS-band após cada construção.
+    policy       -> quem escolhe a ação: "dqn" (agente), "random" (uniforme a cada episódio) ou
+                    "fixed:<ação>" (sempre a mesma ação). Fora do oráculo é sempre "dqn".
 
     `grafo` nunca é substituído: todas as soluções são rotulações dos MESMOS vértices
     (os das centralidades). Antes, `grafo = grafo_solution` trocava o grafo pelo
@@ -494,7 +507,14 @@ def run_agent(grafo, centralities_maps, centralities, condition, local_search, i
     """
     seed_everything(seed)
     actions = get_condition_actions(condition, list(centralities.keys()))
-    agent = build_agent(len(actions), max_iter)
+    agent = build_agent(len(actions), max_iter) if policy == "dqn" else None
+    # gerador próprio para a política aleatória: não consome o random/np.random do construtivo
+    policy_rng = random.Random(seed + 1_000_003)
+    fixed_action = None
+    if policy.startswith("fixed:"):
+        fixed_action = [str(a) for a in actions].index(policy.split(":", 1)[1])
+    elif policy not in ("dqn", "random"):
+        raise ValueError(f"Política inválida: {policy}")
     env = Env(initial_bandwidth, lower_bound=lower_bound, alpha=ALPHA, n_calls=N_CALLS,
               iter_max=ITER_MAX, parent_order=PARENT_ORDER)
 
@@ -507,7 +527,12 @@ def run_agent(grafo, centralities_maps, centralities, condition, local_search, i
     for i in range(max_iter):
         env.reset()
         #Escolha da ação (centralidade, alpha ou estratégia de início, conforme a condição)
-        action = agent.choose_action(state)
+        if agent is not None:
+            action = agent.choose_action(state)
+        elif fixed_action is not None:
+            action = fixed_action
+        else:
+            action = policy_rng.randrange(len(actions))
         action_value = actions[action]
         centrality, alpha, start_strategy = decode_action(condition, action_value)
 
@@ -518,20 +543,22 @@ def run_agent(grafo, centralities_maps, centralities, condition, local_search, i
         gap = info["gap"]
         bandwidth = info["bandwidth"]
         local_iteration.extend({**row, "Episode": i + 1, "Run": run_id, "Seed": seed,
-                                "condition": condition, "action": str(action_value),
+                                "condition": condition, "action": str(action_value), "policy": policy,
                                 "local_search": local_search} for row in info["iterations"])
 
         new_state = normalize_state([info["n_steps"], gap, reward, bandwidth], max_iter, nnodes)
 
-        #Treinamento do novo estado
-        agent.learn(state, action, reward, new_state)
+        #Treinamento do novo estado (só o DQN aprende)
+        if agent is not None:
+            agent.learn(state, action, reward, new_state)
 
         #score acumulado por iteração
         score += reward
 
         logger.info(
-            ">> [%s] Run %s Episode %s Gap: %.4f Reward: %s Score: %s Action: %s Bandwidth: %s Epsilon: %.3f",
-            condition_tag(condition, local_search), run_id, i + 1, gap, reward, score, action_value, bandwidth, agent.epsilon,
+            ">> [%s|%s] Run %s Episode %s Gap: %.4f Reward: %s Score: %s Action: %s Bandwidth: %s Epsilon: %s",
+            condition_tag(condition, local_search), policy, run_id, i + 1, gap, reward, score, action_value, bandwidth,
+            f"{agent.epsilon:.3f}" if agent is not None else "-",
         )
         state = new_state
 
@@ -545,9 +572,13 @@ def run_agent(grafo, centralities_maps, centralities, condition, local_search, i
     return temp_bandwidth, best_solution, best_action, local_iteration, agent
 
 
-def run_condition(instancia, G, grafo, loaded, instance_info, centralities, condition, local_search, path_name, logger):
+def run_condition(instancia, G, grafo, loaded, instance_info, centralities, condition, local_search, path_name, logger,
+                  oracle_runs=ORACLE_N_RUNS):
     """N_RUNS execuções de uma condição numa instância já carregada: persiste o melhor
-    resultado da condição e devolve (linhas por construção, linhas de resumo)."""
+    resultado da condição e devolve (linhas por construção, linhas de resumo).
+
+    No oráculo, roda `oracle_runs` sementes para cada política (DQN, aleatória e cada
+    centralidade fixa), com as MESMAS sementes em todas as políticas."""
     instance_path = instance_info["Instance"]
     tag = condition_tag(condition, local_search)
     best_graph_path = os.path.join(path_name, f"best_graph_{instance_path}_{tag}.json")
@@ -565,12 +596,19 @@ def run_condition(instancia, G, grafo, loaded, instance_info, centralities, cond
 
     df_iteration_rows, summary_rows = [], []
     best_run_bandwidth, best_agent = math.inf, None
-    for run_id in range(N_RUNS):
+    if condition == "oracle":
+        jobs = [(pol, r) for pol in oracle_policies(list(centralities.keys())) for r in range(oracle_runs)]
+        # aquece o torch (a 1ª chamada da rede é lenta) para não inflar o tempo da 1ª execução do DQN
+        warm = build_agent(len(centralities), MAX_ITER)
+        warm.learn([0.0] * 4, 0, 0.0, [0.0] * 4)
+    else:
+        jobs = [("dqn", r) for r in range(N_RUNS)]
+    for policy, run_id in jobs:
         seed = BASE_SEED + run_id
         start_time = time.time()
         temp_bandwidth, best_solution, best_action, local_iteration, agent = run_agent(
             grafo, loaded["centralities_maps"], centralities, condition, local_search, initial_bandwidth,
-            lower_bound, loaded["nnodes"], MAX_ITER, logger, run_id, seed,
+            lower_bound, loaded["nnodes"], MAX_ITER, logger, run_id, seed, policy=policy,
         )
         global_time = time.time() - start_time
 
@@ -590,9 +628,10 @@ def run_condition(instancia, G, grafo, loaded, instance_info, centralities, cond
                 file_name = os.path.join(path_name, os.path.basename(instancia).replace(".mtx", f"_{name_matrix}.png"))
                 plot_solution(G, best_solution, f"{instance_path} | {name_matrix}", file_name)
                 logger.info("Plot salvo: %s", file_name)
-        logger.info("Melhor configuração [%s] rodada %s: bandwidth=%s; persistida=%s", tag, run_id, temp_bandwidth, saved)
+        logger.info("Melhor configuração [%s|%s] rodada %s: bandwidth=%s; persistida=%s",
+                    tag, policy, run_id, temp_bandwidth, saved)
 
-        if temp_bandwidth < best_run_bandwidth:
+        if agent is not None and temp_bandwidth < best_run_bandwidth:
             best_run_bandwidth, best_agent = temp_bandwidth, agent
 
         df_iteration = pd.DataFrame(local_iteration)
@@ -606,6 +645,7 @@ def run_condition(instancia, G, grafo, loaded, instance_info, centralities, cond
         summary_rows.append({
             **instance_info,
             "Condition": condition,
+            "Policy": policy,
             "Local Search": local_search,
             "Run": run_id,
             "Seed": seed,
@@ -627,13 +667,15 @@ def run_condition(instancia, G, grafo, loaded, instance_info, centralities, cond
         json.dump(df_iteration_rows, f, indent=4)
     logger.info("Analise por instancia salva em: %s", json_save_path)
 
-    torch.save(best_agent.Q.state_dict(), torch_save_path)
-    logger.info("Modelo salvo em: %s", torch_save_path)
+    if best_agent is not None:
+        torch.save(best_agent.Q.state_dict(), torch_save_path)
+        logger.info("Modelo salvo em: %s", torch_save_path)
 
     return df_iteration_rows, summary_rows
 
 
-def process_instance(instancia, centralities, conditions=("centrality",), local_search_options=(LOCAL_SEARCH,)):
+def process_instance(instancia, centralities, conditions=("centrality",), local_search_options=(LOCAL_SEARCH,),
+                     oracle_runs=ORACLE_N_RUNS):
     """Fluxo completo de uma instância: leitura, centralidades (uma única vez) e, para cada
     combinação (condição, busca local), N_RUNS execuções do agente com persistência do
     melhor resultado e extração dos resultados.
@@ -698,6 +740,7 @@ def process_instance(instancia, centralities, conditions=("centrality",), local_
         for local_search in local_search_options:
             results[condition_tag(condition, local_search)] = run_condition(
                 instancia, G, grafo, loaded, instance_info, centralities, condition, local_search, path_name, logger,
+                oracle_runs=oracle_runs,
             )
     return results
 
@@ -800,10 +843,12 @@ if __name__ == "__main__":
     #   python main_survey.py --condition alpha --local-search on
     #   python main_survey.py --condition all --local-search both --dataset newdata
     #   python main_survey.py --condition start --instances bp_0 power
+    #   python main_survey.py --condition oracle --dataset newdata     -> DQN x aleatoria x cada centralidade fixa
 
     parser = argparse.ArgumentParser(description="Q-MCH: redução de largura de banda com escolha de ação por DQN")
     parser.add_argument("--condition", nargs="+", default=["centrality"], choices=list(CONDITIONS) + ["all"],
-                        help="o que o agente escolhe a cada episódio (pode passar mais de uma ou 'all')")
+                        help="o que o agente escolhe a cada episódio (pode passar mais de uma). "
+                             "'all' = centrality, alpha e start; 'oracle' (experimento de referência) roda à parte")
     parser.add_argument("--local-search", choices=["off", "on", "both"], default="on" if LOCAL_SEARCH else "off",
                         help="busca local do VNS-band após cada construção ('both' roda com e sem)")
     parser.add_argument("--dataset", choices=list(DATASETS), default=None,
@@ -811,12 +856,17 @@ if __name__ == "__main__":
                              "Se omitido, a escolha é perguntada no terminal")
     parser.add_argument("--instances", nargs="*", default=None, help="restringe às instâncias com estes nomes (sem .mtx)")
     parser.add_argument("--workers", type=int, default=N_WORKERS_INSTANCES, help="instâncias processadas em paralelo")
+    parser.add_argument("--oracle-runs", type=int, default=ORACLE_N_RUNS,
+                        help="sementes por política na condição oracle (padrão: %(default)s)")
     args = parser.parse_args()
     N_WORKERS_INSTANCES = args.workers
     args.dataset = DATASETS[args.dataset] if args.dataset else ask_dataset()
     print(f"[INFO] Dataset selecionado: {args.dataset}", flush=True)
 
-    conditions = list(CONDITIONS) if "all" in args.condition else args.condition
+    if "all" in args.condition:
+        conditions = STRATEGY_CONDITIONS + [c for c in args.condition if c == "oracle"]
+    else:
+        conditions = args.condition
     local_search_options = {"off": (False,), "on": (True,), "both": (False, True)}[args.local_search]
     tags = [condition_tag(c, ls) for c in conditions for ls in local_search_options]
 
@@ -839,13 +889,17 @@ if __name__ == "__main__":
     total_rows = 0
     first_write = {tag: True for tag in tags}
     print(f"[INFO] {len(list_path)} instancias | estrategias: {tags} | {N_WORKERS_INSTANCES} processo(s) | "
-          f"{N_RUNS} execucao(oes) por instancia", flush=True)
+          f"{N_RUNS} execucao(oes) por instancia"
+          + (f" | oracle: {args.oracle_runs} semente(s) x {2 + len(centralities)} politicas" if "oracle" in conditions else ""),
+          flush=True)
 
     if N_WORKERS_INSTANCES <= 1:
-        results = (process_instance(instancia, centralities, conditions, local_search_options) for instancia in list_path)
+        results = (process_instance(instancia, centralities, conditions, local_search_options, args.oracle_runs)
+                   for instancia in list_path)
     else:
         pool = ProcessPoolExecutor(max_workers=N_WORKERS_INSTANCES, mp_context=mp.get_context("spawn"))
-        futures = {pool.submit(process_instance, instancia, centralities, conditions, local_search_options): instancia
+        futures = {pool.submit(process_instance, instancia, centralities, conditions, local_search_options,
+                               args.oracle_runs): instancia
                    for instancia in list_path}
         results = (future.result() for future in as_completed(futures))
 
@@ -856,7 +910,7 @@ if __name__ == "__main__":
             first_write[tag] = False
             total_rows += len(df_iteration_rows)
             for row in summary_rows:
-                print(f"[OK] {row['Instance']} [{tag}] run {row['Run']}: banda {row['Initial Bandwidth']} -> {row['Best Bandwidth']} "
+                print(f"[OK] {row['Instance']} [{tag}|{row['Policy']}] run {row['Run']}: banda {row['Initial Bandwidth']} -> {row['Best Bandwidth']} "
                       f"(melhor acao {row['Best Action']}; RCM {row['RCM Bandwidth']}, LB {row['Lower Bound']}) "
                       f"em {row['Global Time (s)']:.1f}s", flush=True)
 

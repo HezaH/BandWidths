@@ -638,15 +638,33 @@ table{{border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nu
 th,td{{border-bottom:1px solid {GRID};padding:5px 8px;text-align:right;white-space:nowrap}}
 th{{position:sticky;top:0;background:{SURFACE};color:{INK};text-align:right}}
 td:first-child,th:first-child{{text-align:left}}
+h3{{font-size:17px;margin:34px 0 6px}}
+.howto{{color:{INK2};font-size:14px;line-height:1.55;margin:10px 0 4px;padding:8px 16px;
+       border-left:3px solid {AXIS};background:{SURFACE};border-radius:4px}}
+.notes{{background:{SURFACE};border:1px solid rgba(11,11,11,.08);border-radius:8px;padding:4px 20px 6px;margin:12px 0}}
+.notes h4{{margin:10px 0 2px;font-size:14px;color:{INK}}}
+.notes li{{margin:5px 0}}
+code{{font-size:12.5px;background:rgba(11,11,11,.05);padding:1px 4px;border-radius:3px}}
 """
 
 
-def section(title, question, finding, fig=None, table=None, source=None):
+def explainer(title, items):
+    """Bloco de texto explicativo com título e lista de itens (HTML)."""
+    lis = "".join(f"<li>{i}</li>" for i in items)
+    return f'<div class="notes"><h4>{title}</h4><ul>{lis}</ul></div>'
+
+
+def section(title, question, finding, fig=None, table=None, source=None, how=None, notes=None):
+    """Seção do relatório: pergunta + resposta, 'como ler' (antes da figura) e considerações (depois)."""
     parts = [f"<h3>{title}</h3>" if title else "",
              f'<div class="q"><b>Pergunta.</b> {question}<br><b>O que os dados mostram.</b> {finding}</div>']
+    if how:
+        parts.append(f'<p class="howto"><b>Como ler.</b> {how}</p>')
     if fig is not None:
         parts.append('<div class="card">' + fig.to_html(full_html=False, include_plotlyjs=False,
                                                          config={"displaylogo": False, "responsive": True}) + "</div>")
+    if notes:
+        parts.append(explainer("Considerações", notes))
     if table is not None:
         parts.append(f"<details><summary>Ver tabela de dados</summary>{table}</details>")
     if source:
@@ -716,6 +734,16 @@ def main():
              "matrizes do survey rodadas no grafo completo"),
     ])
 
+    # --- numeros extras usados nas explicacoes ---
+    sbpo_rcm_cls = "; ".join(
+        f"{cls}: {w}/{t}/{l}" for cls, g in sbpo.groupby("classe_sbpo")
+        for w, t, l in [count_wtl(g["run_best"], g["rcm_bw"])])
+    med_vs_rcm_all = df["vs_rcm_pct"].median()
+    cv_med = df["cv_pct"].median()
+    n_rand = int(df["random_best"].notna().sum())
+    p_col = "p-valor (Wilcoxon, Pratt)"
+    n_bonf = int((wil[p_col] < 0.05 / len(wil)).sum())
+
     html_parts = [f"<!doctype html><html lang='pt-br'><head><meta charset='utf-8'>"
                   f"<title>Comparação Q-MCH × SBPO 2024 × Survey 2025</title><style>{CSS}</style>"
                   "<script src='https://cdn.plot.ly/plotly-2.35.2.min.js'></script></head><body><main>",
@@ -728,27 +756,115 @@ def main():
                   "<code>comparison/compute_baselines.py</code> sobre exatamente o mesmo grafo de cada execução.</p>",
                   f'<div class="tiles">{tiles}</div>']
 
+    # ---------------- Introducao ----------------
+    html_parts.append("<h2>Como ler este relatório</h2>")
+    html_parts.append(
+        "<p>Este relatório confronta as execuções do Q-MCH deste repositório com duas referências: "
+        "<b>(A)</b> o que o artigo SBPO 2024 publicou (Tabelas 3, 4 e 5) e <b>(C)</b> o benchmark e as "
+        "recomendações experimentais do survey de Gonzaga de Oliveira (2025). A parte <b>(B)</b> olha para dentro "
+        "do método: se a centralidade escolhida faz diferença e se o agente DQN aprende. Cada seção parte de uma "
+        "<b>pergunta</b>, resume <b>o que os dados mostram</b>, explica <b>como ler o gráfico</b> e termina com "
+        "<b>considerações</b>: hipóteses, limitações e o que o resultado permite ou não concluir. Todos os números "
+        "do texto são recalculados a partir dos arquivos de resultado sempre que o relatório é gerado.</p>")
+    html_parts.append(explainer("Glossário", [
+        "<b>β (semi-banda)</b>: para uma rotulação f dos vértices, β = max |f(u) − f(v)| sobre todas as arestas "
+        "{u, v}. É a grandeza que todos os métodos tentam minimizar e a única usada nos gráficos deste relatório. "
+        "A <b>banda da matriz</b> simétrica correspondente, contando a diagonal, é 2β + 1. Confundir as duas é o "
+        "ponto central da Q2.",
+        "<b>Original</b>: β da rotulação que vem no arquivo .mtx, sem nenhuma reordenação.",
+        "<b>RCM</b>: Reverse Cuthill–McKee do SciPy (<code>scipy.sparse.csgraph.reverse_cuthill_mckee</code>). É "
+        "determinístico, custa milissegundos e é a referência de 'estado da prática' apontada pelo survey. "
+        "Inverter a ordem do Cuthill–McKee não muda β, então RCM e CM têm a mesma semi-banda.",
+        "<b>Ordem aleatória</b>: o construtivo do VNS-band sem centralidade, ou seja, uma busca em largura por "
+        "níveis a partir de um vértice sorteado, em que cada nível é rotulado a partir de uma posição sorteada. "
+        "Ela é repetida 450 vezes (semente 0), o mesmo orçamento do Q-MCH, e mede quanto a centralidade e o "
+        "agente acrescentam sobre um multi-start puro.",
+        "<b>Limite inferior (LB)</b>: o maior valor entre Lam et al. (1997), ⌈Δ/2⌉ (Δ = grau máximo) e "
+        "⌈(n−1)/diâmetro⌉. Nenhuma rotulação tem β abaixo dele, então o ótimo fica entre LB e o melhor β "
+        "encontrado.",
+        "<b>Construção, chamada e episódio</b>: uma construção gera uma rotulação completa. A cada episódio o "
+        "agente escolhe uma centralidade e o ambiente faz 5 chamadas × 3 construções = 15 construções com ela. "
+        "São 30 episódios por instância, ou 450 construções.",
+        "<b>run_best / hist_best</b>: melhor β da execução analisada / melhor β já persistido entre todas as "
+        "execuções feitas até hoje (<code>best_bandwidth_*.json</code>).",
+        "<b>melhor / igual / pior</b>: número de instâncias em que o primeiro método tem β menor, igual ou maior "
+        "que o segundo. Instâncias sem o baseline (por exemplo, sem ordem aleatória) ficam fora da contagem.",
+    ]))
+    html_parts.append(explainer("Metodologia e cuidados gerais", [
+        "<b>Mesmo grafo para todos os métodos.</b> O Q-MCH roda na maior componente conexa, reetiquetada 1..n "
+        "(<code>main_survey.py</code>). RCM, ordem aleatória e limite inferior são recalculados exatamente sobre "
+        "esse grafo, então toda comparação é pareada por instância.",
+        "<b>Uma execução por instância (semente 0).</b> O construtivo é aleatório. Diferenças de poucas unidades "
+        "de β entre dois métodos podem estar dentro da variação entre sementes (ver S7).",
+        f"<b>Cobertura da ordem aleatória.</b> Ela só é calculada até 60.000 nós "
+        f"(<code>--max-random-nodes</code>), o que dá {n_rand} das {n_inst} instâncias. Nas maiores, a "
+        "comparação é apenas com o RCM.",
+        "<b>Valores do artigo transcritos do PDF.</b> Os tempos do artigo foram medidos em um Mac M2 e os daqui "
+        "em outra máquina, então compare ordens de grandeza, não valores exatos.",
+        "<b>Estatística.</b> Os testes são de Wilcoxon pareado (empates tratados pelo método de Pratt) com "
+        "α = 0,05. A tabela de testes discute a correção para múltiplas comparações.",
+        "<b>Leitura dos gráficos.</b> Em todos eles, menor β é melhor. Vários eixos estão em escala log, e o "
+        "tooltip (passe o mouse) mostra os valores absolutos. As tabelas completas ficam em 'Ver tabela de "
+        "dados' e também são gravadas em <code>comparison/tabelas/</code>.",
+    ]))
+
     # ---------------- SBPO ----------------
     html_parts.append("<h2>Parte A · Artigo SBPO 2024 (Q-MCH)</h2>")
+    html_parts.append(
+        "<p>Esta parte verifica se os números do artigo são reproduzidos e se as comparações publicadas usam a "
+        "mesma métrica. A Tabela 3 do SBPO traz 26 instâncias em três classes (optimization, structural, "
+        "thermal), com as colunas Original, Cuthill e Q-MCH. A Tabela 4 conta em quantas instâncias o Q-MCH "
+        "melhora cada referência, e a Tabela 5 compara tempos médios.</p>")
     html_parts.append(section(
         "Q1 · Os resultados reproduzem a Tabela 3?",
         "Nas 26 instâncias da Tabela 3 (optimization, structural, thermal), seu Q-MCH chega aos mesmos β do artigo?",
         f"Melhor que o artigo em <b>{w_art[0]}</b>, igual em <b>{w_art[1]}</b> e pior em <b>{w_art[2]}</b> instâncias; "
         f"diferença mediana de <b>{med_vs_art:+.1f}%</b>. As diferenças são de poucas unidades de β, "
         "compatíveis com a aleatoriedade do construtivo (LCR + vértice inicial aleatório): <b>a Tabela 3 é "
-        "reproduzida</b>. Porém, as barras verdes (RCM, mesma métrica β) ficam abaixo do Q-MCH em quase todas as "
-        f"instâncias: o RCM é melhor que seu Q-MCH em <b>{w_rcm_ours_sbpo[2]}</b> das {sum(w_rcm_ours_sbpo)} instâncias "
-        f"com baseline, e a ordem aleatória (rosa) em {w_rand_sbpo[2]}. A diferença é maior em optimization (bp_*) "
-        "e thermal (lshp*).",
+        "reproduzida</b>. Contra o RCM na mesma métrica β, seu Q-MCH vence em "
+        f"<b>{w_rcm_ours_sbpo[0]}</b>, empata em {w_rcm_ours_sbpo[1]} e perde em <b>{w_rcm_ours_sbpo[2]}</b> das "
+        f"{sum(w_rcm_ours_sbpo)} instâncias; contra a ordem aleatória perde em {w_rand_sbpo[2]}. Por classe "
+        f"(vence/empata/perde contra o RCM): {sbpo_rcm_cls}.",
         fig_sbpo_table3(sbpo),
         table_html(sbpo[["instance", "classe_sbpo", "art_original", "art_cuthill", "art_qmch", "run_best",
                          "hist_best", "run_mean", "rcm_bw", "random_best", "lower_bound"]],
                    {"run_mean": "{:.1f}", "hist_best": "{:.0f}", "random_best": "{:.0f}"}),
         "Tabela 3 do SBPO. 'run_best' = melhor β nas 450 construções da execução atual; 'hist_best' = "
-        "best_bandwidth_*.json (melhor histórico entre execuções)."))
-    html_parts.append(section(None, "Onde exatamente você ganha ou perde do artigo?",
-                              "Cada barra é uma instância; o tooltip mostra os valores absolutos.",
-                              fig_sbpo_diff(sbpo)))
+        "best_bandwidth_*.json (melhor histórico entre execuções).",
+        how="Há um painel por classe. Em cada instância aparecem quatro barras, na ordem da legenda: o Q-MCH do "
+            "artigo (transcrito da Tabela 3), o seu Q-MCH (melhor β das 450 construções), o RCM e a ordem "
+            "aleatória, os dois últimos recalculados aqui no mesmo grafo. O traço preto horizontal é o limite "
+            "inferior. Todas as barras estão em β; as colunas 'Original' e 'Cuthill' do artigo ficam de fora "
+            "porque estão em outra métrica (ver Q2). Para avaliar a <b>reprodução</b>, compare as duas barras de "
+            "Q-MCH. Para avaliar a <b>qualidade</b>, compare o seu Q-MCH com o RCM.",
+        notes=[
+            "<b>Reproduzir não é obter o mesmo número.</b> O construtivo sorteia o vértice inicial e embaralha a "
+            "LCR, então duas execuções corretas do mesmo algoritmo quase nunca dão o mesmo β. O critério razoável "
+            "é ficar na mesma ordem de grandeza, com diferenças de poucas unidades.",
+            "<b>Ficar melhor que o artigo não prova que o método foi superado.</b> Esta execução faz 450 "
+            "construções por instância, contra maxiter = 100 no SBPO. Além disso, o construtivo atual rotula os "
+            "filhos na ordem do pai (regra de Cuthill–McKee, <code>PARENT_ORDER = True</code>), uma mudança em "
+            "relação ao Algoritmo 1 original. Parte do ganho vem do orçamento maior e dessa alteração.",
+            "<b>A comparação que mais pesa é contra o RCM.</b> Ele está na mesma métrica e é a referência de "
+            "baixo custo que qualquer leitor vai usar. Antes de generalizar, olhe as derrotas por classe "
+            "(texto acima) e instância por instância (tooltip e tabela).",
+            "<b>'hist_best' pode ser menor que 'run_best'</b> porque guarda o melhor resultado de todas as "
+            "execuções já feitas. Para a dissertação, reporte run_best (uma execução em condições controladas) "
+            "ou, melhor ainda, rode várias sementes e reporte média ± desvio.",
+        ]))
+    html_parts.append(section(
+        None, "Onde exatamente você ganha ou perde do artigo?",
+        "Cada barra é uma instância; o tooltip mostra os valores absolutos.",
+        fig_sbpo_diff(sbpo),
+        how="Cada barra é (seu β − β do artigo) / β do artigo. Barras à esquerda de zero indicam que a sua "
+            "execução ficou melhor, e barras à direita, que ficou pior (cores na legenda do título). As "
+            "instâncias estão agrupadas por classe e ordenadas pela diferença.",
+        notes=[
+            "Em instâncias pequenas, com β de algumas dezenas, uma diferença percentual grande corresponde a "
+            "poucas unidades de β. Confira o valor absoluto no tooltip antes de interpretar.",
+            "Se as barras de uma classe estiverem todas do mesmo lado, há um efeito sistemático (orçamento, "
+            "regra do pai), e não apenas ruído do sorteio.",
+        ]))
     html_parts.append(section(
         "Q2 · A comparação com o Cuthill-McKee usa a mesma métrica?",
         "O survey (Seção 2) lembra que a banda da matriz simétrica é 2β+1, enquanto β é a semi-banda. "
@@ -760,35 +876,116 @@ def main():
         "Q-MCH = 65. As reduções de ~40% e o p = 2,98×10⁻⁸ comparam, portanto, grandezas diferentes.",
         fig_sbpo_cuthill_metric(sbpo),
         table_html(sbpo[["instance", "art_original", "original_bw", "full_orig", "art_cuthill", "rcm_bw", "full_rcm",
-                         "art_qmch"]])))
+                         "art_qmch"]]),
+        how="São dois gráficos de dispersão em escala log. À esquerda, o valor 'Cuthill' publicado (eixo y) "
+            "contra o RCM recalculado aqui (eixo x); à direita, o 'Original' publicado contra a rotulação do "
+            "arquivo. Cada instância aparece duas vezes: como β (círculos) e como 2β+1 (losangos). A série que "
+            "cai sobre a reta pontilhada y = x indica a métrica que o artigo usou naquela coluna.",
+        notes=[
+            "<b>Por que isso importa.</b> Como 2β+1 ≈ 2β, um método com exatamente o mesmo β do Cuthill–McKee "
+            "pareceria ~50% melhor nessa comparação. As reduções percentuais (Q3), a Tabela 4 (Q4) e o teste de "
+            "Wilcoxon do artigo herdam essa diferença de escala.",
+            f"<b>A coincidência exata é uma evidência forte.</b> O RCM do SciPy não é necessariamente a mesma "
+            f"implementação usada no artigo, que pode escolher outro vértice inicial ou desempatar de outro "
+            f"jeito. Mesmo assim, coincidir exatamente em {full_match} das 26 instâncias dificilmente seria acaso. "
+            f"Nas demais, pequenas diferenças são esperadas.",
+            "<b>bcsstk02 não depende de implementação.</b> Num grafo completo, toda rotulação tem β = n − 1, então "
+            "o valor 131 só pode ser 2β+1.",
+            "<b>Recomendação para a escrita.</b> Reporte sempre β e, ao citar valores do SBPO, indique "
+            "explicitamente a conversão (Cuthill_β = (Cuthill − 1)/2).",
+        ]))
     html_parts.append(section(
         "Q3 · As reduções de 40,5% (optimization) e 38,5% (structural) se sustentam?",
         "Refazendo a conta com a Tabela 3 do próprio artigo e com a mesma métrica (β vs β), qual é a redução real?",
         "Com a Tabela 3 como publicada, a conta reproduz aproximadamente os valores do texto. Convertendo a coluna "
         f"Cuthill para β ((Cuthill−1)/2), a 'redução' passa a ser <b>{red_same}</b>; seus resultados contra o RCM "
         f"(scipy) ficam em <b>{red_rcm}</b>. Valores negativos indicam que o Q-MCH é <b>pior</b> que o Cuthill/RCM.",
-        f_red, table_html(red, {c: "{:.1f}" for c in red.columns[1:]})))
+        f_red, table_html(red, {c: "{:.1f}" for c in red.columns[1:]}),
+        how="Para cada classe há até quatro barras: (1) a redução afirmada no texto do artigo; (2) a mesma conta "
+            "refeita com a Tabela 3 publicada (Q-MCH contra Cuthill, como impresso); (3) a conta com o Cuthill "
+            "convertido para β; (4) os seus resultados contra o RCM β. A redução é a média, por instância, de "
+            "1 − β<sub>Q-MCH</sub>/β<sub>referência</sub>. Positivo = melhor que a referência; negativo = pior.",
+        notes=[
+            "Se a barra (2) fica próxima da (1), o texto do artigo deriva corretamente da Tabela 3: o problema "
+            "está na métrica da coluna Cuthill, não na aritmética.",
+            "A classe thermal não tem valor afirmado no texto do artigo, por isso falta a barra (1) nela.",
+            "A média de razões dá o mesmo peso a instâncias pequenas e grandes e é sensível a instâncias com "
+            "β pequeno. A mediana ou a média geométrica das razões seriam alternativas mais robustas para a "
+            "dissertação.",
+            "As barras (3) e (4) respondem perguntas diferentes: a (3) avalia o Q-MCH <i>publicado</i>, e a (4), "
+            "as <i>suas</i> execuções. As duas usam a métrica correta.",
+        ]))
     html_parts.append(section(
         "Q4 · A Tabela 4 (100% de melhoria sobre Original e Cuthill) se mantém?",
         "Em quantas das 26 instâncias o Q-MCH é estritamente melhor que cada referência?",
         f"Contra as colunas publicadas (2β+1) o Q-MCH vence sempre, como no artigo. Contra o RCM na mesma métrica, "
         f"o próprio Q-MCH do artigo vence {w_rcm_sbpo[0]}, empata {w_rcm_sbpo[1]} e perde {w_rcm_sbpo[2]}.",
-        f_wins, table_html(wins)))
+        f_wins, table_html(wins),
+        how="Cada linha é uma comparação; as barras empilhadas somam 26 instâncias, divididas em vitórias, "
+            "empates e derrotas do primeiro método. As linhas 'vs Original' aparecem nas duas métricas (2β+1 do "
+            "artigo e β do arquivo). 'vs Cuthill (artigo, 2β+1)' reproduz a Tabela 4. 'vs RCM β' é a comparação "
+            "justa. A última linha aplica a mesma régua ao Q-MCH publicado.",
+        notes=[
+            "Contagens não medem o tamanho do efeito: vencer por 1 unidade de β conta igual a vencer por 50%. "
+            "Leia esta seção junto com Q1b e Q3.",
+            "Vencer o 'Original' é esperado para qualquer reordenação razoável, porque a rotulação dos arquivos "
+            "não foi feita para reduzir banda. Isso não diz muito sobre a qualidade do método.",
+            "A Tabela 4 do artigo também compara com o MCH (a heurística sem aprendizado por reforço). Essa "
+            "comparação não foi refeita aqui.",
+        ]))
     html_parts.append(section(
         "Teste de Wilcoxon (como na Seção 5.2 do SBPO)",
         "O teste pareado de Wilcoxon (α = 0,05) continua significativo quando as métricas são homogêneas?",
         f"O artigo reporta p = {SBPO_WILCOXON_P:.2e} para Q-MCH vs Cuthill. A tabela abaixo refaz esse teste e o "
         "repete contra o RCM β, contra o artigo e contra a ordem aleatória.",
-        None, table_html(wil, {"p-valor (Wilcoxon, Pratt)": "{:.2e}", "mediana A": "{:.1f}", "mediana B": "{:.1f}"})))
+        None, table_html(wil, {"p-valor (Wilcoxon, Pratt)": "{:.2e}", "mediana A": "{:.1f}", "mediana B": "{:.1f}"}),
+        how="Cada linha da tabela (abra 'Ver tabela de dados') é um teste pareado: A e B são os β das mesmas "
+            "instâncias. 'A&lt;B' conta as instâncias em que A é melhor. Um p-valor abaixo de 0,05 indica que "
+            "uma diferença sistemática desse tamanho seria improvável se os dois métodos fossem equivalentes. "
+            "<b>Atenção ao sentido:</b> 'diferença significativa' pode ser a favor de A ou de B. Veja as colunas "
+            "de mediana e de contagem.",
+        notes=[
+            "<b>O p = 2,98×10⁻⁸ do artigo é o menor valor possível</b> do teste exato com 26 pares (2/2²⁶). Ele "
+            "só diz que o Q-MCH venceu nas 26 instâncias, o que é automático quando a referência está em 2β+1. "
+            "O valor não mede o tamanho da melhoria.",
+            "O teste indica se há diferença sistemática, não quão grande ela é. Reporte sempre a mediana das "
+            "diferenças, ou a redução percentual na mesma métrica, junto com o p-valor.",
+            f"<b>Múltiplas comparações.</b> São {len(wil)} testes sobre os mesmos dados. Com a correção de "
+            f"Bonferroni (α = 0,05/{len(wil)} ≈ {0.05 / len(wil):.4f}), {n_bonf} de {len(wil)} continuam "
+            "significativos.",
+            "O método de Pratt mantém os empates (A = B) no ranking das diferenças, mas não na estatística. Ele é "
+            "o mais adequado quando há muitos empates, como nas instâncias pequenas.",
+        ]))
     html_parts.append(section(
         "Q5 · O custo computacional é comparável ao da Tabela 5?",
         "O artigo reporta 0,42 s em média para o Q-MCH (maxiter = 100, Mac M2). Quanto custam suas execuções?",
         f"Sua execução faz 450 construções (30 episódios × 5 × 3) mais o treino do DQN. Normalizando para 100 "
         f"construções, o tempo é ≈ <b>{sbpo_time_ratio:.1f}×</b> o reportado no artigo (hardware diferente). O RCM do "
         "scipy fica abaixo de 0,01 s: segundo o survey, essa é a referência de custo para heurísticas 'low-cost'.",
-        fig_times(sbpo, df)))
+        fig_times(sbpo, df),
+        how="As barras horizontais estão em escala log: cada marca no eixo é um fator de 10. As cores separam os "
+            "valores publicados no artigo, os medidos nas suas execuções e o RCM recalculado. 'Equivalente a 100 "
+            "construções' é o tempo total dividido por 4,5 (450/100), para comparar com o maxiter = 100 do "
+            "artigo.",
+        notes=[
+            "A normalização é aproximada. O tempo total inclui custos que não crescem com o número de construções "
+            "(leitura do grafo e cálculo das centralidades), e dividi-los por 4,5 subestima esse custo fixo.",
+            "O artigo não detalha se a Tabela 5 inclui o cálculo das centralidades. Se não incluir, a comparação "
+            "fica desfavorável às suas execuções, que medem o tempo de ponta a ponta.",
+            "A diferença para o RCM é de ordens de grandeza. Pelo critério do survey (heurística de baixo custo "
+            "para acelerar solvers), o Q-MCH precisa justificar o custo extra com ganho de qualidade, ou ser "
+            "posicionado como heurística de alta qualidade, comparável ao VNS-band, e não ao RCM.",
+            "GPS, FNCHC e VNS-band aparecem com os tempos do artigo, medidos no hardware do artigo. Eles não "
+            "foram reexecutados aqui.",
+        ]))
 
     html_parts.append("<h2>Parte B · Comportamento do Q-MCH (centralidades e aprendizado)</h2>")
+    html_parts.append(
+        "<p>A premissa do Q-MCH é que a escolha da centralidade importa e que um agente pode aprender qual usar. "
+        "Esta parte testa as duas hipóteses com as construções registradas em "
+        "<code>analysis_inputs_*_centrality.json</code>: a primeira (Q6) olhando a qualidade das construções por "
+        "centralidade, a segunda (Q7) olhando as escolhas do agente ao longo dos episódios. A Q8 avalia o "
+        "orçamento de construções.</p>")
     html_parts.append(section(
         "Q6 · A escolha da centralidade importa?",
         "A premissa do SBPO é que um agente escolha a melhor centralidade por classe. As centralidades produzem "
@@ -797,30 +994,94 @@ def main():
         "totalmente: a centralidade tem efeito pequeno e a variação vem principalmente do multi-start aleatório "
         "(LCR com α = 0,3, em que os 70% restantes da fila são embaralhados, mais o vértice inicial aleatório). "
         "Veja no heatmap abaixo como o melhor β se distribui entre as centralidades em cada classe.",
-        fig_centrality_box(iters, df)))
-    html_parts.append(section(None, "Qual centralidade encontrou o melhor β em cada classe?",
-                              "Leitura por linha: a soma passa de 100% quando há empate entre centralidades.",
-                              fig_centrality_best(df, iters)))
+        fig_centrality_box(iters, df),
+        how="Cada caixa reúne todas as construções feitas com uma centralidade, em todas as instâncias de um "
+            "conjunto (newdata à esquerda, survey à direita). O eixo vertical é o β da construção dividido pelo "
+            "melhor β da instância: 1 significa que a construção atingiu o melhor resultado, e 1,5, que ficou 50% "
+            "acima. A caixa vai do 1º ao 3º quartil, e a linha interna é a mediana. O eixo está cortado em 2,2. "
+            "Caixas sobrepostas indicam centralidades praticamente intercambiáveis.",
+        notes=[
+            "<b>Por que o efeito é pequeno, pelo desenho do construtivo.</b> Com <code>PARENT_ORDER = True</code>, "
+            "a centralidade só decide a ordem dos filhos de cada vértice: os α = 30% mais centrais vêm primeiro "
+            "(embaralhados entre si) e os demais depois (também embaralhados). Ela também pesa no sorteio do "
+            "vértice inicial. A estrutura de níveis da busca em largura, que determina a maior parte de β, não "
+            "depende da centralidade.",
+            "<b>A amostra não é balanceada.</b> O agente escolhe umas centralidades mais que outras, e as escolhas "
+            "dos episódios finais acontecem quando o agente já tem um bom β. Por isso, diferenças pequenas entre "
+            "caixas não devem ser lidas como efeito causal da centralidade.",
+            "Para isolar o efeito, seria preciso rodar cada centralidade fixa com o mesmo número de construções. "
+            "O relatório de estratégias faz algo próximo ao fixar Degree e variar α ou o vértice inicial.",
+        ]))
+    html_parts.append(section(
+        None, "Qual centralidade encontrou o melhor β em cada classe?",
+        "Leitura por linha: a soma passa de 100% quando há empate entre centralidades.",
+        fig_centrality_best(df, iters),
+        how="Linhas são classes, e colunas, centralidades. O número na célula é quantas instâncias da classe "
+            "tiveram o melhor β atingido por pelo menos uma construção com aquela centralidade; a cor é essa "
+            "contagem como porcentagem das instâncias da classe.",
+        notes=[
+            "Uma centralidade usada mais vezes tem mais chances de atingir o melhor β. A contagem mistura "
+            "qualidade e frequência de uso (ver Q7), então uma coluna escura não prova que a centralidade é "
+            "melhor.",
+            "Classes com poucas instâncias produzem porcentagens instáveis: 1 instância a mais pode mudar a "
+            "célula em dezenas de pontos percentuais.",
+        ]))
     html_parts.append(section(
         "Q7 · O agente aprende?",
-        "Com ε inicial = 1 e decaimento de 0,995 por passo, o agente chega a explorar menos e convergir para uma "
-        "centralidade em 30 episódios?",
+        "O SBPO usa ε inicial = 1 e decaimento de 0,995 por passo. O agente chega a explorar menos e convergir "
+        "para uma centralidade em 30 episódios?",
         "Na versão atual de <code>main_survey.py</code>, o decaimento de ε é calculado para que ε chegue a 0,01 "
         "após 80% dos episódios, o estado [passo, gap, recompensa, β] é normalizado antes de entrar na rede e o gap "
         "é medido contra o limite inferior da instância. Nos episódios 21–30, nenhuma centralidade passa de "
         f"{max_late:.0f}% das escolhas. O script continua criando um <b>Agent novo por instância</b> "
         "(não há aprendizado por classe, que é a premissa do SBPO).",
-        fig_selection_over_time(iters)))
+        fig_selection_over_time(iters),
+        how="Há um painel por conjunto. Cada ponto é a fração das instâncias em que o agente escolheu aquela "
+            "centralidade dentro de um bloco de 5 episódios. A linha pontilhada é a fração esperada se a escolha "
+            "fosse uniforme (100% dividido pelo número de centralidades). Aprendizado apareceria como uma curva "
+            "subindo bem acima da linha uniforme nos últimos blocos.",
+        notes=[
+            "<b>ε nos últimos episódios.</b> Com 30 episódios, ε chega a 0,01 por volta do episódio 24. Os "
+            "últimos blocos são, portanto, quase gulosos: o agente escolhe a ação que a rede considera melhor.",
+            "<b>O gráfico agrega instâncias.</b> Se cada agente convergir para uma centralidade diferente, a soma "
+            "pode parecer uniforme mesmo com aprendizado individual. Para separar os dois casos, verifique se, em "
+            "cada instância, a escolha se repete nos episódios 25–30 (os dados estão em "
+            "<code>analysis_inputs_*.json</code>).",
+            "<b>Pouco sinal para aprender.</b> A recompensa é +10 quando a chamada iguala ou melhora o melhor β, "
+            "+5 quando melhora a chamada anterior e −2 nos outros casos. Depois dos primeiros episódios, melhorar "
+            "o melhor β fica raro. Com só 30 transições por instância e centralidades que produzem distribuições "
+            "parecidas (Q6), a rede tem pouca informação para diferenciar as ações.",
+            "<b>Premissa do SBPO.</b> Com um agente novo por instância, nada do que é aprendido passa para a "
+            "instância seguinte da mesma classe. Testar a premissa exigiria treinar o agente numa classe e "
+            "avaliá-lo, congelado, em instâncias novas da mesma classe.",
+        ]))
     html_parts.append(section(
         "Q8 · Quantas construções são necessárias?",
         "O artigo usa maxiter = 100. Quanto o β ainda melhora entre a construção 100 e a 450?",
         f"Após 100 construções, o melhor β acumulado já é, na mediana, {at100_ratio.median():.3f}× o β final "
         f"(90º percentil: {at100_ratio.quantile(0.9):.3f}×), e {at100_same} de {len(at100_ratio)} instâncias já "
         "tinham atingido o β final. As 350 construções extras rendem pouco.",
-        fig_convergence(iters, df)))
+        fig_convergence(iters, df),
+        how="O eixo horizontal é o número de construções já feitas, e o vertical, o melhor β encontrado até ali "
+            "dividido pelo β final da execução (1 = já atingiu o resultado final). A linha é a mediana entre "
+            "instâncias, e a faixa sombreada vai do 1º ao 3º quartil. A marca em 100 indica o maxiter do artigo.",
+        notes=[
+            "A referência é o β final da própria execução. A curva mostra quanto da melhoria acontece cedo, não "
+            "a distância ao ótimo.",
+            "Truncar a curva em 100 construções não equivale exatamente a rodar com maxiter = 100: com menos "
+            "episódios, o decaimento de ε seria outro e o agente se comportaria de outra forma. O resultado é uma "
+            "boa aproximação, não uma simulação exata.",
+            "O tempo cresce linearmente com o número de construções, enquanto o ganho depois da construção 100 é "
+            "pequeno. Na escolha do orçamento, vale mostrar essa troca explicitamente (qualidade × tempo).",
+        ]))
 
     # ---------------- Survey ----------------
     html_parts.append("<h2>Parte C · Survey de heurísticas (Gonzaga de Oliveira, 2025)</h2>")
+    html_parts.append(
+        "<p>O survey propõe um novo benchmark de 23 matrizes grandes (Tabela 1) e recomendações para os "
+        "experimentos: comparar com o RCM, controlar o tempo, reportar média, desvio, melhor resultado e tempo "
+        "total, com pelo menos 3 execuções. Esta parte verifica a cobertura do benchmark, a qualidade contra o "
+        "RCM e a ordem aleatória, o custo, a distância ao ótimo e a aderência às recomendações estatísticas.</p>")
     html_parts.append(section(
         "S1 · O benchmark proposto foi coberto?",
         "A Tabela 1 do survey propõe 23 matrizes (2.427 a 534.388 vértices) como novo benchmark. Quais foram "
@@ -833,7 +1094,23 @@ def main():
         "seja, 2× o nº de arestas não direcionadas (ex.: Fashion_MNIST 158.304 = 2 × 79.152).",
         fig_survey_coverage(cov),
         table_html(cov, {"fração de V usada": "{:.1f}", "lcc_V": "{:,.0f}", "full_E": "{:,.0f}", "run_V": "{:,.0f}",
-                         "run_E": "{:,.0f}"})))
+                         "run_E": "{:,.0f}"}),
+        how="As barras cinza mostram o |V| da Tabela 1 do survey. Os marcadores mostram o |V| realmente usado "
+            "na execução (cor por situação: grafo completo ou subgrafo), e o X marca a matriz não executada. O "
+            "eixo está em escala log. Quando o marcador fica no fim da barra, a matriz foi usada inteira.",
+        notes=[
+            "<b>Maior componente conexa.</b> O |V| usado pode ser menor que o da Tabela 1 quando o grafo é "
+            "desconexo, porque <code>main_survey.py</code> usa só a maior componente. Para a banda isso é "
+            "legítimo: rotulando as componentes em blocos consecutivos, β do grafo é o máximo dos β das "
+            "componentes. Mesmo assim, o resultado é o da maior componente, não o da matriz inteira (veja a "
+            "coluna 'fração de V usada').",
+            "<b>Fallback de 2000 nós.</b> O subgrafo BFS só é usado quando o cálculo das centralidades estoura "
+            "<code>TIMEOUT_SECONDS</code> ou falha. Na configuração atual (timeout infinito, Closeness "
+            "aproximada) ele não é acionado. Resultados de subgrafos não devem ser misturados com os do grafo "
+            "completo.",
+            "Para completar o benchmark, basta baixar vsp_befref_fxm_2_4_air02 para <code>data/survey</code> e "
+            "rodar <code>main_survey.py --dataset survey --instances vsp_befref_fxm_2_4_air02</code>.",
+        ]))
     html_parts.append(section(
         "S2 · Qualidade nas instâncias do survey",
         "O survey não publica β para essas matrizes; a referência natural é o RCM (George–Liu), apontado como "
@@ -844,16 +1121,56 @@ def main():
         "complexas/VSP, onde o RCM é fraco." + (
             " Instâncias marcadas com * ainda vêm de subgrafos BFS de 2000 nós: " + ", ".join(surv_reduced) + "."
             if surv_reduced else " Todas as instâncias do survey rodaram no grafo completo (maior componente)."),
-        fig_survey_quality(df)))
-    html_parts.append(section(None, "Visão geral: diferença percentual para o RCM em todas as instâncias.",
-                              "Pontos abaixo da linha indicam Q-MCH melhor que RCM.", fig_ratio_rcm(df)))
+        fig_survey_quality(df),
+        how="As instâncias estão ordenadas por número de vértices. Cada uma tem barras para Original, RCM, ordem "
+            "aleatória e Q-MCH, com o eixo vertical em escala log, e o traço preto marca o limite inferior. Um * "
+            "no nome indica instância executada num subgrafo. Falta a barra da ordem aleatória quando a "
+            "instância tem mais de 60.000 nós.",
+        notes=[
+            "<b>Escala log.</b> Barras de altura parecida podem diferir em dezenas de por cento. Para a magnitude "
+            "da diferença, use o gráfico seguinte (diferença % para o RCM).",
+            "<b>Grafos com hub.</b> Quando há um vértice de grau muito alto, β ≥ ⌈Δ/2⌉, e o resultado depende "
+            "sobretudo de onde esse vértice é rotulado (o ideal é perto do meio da numeração). Métodos por níveis "
+            "que partem da periferia tendem a deixá-lo numa ponta. Ganhos grandes sobre o RCM nesse tipo de grafo "
+            "refletem essa situação particular, não uma melhoria uniforme. Confira na tabela S7 as instâncias em "
+            "que o limite inferior vem de ⌈Δ/2⌉.",
+            "<b>Sem comparação direta com o estado da arte.</b> O survey não publica β para essas matrizes. A "
+            "comparação aqui é só com o RCM recalculado e com a ordem aleatória, não com VNS-band, GPS ou outras "
+            "heurísticas de alta qualidade.",
+        ]))
+    html_parts.append(section(
+        None, "Visão geral: diferença percentual para o RCM em todas as instâncias.",
+        "Pontos abaixo da linha indicam Q-MCH melhor que RCM.", fig_ratio_rcm(df),
+        how="Cada ponto é uma instância (newdata e survey, em cores diferentes). O eixo x é o número de vértices "
+            "do grafo executado (log), e o eixo y, a diferença percentual (β<sub>Q-MCH</sub> − β<sub>RCM</sub>) / "
+            "β<sub>RCM</sub>. A linha em 0 é o empate.",
+        notes=[
+            f"A mediana da diferença em todas as {n_inst} instâncias é {med_vs_rcm_all:+.1f}%.",
+            "Observe se a vantagem muda com o tamanho. Pontos se aproximando de zero nas maiores instâncias "
+            "indicariam que 450 construções não bastam para grafos grandes, já que o orçamento é fixo e não "
+            "cresce com n.",
+        ]))
     html_parts.append(section(
         "S4 · As centralidades superam uma ordem aleatória?",
         "O survey (Seção 4.2.1) relata que Maues et al. [74] avaliaram ordenações por centralidade no construtivo do "
         "VNS-band e que <i>a ordem aleatória deu os melhores resultados</i>. Isso se repete aqui, com orçamento igual "
         "(450 construções)?",
         f"Q-MCH melhor que a ordem aleatória em {w_rand[0]}, igual em {w_rand[1]} e pior em {w_rand[2]} instâncias.",
-        fig_random_vs_ours(df)))
+        fig_random_vs_ours(df),
+        how="Cada ponto é uma instância. O eixo x é o melhor β da ordem aleatória, e o eixo y, o melhor β do "
+            "Q-MCH, ambos com 450 construções e no mesmo grafo (escalas log). Pontos abaixo da diagonal y = x "
+            "indicam Q-MCH melhor; a distância vertical à diagonal é a razão entre os dois.",
+        notes=[
+            "<b>O que exatamente está sendo comparado.</b> A ordem aleatória é o construtivo do VNS-band, que "
+            "rotula cada nível da busca em largura a partir de uma posição sorteada e <i>não</i> usa a regra do "
+            "pai do Cuthill–McKee. O construtivo do Q-MCH usa essa regra (<code>PARENT_ORDER = True</code>). Parte "
+            "da vantagem pode vir da regra do pai, e não da centralidade ou do agente.",
+            "<b>Como separar os efeitos.</b> A condição α = 0 do relatório de estratégias usa a regra do pai com "
+            "os filhos embaralhados, sem efeito da centralidade na ordem. Comparar o Q-MCH com α = 0 isola o "
+            "papel da centralidade.",
+            "Maues et al. (citados no survey) fizeram a comparação dentro do construtivo do VNS-band. Um "
+            "resultado diferente aqui não contradiz necessariamente o deles, porque o construtivo mudou.",
+        ]))
     html_parts.append(section(
         "S5 · O custo é aceitável?",
         "O survey destaca que, para acelerar solvers, a heurística precisa ter custo baixo (Seção 3.1), sugere "
@@ -863,7 +1180,22 @@ def main():
          f"{n_centralities} centralidades ({', '.join(centrality_names)}), com Closeness aproximada por amostragem; "
          "esse cálculo domina o tempo nos grafos maiores. Para comparação, o RCM leva menos de 1 s mesmo no maior "
          "grafo."),
-        fig_runtime_scaling(df)))
+        fig_runtime_scaling(df),
+        how="Cada ponto é uma execução. O eixo x é o número de arestas, e o eixo y, o tempo total (leitura, "
+            "centralidades, 450 construções e treino do DQN), ambos em escala log. As linhas tracejadas "
+            "horizontais são referências: os 1500 s sugeridos pelo survey, os 500 s do VNS-band e os 0,42 s do "
+            "Q-MCH no SBPO.",
+        notes=[
+            "<b>Como ler a inclinação.</b> Uma reta no log-log corresponde a t ∝ |E|<sup>k</sup>, e a inclinação "
+            "é k. Com k > 1, o tempo cresce mais que linearmente: dobrar o grafo mais que dobra o tempo. As "
+            "centralidades baseadas em caminhos (Betweenness e Closeness, mesmo aproximadas) fazem várias buscas "
+            "em largura e puxam a inclinação para cima.",
+            "<b>O critério de parada é o número de construções, não o tempo.</b> O survey recomenda comparar "
+            "heurísticas com o mesmo limite de tempo. Para uma comparação justa com o VNS-band ou outras "
+            "heurísticas, rode todas com o mesmo tempo máximo.",
+            "Os tempos dependem da máquina e da carga no momento da execução. Para comparar com tempos "
+            "publicados, repita as medições e reporte média e desvio.",
+        ]))
     html_parts.append(section(
         "S6 · Quão longe do ótimo?",
         "O SBPO usa o limite de Lam et al. (1997) como 'limite dual' no cálculo do gap. Ele é informativo?",
@@ -872,7 +1204,20 @@ def main():
         ", ".join(hub["instance"]) + ") indicam sobretudo que o limite inferior é fraco nessas instâncias, e não "
         "necessariamente que a solução seja ruim. O gap do estado do agente (<code>Env</code>) usa o máximo entre "
         "Lam e ⌈Δ/2⌉ calculado em <code>main_survey.py</code>.",
-        fig_gap_lb(df)))
+        fig_gap_lb(df),
+        how="Há uma caixa por classe, e cada ponto é uma instância. O eixo x é o gap (β − LB)/LB em %, em escala "
+            "log. 0% significaria ótimo comprovado; 100% significa β igual ao dobro do limite inferior.",
+        notes=[
+            "<b>Gap alto não é sinônimo de solução ruim.</b> O ótimo está em algum ponto entre LB e β, e não se "
+            "sabe onde. Com um limite fraco, o gap superestima a distância real ao ótimo.",
+            "<b>Por que o limite de Lam é fraco.</b> Ele depende só de n e m e, para grafos esparsos (m ≪ n²), "
+            "fica da ordem de m/n, ou seja, poucas unidades.",
+            "⌈(n−1)/diâmetro⌉ só é calculado para n ≤ 5000, porque o diâmetro exato custa O(n·m). Nas instâncias "
+            "maiores, o limite vem só de Lam e ⌈Δ/2⌉.",
+            "Para uma medida absoluta de qualidade, compare com os ótimos ou melhores valores conhecidos que a "
+            "literatura publica para parte das instâncias Harwell–Boeing (por exemplo, nos trabalhos do "
+            "VNS-band).",
+        ]))
     html_parts.append(section(
         "S7 · Estatísticas recomendadas pelo survey",
         "A Seção 4.3 recomenda reportar média, desvio padrão, melhor resultado e tempo total, com ≥ 3 execuções "
@@ -885,7 +1230,52 @@ def main():
                        "best_centrality"]].sort_values(["dataset", "classe", "instance"]),
                    {"run_mean": "{:.1f}", "run_std": "{:.1f}", "cv_pct": "{:.1f}", "gap_lb_pct": "{:.0f}",
                     "global_time_s": "{:.1f}", "random_best": "{:.0f}", "rcm_bw": "{:.0f}", "original_bw": "{:.0f}",
-                    "lower_bound": "{:.0f}", "nodes": "{:,.0f}", "edges": "{:,.0f}"})))
+                    "lower_bound": "{:.0f}", "nodes": "{:,.0f}", "edges": "{:,.0f}"}),
+        how="A tabela (abra 'Ver tabela de dados') tem uma linha por instância. run_best, run_mean e run_std são "
+            "o melhor β, a média e o desvio padrão das 450 construções da execução; cv_pct é o coeficiente de "
+            "variação (desvio/média); gap_lb_pct é o gap para o limite inferior; global_time_s é o tempo total; "
+            "best_centrality é a centralidade da construção que atingiu o melhor β.",
+        notes=[
+            "<b>Média e desvio intra-execução</b> medem a dispersão das construções, não a variabilidade do "
+            "método entre execuções. Para seguir o padrão do survey, rode N_RUNS ≥ 3 (<code>main_survey.py</code> "
+            "já suporta e grava Run e Seed) e reporte média ± desvio do melhor β por execução.",
+            f"<b>Dispersão das construções.</b> O coeficiente de variação mediano é {cv_med:.1f}%: as construções "
+            "individuais variam bastante. Isso reforça que o melhor β depende do número de construções e que "
+            "comparações com orçamentos diferentes precisam ser feitas com cuidado.",
+        ]))
+
+    # ---------------- Sintese ----------------
+    html_parts.append("<h2>Síntese e considerações finais</h2>")
+    html_parts.append(
+        "<p>Os pontos abaixo resumem o relatório na ordem em que aparecem e indicam o que ainda falta para que as "
+        "conclusões possam ser usadas na dissertação.</p>")
+    html_parts.append(explainer("O que os dados sustentam", [
+        f"<b>Reprodução do SBPO.</b> As 26 instâncias da Tabela 3 são reproduzidas na mesma ordem de grandeza "
+        f"(melhor/igual/pior que o artigo: {w_art[0]}/{w_art[1]}/{w_art[2]}; diferença mediana {med_vs_art:+.1f}%). "
+        "Parte da vantagem vem do orçamento maior (450 contra 100 construções) e da regra do pai no construtivo.",
+        f"<b>Métrica das comparações do artigo.</b> A coluna 'Cuthill' está em 2β+1 (coincidência exata em "
+        f"{full_match}/26), enquanto o Q-MCH está em β. As reduções de ~40%, a Tabela 4 e o p-valor do artigo "
+        "precisam ser refeitos na mesma métrica. Esse é o principal ponto metodológico a registrar.",
+        f"<b>Contra o estado da prática.</b> Nas {n_inst} instâncias, seu Q-MCH fica melhor/igual/pior que o RCM em "
+        f"{w_rcm_all[0]}/{w_rcm_all[1]}/{w_rcm_all[2]}, com diferença mediana de {med_vs_rcm_all:+.1f}% "
+        f"(Wilcoxon p = {wil.loc[4, p_col]:.1e}).",
+        f"<b>Contra a ordem aleatória.</b> Melhor/igual/pior em {w_rand[0]}/{w_rand[1]}/{w_rand[2]} instâncias "
+        f"(Wilcoxon p = {wil.loc[5, p_col]:.1e}). Ainda não está separado quanto disso vem da regra do pai e "
+        "quanto vem da centralidade (ver S4).",
+        f"<b>Survey.</b> {s_cov.get('grafo completo (maior componente)', 0)} das 23 matrizes do benchmark rodaram "
+        "no grafo completo, sem tempo acima dos 1500 s sugeridos, mas com custo ordens de grandeza acima do RCM.",
+    ]))
+    html_parts.append(explainer("O que ainda não está demonstrado", [
+        "<b>Que a centralidade importa.</b> As distribuições por centralidade se sobrepõem (Q6), e a amostra não é "
+        "balanceada. Falta um experimento com cada centralidade fixa e o mesmo orçamento.",
+        "<b>Que o agente aprende.</b> As escolhas agregadas não se afastam claramente da escolha uniforme (Q7), e "
+        "não há transferência entre instâncias de uma classe. Falta verificar a convergência por instância e "
+        "testar um agente treinado por classe.",
+        "<b>Robustez estatística.</b> Há uma execução por instância. O survey pede ≥ 3 execuções com média e "
+        "desvio, e as comparações de qualidade deveriam usar o mesmo limite de tempo para todos os métodos.",
+        "<b>Comparação com o estado da arte.</b> Faltam resultados de heurísticas de alta qualidade (VNS-band, GPS "
+        "e outras do survey) nas mesmas instâncias e com o mesmo tempo, e a matriz vsp_befref_fxm_2_4_air02.",
+    ]))
 
     html_parts.append("</main></body></html>")
     with open(OUT_HTML, "w", encoding="utf-8") as f:

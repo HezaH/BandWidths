@@ -1,44 +1,741 @@
-2026-11-09 21:20:38,847 | INFO | Inicio da instancia: /hdd/home/hsouza/BandWidths/article_code/data/newdata/trash/can_838.mtx
-2026-11-09 21:20:38,847 | INFO | Arquivo de log salvo em: /hdd/home/hsouza/BandWidths/article_code/logs/can_838.log
-2026-11-09 21:20:38,847 | INFO | Condicoes: ['centrality'] | busca local: [False]
-2026-11-09 21:20:38,847 | INFO | Calculando centralidades (timeout: infs)
-2026-11-09 21:20:39,177 | INFO | Leitura e centralidades finalizadas: ok=True timed_out=False
-2026-11-09 21:20:39,177 | INFO | Tempo por centralidade (s): {'Degree': 0.0, 'Closeness': 0.15, 'Betweenness': 0.12, 'Eigenvector': 0.0, 'PageRank': 0.01}
-2026-11-09 21:20:39,193 | INFO | Bandwidth original: 837 | RCM: 135 | limite inferior: 16
-2026-11-09 21:20:39,244 | INFO | >> [centrality] Run 0 Episode 1 Gap: 0.8897 Reward: 10 Score: 10 Action: Degree Bandwidth: 145 Epsilon: 0.825
-2026-11-09 21:20:39,245 | INFO | Melhor solução atualizada: bandwidth=145 (centrality=Degree)
-2026-11-09 21:20:39,280 | INFO | >> [centrality] Run 0 Episode 2 Gap: 0.8815 Reward: 10 Score: 20 Action: Eigenvector Bandwidth: 135 Epsilon: 0.681
-2026-11-09 21:20:39,281 | INFO | Melhor solução atualizada: bandwidth=135 (centrality=Eigenvector)
-2026-11-09 21:20:39,313 | INFO | >> [centrality] Run 0 Episode 3 Gap: 0.8730 Reward: 10 Score: 30 Action: Closeness Bandwidth: 126 Epsilon: 0.562
-2026-11-09 21:20:39,314 | INFO | Melhor solução atualizada: bandwidth=126 (centrality=Closeness)
-2026-11-09 21:20:39,348 | INFO | >> [centrality] Run 0 Episode 4 Gap: 0.8779 Reward: -2 Score: 28 Action: Closeness Bandwidth: 131 Epsilon: 0.464
-2026-11-09 21:20:39,382 | INFO | >> [centrality] Run 0 Episode 5 Gap: 0.8797 Reward: -2 Score: 26 Action: Degree Bandwidth: 133 Epsilon: 0.383
-2026-11-09 21:20:39,419 | INFO | >> [centrality] Run 0 Episode 6 Gap: 0.8897 Reward: -2 Score: 24 Action: Closeness Bandwidth: 145 Epsilon: 0.316
-2026-11-09 21:20:39,461 | INFO | >> [centrality] Run 0 Episode 7 Gap: 0.8769 Reward: 5 Score: 29 Action: Closeness Bandwidth: 130 Epsilon: 0.261
-2026-11-09 21:20:39,496 | INFO | >> [centrality] Run 0 Episode 8 Gap: 0.8730 Reward: 10 Score: 39 Action: Eigenvector Bandwidth: 126 Epsilon: 0.215
-2026-11-09 21:20:39,528 | INFO | >> [centrality] Run 0 Episode 9 Gap: 0.8760 Reward: -2 Score: 37 Action: Eigenvector Bandwidth: 129 Epsilon: 0.178
-2026-11-09 21:20:39,562 | INFO | >> [centrality] Run 0 Episode 10 Gap: 0.8769 Reward: -2 Score: 35 Action: Closeness Bandwidth: 130 Epsilon: 0.147
-2026-11-09 21:20:39,608 | INFO | >> [centrality] Run 0 Episode 11 Gap: 0.8797 Reward: -2 Score: 33 Action: Closeness Bandwidth: 133 Epsilon: 0.121
-2026-11-09 21:20:39,644 | INFO | >> [centrality] Run 0 Episode 12 Gap: 0.8815 Reward: -2 Score: 31 Action: Closeness Bandwidth: 135 Epsilon: 0.100
-2026-11-09 21:20:39,677 | INFO | >> [centrality] Run 0 Episode 13 Gap: 0.8849 Reward: -2 Score: 29 Action: Closeness Bandwidth: 139 Epsilon: 0.083
-2026-11-09 21:20:39,718 | INFO | >> [centrality] Run 0 Episode 14 Gap: 0.8832 Reward: 5 Score: 34 Action: Closeness Bandwidth: 137 Epsilon: 0.068
-2026-11-09 21:20:39,751 | INFO | >> [centrality] Run 0 Episode 15 Gap: 0.8720 Reward: 10 Score: 44 Action: Eigenvector Bandwidth: 125 Epsilon: 0.056
-2026-11-09 21:20:39,751 | INFO | Melhor solução atualizada: bandwidth=125 (centrality=Eigenvector)
-2026-11-09 21:20:39,785 | INFO | >> [centrality] Run 0 Episode 16 Gap: 0.8797 Reward: -2 Score: 42 Action: Eigenvector Bandwidth: 133 Epsilon: 0.046
-2026-11-09 21:20:39,825 | INFO | >> [centrality] Run 0 Episode 17 Gap: 0.8912 Reward: -2 Score: 40 Action: Closeness Bandwidth: 147 Epsilon: 0.038
-2026-11-09 21:20:39,864 | INFO | >> [centrality] Run 0 Episode 18 Gap: 0.8873 Reward: 5 Score: 45 Action: Closeness Bandwidth: 142 Epsilon: 0.032
-2026-11-09 21:20:39,902 | INFO | >> [centrality] Run 0 Episode 19 Gap: 0.8806 Reward: 5 Score: 50 Action: Eigenvector Bandwidth: 134 Epsilon: 0.026
-2026-11-09 21:20:39,935 | INFO | >> [centrality] Run 0 Episode 20 Gap: 0.8760 Reward: 5 Score: 55 Action: Eigenvector Bandwidth: 129 Epsilon: 0.022
-2026-11-09 21:20:39,969 | INFO | >> [centrality] Run 0 Episode 21 Gap: 0.8832 Reward: -2 Score: 53 Action: Eigenvector Bandwidth: 137 Epsilon: 0.018
-2026-11-09 21:20:40,012 | INFO | >> [centrality] Run 0 Episode 22 Gap: 0.8832 Reward: 5 Score: 58 Action: Closeness Bandwidth: 137 Epsilon: 0.015
-2026-11-09 21:20:40,049 | INFO | >> [centrality] Run 0 Episode 23 Gap: 0.8865 Reward: -2 Score: 56 Action: Closeness Bandwidth: 141 Epsilon: 0.012
-2026-11-09 21:20:40,083 | INFO | >> [centrality] Run 0 Episode 24 Gap: 0.8797 Reward: 5 Score: 61 Action: Closeness Bandwidth: 133 Epsilon: 0.010
-2026-11-09 21:20:40,122 | INFO | >> [centrality] Run 0 Episode 25 Gap: 0.8815 Reward: -2 Score: 59 Action: Closeness Bandwidth: 135 Epsilon: 0.010
-2026-11-09 21:20:40,156 | INFO | >> [centrality] Run 0 Episode 26 Gap: 0.8740 Reward: 5 Score: 64 Action: Closeness Bandwidth: 127 Epsilon: 0.010
-2026-11-09 21:20:40,191 | INFO | >> [centrality] Run 0 Episode 27 Gap: 0.8760 Reward: -2 Score: 62 Action: Closeness Bandwidth: 129 Epsilon: 0.010
-2026-11-09 21:20:40,230 | INFO | >> [centrality] Run 0 Episode 28 Gap: 0.8926 Reward: -2 Score: 60 Action: Closeness Bandwidth: 149 Epsilon: 0.010
-2026-11-09 21:20:40,272 | INFO | >> [centrality] Run 0 Episode 29 Gap: 0.8824 Reward: 5 Score: 65 Action: Closeness Bandwidth: 136 Epsilon: 0.010
-2026-11-09 21:20:40,308 | INFO | >> [centrality] Run 0 Episode 30 Gap: 0.8824 Reward: 5 Score: 70 Action: Closeness Bandwidth: 136 Epsilon: 0.010
-2026-11-09 21:20:40,310 | INFO | Melhor configuração [centrality] rodada 0: bandwidth=125; persistida=False
-2026-11-09 21:20:40,331 | INFO | Analise por instancia salva em: /hdd/home/hsouza/BandWidths/article_code/data/newdata/plots/can_838/analysis_inputs_can_838_centrality.json
-2026-11-09 21:20:40,332 | INFO | Modelo salvo em: /hdd/home/hsouza/BandWidths/article_code/data/newdata/plots/can_838/trained_model_can_838_centrality.pth
+2026-11-14 15:41:26,844 | INFO | Inicio da instancia: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\trash\can_838.mtx
+2026-11-14 15:41:26,844 | INFO | Arquivo de log salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\logs\can_838.log
+2026-11-14 15:41:26,844 | INFO | Condicoes: ['oracle'] | busca local: [False]
+2026-11-14 15:41:26,844 | INFO | Calculando centralidades (timeout: infs)
+2026-11-14 15:41:27,428 | INFO | Leitura e centralidades finalizadas: ok=True timed_out=False
+2026-11-14 15:41:27,428 | INFO | Tempo por centralidade (s): {'Degree': 0.0, 'Closeness': 0.38, 'Betweenness': 0.13, 'Eigenvector': 0.0, 'PageRank': 0.01}
+2026-11-14 15:41:27,450 | INFO | Bandwidth original: 837 | RCM: 135 | limite inferior: 16
+2026-11-14 15:41:27,524 | INFO | [oracle] Configuração inicial persistida como melhor resultado.
+2026-11-14 15:41:27,585 | INFO | >> [oracle|dqn] Run 0 Episode 1 Gap: 0.8897 Reward: 10 Score: 10 Action: Degree Bandwidth: 145 Epsilon: 0.825
+2026-11-14 15:41:27,585 | INFO | Melhor solução atualizada: bandwidth=145 (oracle=Degree)
+2026-11-14 15:41:27,617 | INFO | >> [oracle|dqn] Run 0 Episode 2 Gap: 0.8815 Reward: 10 Score: 20 Action: Eigenvector Bandwidth: 135 Epsilon: 0.681
+2026-11-14 15:41:27,618 | INFO | Melhor solução atualizada: bandwidth=135 (oracle=Eigenvector)
+2026-11-14 15:41:27,654 | INFO | >> [oracle|dqn] Run 0 Episode 3 Gap: 0.8730 Reward: 10 Score: 30 Action: Closeness Bandwidth: 126 Epsilon: 0.562
+2026-11-14 15:41:27,654 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Closeness)
+2026-11-14 15:41:27,705 | INFO | >> [oracle|dqn] Run 0 Episode 4 Gap: 0.8779 Reward: -2 Score: 28 Action: Closeness Bandwidth: 131 Epsilon: 0.464
+2026-11-14 15:41:27,753 | INFO | >> [oracle|dqn] Run 0 Episode 5 Gap: 0.8797 Reward: -2 Score: 26 Action: Degree Bandwidth: 133 Epsilon: 0.383
+2026-11-14 15:41:27,806 | INFO | >> [oracle|dqn] Run 0 Episode 6 Gap: 0.8897 Reward: -2 Score: 24 Action: Closeness Bandwidth: 145 Epsilon: 0.316
+2026-11-14 15:41:27,861 | INFO | >> [oracle|dqn] Run 0 Episode 7 Gap: 0.8769 Reward: 5 Score: 29 Action: Closeness Bandwidth: 130 Epsilon: 0.261
+2026-11-14 15:41:27,909 | INFO | >> [oracle|dqn] Run 0 Episode 8 Gap: 0.8730 Reward: 10 Score: 39 Action: Eigenvector Bandwidth: 126 Epsilon: 0.215
+2026-11-14 15:41:27,974 | INFO | >> [oracle|dqn] Run 0 Episode 9 Gap: 0.8760 Reward: -2 Score: 37 Action: Eigenvector Bandwidth: 129 Epsilon: 0.178
+2026-11-14 15:41:28,010 | INFO | >> [oracle|dqn] Run 0 Episode 10 Gap: 0.8769 Reward: -2 Score: 35 Action: Closeness Bandwidth: 130 Epsilon: 0.147
+2026-11-14 15:41:28,049 | INFO | >> [oracle|dqn] Run 0 Episode 11 Gap: 0.8797 Reward: -2 Score: 33 Action: Closeness Bandwidth: 133 Epsilon: 0.121
+2026-11-14 15:41:28,101 | INFO | >> [oracle|dqn] Run 0 Episode 12 Gap: 0.8815 Reward: -2 Score: 31 Action: Closeness Bandwidth: 135 Epsilon: 0.100
+2026-11-14 15:41:28,133 | INFO | >> [oracle|dqn] Run 0 Episode 13 Gap: 0.8849 Reward: -2 Score: 29 Action: Closeness Bandwidth: 139 Epsilon: 0.083
+2026-11-14 15:41:28,164 | INFO | >> [oracle|dqn] Run 0 Episode 14 Gap: 0.8832 Reward: 5 Score: 34 Action: Closeness Bandwidth: 137 Epsilon: 0.068
+2026-11-14 15:41:28,213 | INFO | >> [oracle|dqn] Run 0 Episode 15 Gap: 0.8720 Reward: 10 Score: 44 Action: Eigenvector Bandwidth: 125 Epsilon: 0.056
+2026-11-14 15:41:28,213 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=Eigenvector)
+2026-11-14 15:41:28,265 | INFO | >> [oracle|dqn] Run 0 Episode 16 Gap: 0.8797 Reward: -2 Score: 42 Action: Eigenvector Bandwidth: 133 Epsilon: 0.046
+2026-11-14 15:41:28,293 | INFO | >> [oracle|dqn] Run 0 Episode 17 Gap: 0.8912 Reward: -2 Score: 40 Action: Closeness Bandwidth: 147 Epsilon: 0.038
+2026-11-14 15:41:28,321 | INFO | >> [oracle|dqn] Run 0 Episode 18 Gap: 0.8873 Reward: 5 Score: 45 Action: Closeness Bandwidth: 142 Epsilon: 0.032
+2026-11-14 15:41:28,366 | INFO | >> [oracle|dqn] Run 0 Episode 19 Gap: 0.8806 Reward: 5 Score: 50 Action: Eigenvector Bandwidth: 134 Epsilon: 0.026
+2026-11-14 15:41:28,395 | INFO | >> [oracle|dqn] Run 0 Episode 20 Gap: 0.8760 Reward: 5 Score: 55 Action: Eigenvector Bandwidth: 129 Epsilon: 0.022
+2026-11-14 15:41:28,431 | INFO | >> [oracle|dqn] Run 0 Episode 21 Gap: 0.8832 Reward: -2 Score: 53 Action: Eigenvector Bandwidth: 137 Epsilon: 0.018
+2026-11-14 15:41:28,461 | INFO | >> [oracle|dqn] Run 0 Episode 22 Gap: 0.8832 Reward: 5 Score: 58 Action: Closeness Bandwidth: 137 Epsilon: 0.015
+2026-11-14 15:41:28,506 | INFO | >> [oracle|dqn] Run 0 Episode 23 Gap: 0.8865 Reward: -2 Score: 56 Action: Closeness Bandwidth: 141 Epsilon: 0.012
+2026-11-14 15:41:28,543 | INFO | >> [oracle|dqn] Run 0 Episode 24 Gap: 0.8797 Reward: 5 Score: 61 Action: Closeness Bandwidth: 133 Epsilon: 0.010
+2026-11-14 15:41:28,594 | INFO | >> [oracle|dqn] Run 0 Episode 25 Gap: 0.8815 Reward: -2 Score: 59 Action: Closeness Bandwidth: 135 Epsilon: 0.010
+2026-11-14 15:41:28,633 | INFO | >> [oracle|dqn] Run 0 Episode 26 Gap: 0.8740 Reward: 5 Score: 64 Action: Closeness Bandwidth: 127 Epsilon: 0.010
+2026-11-14 15:41:28,665 | INFO | >> [oracle|dqn] Run 0 Episode 27 Gap: 0.8760 Reward: -2 Score: 62 Action: Closeness Bandwidth: 129 Epsilon: 0.010
+2026-11-14 15:41:28,712 | INFO | >> [oracle|dqn] Run 0 Episode 28 Gap: 0.8926 Reward: -2 Score: 60 Action: Closeness Bandwidth: 149 Epsilon: 0.010
+2026-11-14 15:41:28,748 | INFO | >> [oracle|dqn] Run 0 Episode 29 Gap: 0.8824 Reward: 5 Score: 65 Action: Closeness Bandwidth: 136 Epsilon: 0.010
+2026-11-14 15:41:28,777 | INFO | >> [oracle|dqn] Run 0 Episode 30 Gap: 0.8824 Reward: 5 Score: 70 Action: Closeness Bandwidth: 136 Epsilon: 0.010
+2026-11-14 15:41:29,006 | INFO | Plot salvo: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\can_838\can_838_oracle_bandwidth_125_oracle=Eigenvector.png
+2026-11-14 15:41:29,007 | INFO | Melhor configuração [oracle|dqn] rodada 0: bandwidth=125; persistida=True
+2026-11-14 15:41:29,077 | INFO | >> [oracle|dqn] Run 1 Episode 1 Gap: 0.8797 Reward: 10 Score: 10 Action: PageRank Bandwidth: 133 Epsilon: 0.825
+2026-11-14 15:41:29,077 | INFO | Melhor solução atualizada: bandwidth=133 (oracle=PageRank)
+2026-11-14 15:41:29,111 | INFO | >> [oracle|dqn] Run 1 Episode 2 Gap: 0.8740 Reward: 10 Score: 20 Action: PageRank Bandwidth: 127 Epsilon: 0.681
+2026-11-14 15:41:29,111 | INFO | Melhor solução atualizada: bandwidth=127 (oracle=PageRank)
+2026-11-14 15:41:29,152 | INFO | >> [oracle|dqn] Run 1 Episode 3 Gap: 0.8760 Reward: -2 Score: 18 Action: Degree Bandwidth: 129 Epsilon: 0.562
+2026-11-14 15:41:29,184 | INFO | >> [oracle|dqn] Run 1 Episode 4 Gap: 0.8760 Reward: 5 Score: 23 Action: PageRank Bandwidth: 129 Epsilon: 0.464
+2026-11-14 15:41:29,236 | INFO | >> [oracle|dqn] Run 1 Episode 5 Gap: 0.8841 Reward: -2 Score: 21 Action: PageRank Bandwidth: 138 Epsilon: 0.383
+2026-11-14 15:41:29,282 | INFO | >> [oracle|dqn] Run 1 Episode 6 Gap: 0.8779 Reward: 5 Score: 26 Action: PageRank Bandwidth: 131 Epsilon: 0.316
+2026-11-14 15:41:29,336 | INFO | >> [oracle|dqn] Run 1 Episode 7 Gap: 0.8806 Reward: -2 Score: 24 Action: PageRank Bandwidth: 134 Epsilon: 0.261
+2026-11-14 15:41:29,384 | INFO | >> [oracle|dqn] Run 1 Episode 8 Gap: 0.8730 Reward: 10 Score: 34 Action: PageRank Bandwidth: 126 Epsilon: 0.215
+2026-11-14 15:41:29,384 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=PageRank)
+2026-11-14 15:41:29,418 | INFO | >> [oracle|dqn] Run 1 Episode 9 Gap: 0.8689 Reward: 10 Score: 44 Action: PageRank Bandwidth: 122 Epsilon: 0.178
+2026-11-14 15:41:29,418 | INFO | Melhor solução atualizada: bandwidth=122 (oracle=PageRank)
+2026-11-14 15:41:29,471 | INFO | >> [oracle|dqn] Run 1 Episode 10 Gap: 0.8750 Reward: -2 Score: 42 Action: PageRank Bandwidth: 128 Epsilon: 0.147
+2026-11-14 15:41:29,500 | INFO | >> [oracle|dqn] Run 1 Episode 11 Gap: 0.8788 Reward: -2 Score: 40 Action: PageRank Bandwidth: 132 Epsilon: 0.121
+2026-11-14 15:41:29,529 | INFO | >> [oracle|dqn] Run 1 Episode 12 Gap: 0.8832 Reward: -2 Score: 38 Action: Betweenness Bandwidth: 137 Epsilon: 0.100
+2026-11-14 15:41:29,572 | INFO | >> [oracle|dqn] Run 1 Episode 13 Gap: 0.8788 Reward: 5 Score: 43 Action: PageRank Bandwidth: 132 Epsilon: 0.083
+2026-11-14 15:41:29,602 | INFO | >> [oracle|dqn] Run 1 Episode 14 Gap: 0.8806 Reward: -2 Score: 41 Action: PageRank Bandwidth: 134 Epsilon: 0.068
+2026-11-14 15:41:29,630 | INFO | >> [oracle|dqn] Run 1 Episode 15 Gap: 0.8730 Reward: 5 Score: 46 Action: PageRank Bandwidth: 126 Epsilon: 0.056
+2026-11-14 15:41:29,663 | INFO | >> [oracle|dqn] Run 1 Episode 16 Gap: 0.8849 Reward: -2 Score: 44 Action: PageRank Bandwidth: 139 Epsilon: 0.046
+2026-11-14 15:41:29,714 | INFO | >> [oracle|dqn] Run 1 Episode 17 Gap: 0.8730 Reward: 5 Score: 49 Action: PageRank Bandwidth: 126 Epsilon: 0.038
+2026-11-14 15:41:29,746 | INFO | >> [oracle|dqn] Run 1 Episode 18 Gap: 0.8806 Reward: -2 Score: 47 Action: PageRank Bandwidth: 134 Epsilon: 0.032
+2026-11-14 15:41:29,795 | INFO | >> [oracle|dqn] Run 1 Episode 19 Gap: 0.8740 Reward: 5 Score: 52 Action: PageRank Bandwidth: 127 Epsilon: 0.026
+2026-11-14 15:41:29,833 | INFO | >> [oracle|dqn] Run 1 Episode 20 Gap: 0.8750 Reward: -2 Score: 50 Action: PageRank Bandwidth: 128 Epsilon: 0.022
+2026-11-14 15:41:29,865 | INFO | >> [oracle|dqn] Run 1 Episode 21 Gap: 0.8797 Reward: -2 Score: 48 Action: PageRank Bandwidth: 133 Epsilon: 0.018
+2026-11-14 15:41:29,916 | INFO | >> [oracle|dqn] Run 1 Episode 22 Gap: 0.8912 Reward: -2 Score: 46 Action: PageRank Bandwidth: 147 Epsilon: 0.015
+2026-11-14 15:41:29,961 | INFO | >> [oracle|dqn] Run 1 Episode 23 Gap: 0.8779 Reward: 5 Score: 51 Action: PageRank Bandwidth: 131 Epsilon: 0.012
+2026-11-14 15:41:29,989 | INFO | >> [oracle|dqn] Run 1 Episode 24 Gap: 0.8788 Reward: -2 Score: 49 Action: PageRank Bandwidth: 132 Epsilon: 0.010
+2026-11-14 15:41:30,021 | INFO | >> [oracle|dqn] Run 1 Episode 25 Gap: 0.8788 Reward: 5 Score: 54 Action: PageRank Bandwidth: 132 Epsilon: 0.010
+2026-11-14 15:41:30,060 | INFO | >> [oracle|dqn] Run 1 Episode 26 Gap: 0.8797 Reward: -2 Score: 52 Action: PageRank Bandwidth: 133 Epsilon: 0.010
+2026-11-14 15:41:30,107 | INFO | >> [oracle|dqn] Run 1 Episode 27 Gap: 0.8750 Reward: 5 Score: 57 Action: PageRank Bandwidth: 128 Epsilon: 0.010
+2026-11-14 15:41:30,135 | INFO | >> [oracle|dqn] Run 1 Episode 28 Gap: 0.8720 Reward: 5 Score: 62 Action: PageRank Bandwidth: 125 Epsilon: 0.010
+2026-11-14 15:41:30,162 | INFO | >> [oracle|dqn] Run 1 Episode 29 Gap: 0.8720 Reward: 5 Score: 67 Action: PageRank Bandwidth: 125 Epsilon: 0.010
+2026-11-14 15:41:30,190 | INFO | >> [oracle|dqn] Run 1 Episode 30 Gap: 0.8769 Reward: -2 Score: 65 Action: PageRank Bandwidth: 130 Epsilon: 0.010
+2026-11-14 15:41:30,430 | INFO | Plot salvo: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\can_838\can_838_oracle_bandwidth_122_oracle=PageRank.png
+2026-11-14 15:41:30,430 | INFO | Melhor configuração [oracle|dqn] rodada 1: bandwidth=122; persistida=True
+2026-11-14 15:41:30,481 | INFO | >> [oracle|dqn] Run 2 Episode 1 Gap: 0.8720 Reward: 10 Score: 10 Action: Degree Bandwidth: 125 Epsilon: 0.825
+2026-11-14 15:41:30,481 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=Degree)
+2026-11-14 15:41:30,521 | INFO | >> [oracle|dqn] Run 2 Episode 2 Gap: 0.8974 Reward: -2 Score: 8 Action: Betweenness Bandwidth: 156 Epsilon: 0.681
+2026-11-14 15:41:30,573 | INFO | >> [oracle|dqn] Run 2 Episode 3 Gap: 0.8954 Reward: 5 Score: 13 Action: Betweenness Bandwidth: 153 Epsilon: 0.562
+2026-11-14 15:41:30,616 | INFO | >> [oracle|dqn] Run 2 Episode 4 Gap: 0.8779 Reward: 5 Score: 18 Action: Eigenvector Bandwidth: 131 Epsilon: 0.464
+2026-11-14 15:41:30,645 | INFO | >> [oracle|dqn] Run 2 Episode 5 Gap: 0.8832 Reward: -2 Score: 16 Action: Degree Bandwidth: 137 Epsilon: 0.383
+2026-11-14 15:41:30,674 | INFO | >> [oracle|dqn] Run 2 Episode 6 Gap: 0.8994 Reward: -2 Score: 14 Action: Betweenness Bandwidth: 159 Epsilon: 0.316
+2026-11-14 15:41:30,706 | INFO | >> [oracle|dqn] Run 2 Episode 7 Gap: 0.8873 Reward: 5 Score: 19 Action: Degree Bandwidth: 142 Epsilon: 0.261
+2026-11-14 15:41:30,757 | INFO | >> [oracle|dqn] Run 2 Episode 8 Gap: 0.8720 Reward: 10 Score: 29 Action: Degree Bandwidth: 125 Epsilon: 0.215
+2026-11-14 15:41:30,801 | INFO | >> [oracle|dqn] Run 2 Episode 9 Gap: 0.8769 Reward: -2 Score: 27 Action: Degree Bandwidth: 130 Epsilon: 0.178
+2026-11-14 15:41:30,845 | INFO | >> [oracle|dqn] Run 2 Episode 10 Gap: 0.8769 Reward: 5 Score: 32 Action: Degree Bandwidth: 130 Epsilon: 0.147
+2026-11-14 15:41:30,874 | INFO | >> [oracle|dqn] Run 2 Episode 11 Gap: 0.8889 Reward: -2 Score: 30 Action: Degree Bandwidth: 144 Epsilon: 0.121
+2026-11-14 15:41:30,912 | INFO | >> [oracle|dqn] Run 2 Episode 12 Gap: 0.8740 Reward: 5 Score: 35 Action: Degree Bandwidth: 127 Epsilon: 0.100
+2026-11-14 15:41:30,941 | INFO | >> [oracle|dqn] Run 2 Episode 13 Gap: 0.8788 Reward: -2 Score: 33 Action: Degree Bandwidth: 132 Epsilon: 0.083
+2026-11-14 15:41:30,991 | INFO | >> [oracle|dqn] Run 2 Episode 14 Gap: 0.8730 Reward: 5 Score: 38 Action: Degree Bandwidth: 126 Epsilon: 0.068
+2026-11-14 15:41:31,041 | INFO | >> [oracle|dqn] Run 2 Episode 15 Gap: 0.8750 Reward: -2 Score: 36 Action: Degree Bandwidth: 128 Epsilon: 0.056
+2026-11-14 15:41:31,091 | INFO | >> [oracle|dqn] Run 2 Episode 16 Gap: 0.8760 Reward: -2 Score: 34 Action: Degree Bandwidth: 129 Epsilon: 0.046
+2026-11-14 15:41:31,139 | INFO | >> [oracle|dqn] Run 2 Episode 17 Gap: 0.8779 Reward: -2 Score: 32 Action: Degree Bandwidth: 131 Epsilon: 0.038
+2026-11-14 15:41:31,185 | INFO | >> [oracle|dqn] Run 2 Episode 18 Gap: 0.8750 Reward: 5 Score: 37 Action: Degree Bandwidth: 128 Epsilon: 0.032
+2026-11-14 15:41:31,211 | INFO | >> [oracle|dqn] Run 2 Episode 19 Gap: 0.8740 Reward: 5 Score: 42 Action: Degree Bandwidth: 127 Epsilon: 0.026
+2026-11-14 15:41:31,241 | INFO | >> [oracle|dqn] Run 2 Episode 20 Gap: 0.8806 Reward: -2 Score: 40 Action: Degree Bandwidth: 134 Epsilon: 0.022
+2026-11-14 15:41:31,278 | INFO | >> [oracle|dqn] Run 2 Episode 21 Gap: 0.8806 Reward: 5 Score: 45 Action: Degree Bandwidth: 134 Epsilon: 0.018
+2026-11-14 15:41:31,314 | INFO | >> [oracle|dqn] Run 2 Episode 22 Gap: 0.8750 Reward: 5 Score: 50 Action: Degree Bandwidth: 128 Epsilon: 0.015
+2026-11-14 15:41:31,358 | INFO | >> [oracle|dqn] Run 2 Episode 23 Gap: 0.8760 Reward: -2 Score: 48 Action: Degree Bandwidth: 129 Epsilon: 0.012
+2026-11-14 15:41:31,409 | INFO | >> [oracle|dqn] Run 2 Episode 24 Gap: 0.8730 Reward: 5 Score: 53 Action: Degree Bandwidth: 126 Epsilon: 0.010
+2026-11-14 15:41:31,440 | INFO | >> [oracle|dqn] Run 2 Episode 25 Gap: 0.8857 Reward: -2 Score: 51 Action: Degree Bandwidth: 140 Epsilon: 0.010
+2026-11-14 15:41:31,491 | INFO | >> [oracle|dqn] Run 2 Episode 26 Gap: 0.8769 Reward: 5 Score: 56 Action: Degree Bandwidth: 130 Epsilon: 0.010
+2026-11-14 15:41:31,530 | INFO | >> [oracle|dqn] Run 2 Episode 27 Gap: 0.8779 Reward: -2 Score: 54 Action: Degree Bandwidth: 131 Epsilon: 0.010
+2026-11-14 15:41:31,581 | INFO | >> [oracle|dqn] Run 2 Episode 28 Gap: 0.8815 Reward: -2 Score: 52 Action: Degree Bandwidth: 135 Epsilon: 0.010
+2026-11-14 15:41:31,633 | INFO | >> [oracle|dqn] Run 2 Episode 29 Gap: 0.8760 Reward: 5 Score: 57 Action: Degree Bandwidth: 129 Epsilon: 0.010
+2026-11-14 15:41:31,661 | INFO | >> [oracle|dqn] Run 2 Episode 30 Gap: 0.8919 Reward: -2 Score: 55 Action: Degree Bandwidth: 148 Epsilon: 0.010
+2026-11-14 15:41:31,663 | INFO | Melhor configuração [oracle|dqn] rodada 2: bandwidth=125; persistida=False
+2026-11-14 15:41:31,697 | INFO | >> [oracle|random] Run 0 Episode 1 Gap: 0.8730 Reward: 10 Score: 10 Action: PageRank Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:31,697 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=PageRank)
+2026-11-14 15:41:31,722 | INFO | >> [oracle|random] Run 0 Episode 2 Gap: 0.8849 Reward: -2 Score: 8 Action: Betweenness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:31,761 | INFO | >> [oracle|random] Run 0 Episode 3 Gap: 0.8750 Reward: 5 Score: 13 Action: PageRank Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:31,808 | INFO | >> [oracle|random] Run 0 Episode 4 Gap: 0.8740 Reward: 5 Score: 18 Action: Closeness Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:31,835 | INFO | >> [oracle|random] Run 0 Episode 5 Gap: 0.8797 Reward: -2 Score: 16 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:31,868 | INFO | >> [oracle|random] Run 0 Episode 6 Gap: 0.8857 Reward: -2 Score: 14 Action: Closeness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:31,909 | INFO | >> [oracle|random] Run 0 Episode 7 Gap: 0.8779 Reward: 5 Score: 19 Action: Eigenvector Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:31,952 | INFO | >> [oracle|random] Run 0 Episode 8 Gap: 0.8904 Reward: -2 Score: 17 Action: PageRank Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:31,993 | INFO | >> [oracle|random] Run 0 Episode 9 Gap: 0.8904 Reward: 5 Score: 22 Action: Closeness Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:32,042 | INFO | >> [oracle|random] Run 0 Episode 10 Gap: 0.8750 Reward: 5 Score: 27 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:32,073 | INFO | >> [oracle|random] Run 0 Episode 11 Gap: 0.8667 Reward: 10 Score: 37 Action: Closeness Bandwidth: 120 Epsilon: -
+2026-11-14 15:41:32,073 | INFO | Melhor solução atualizada: bandwidth=120 (oracle=Closeness)
+2026-11-14 15:41:32,109 | INFO | >> [oracle|random] Run 0 Episode 12 Gap: 0.8769 Reward: -2 Score: 35 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:32,148 | INFO | >> [oracle|random] Run 0 Episode 13 Gap: 0.8912 Reward: -2 Score: 33 Action: Betweenness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:32,175 | INFO | >> [oracle|random] Run 0 Episode 14 Gap: 0.8720 Reward: 5 Score: 38 Action: Closeness Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:32,205 | INFO | >> [oracle|random] Run 0 Episode 15 Gap: 0.8849 Reward: -2 Score: 36 Action: Eigenvector Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:32,234 | INFO | >> [oracle|random] Run 0 Episode 16 Gap: 0.8857 Reward: -2 Score: 34 Action: Degree Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:32,280 | INFO | >> [oracle|random] Run 0 Episode 17 Gap: 0.8750 Reward: 5 Score: 39 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:32,324 | INFO | >> [oracle|random] Run 0 Episode 18 Gap: 0.8779 Reward: -2 Score: 37 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:32,368 | INFO | >> [oracle|random] Run 0 Episode 19 Gap: 0.8806 Reward: -2 Score: 35 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:32,399 | INFO | >> [oracle|random] Run 0 Episode 20 Gap: 0.8832 Reward: -2 Score: 33 Action: Degree Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:32,429 | INFO | >> [oracle|random] Run 0 Episode 21 Gap: 0.8769 Reward: 5 Score: 38 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:32,475 | INFO | >> [oracle|random] Run 0 Episode 22 Gap: 0.8832 Reward: -2 Score: 36 Action: Betweenness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:32,525 | INFO | >> [oracle|random] Run 0 Episode 23 Gap: 0.8788 Reward: 5 Score: 41 Action: Betweenness Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:32,555 | INFO | >> [oracle|random] Run 0 Episode 24 Gap: 0.8779 Reward: 5 Score: 46 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:32,583 | INFO | >> [oracle|random] Run 0 Episode 25 Gap: 0.8857 Reward: -2 Score: 44 Action: Closeness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:32,629 | INFO | >> [oracle|random] Run 0 Episode 26 Gap: 0.8806 Reward: 5 Score: 49 Action: Betweenness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:32,664 | INFO | >> [oracle|random] Run 0 Episode 27 Gap: 0.8797 Reward: 5 Score: 54 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:32,693 | INFO | >> [oracle|random] Run 0 Episode 28 Gap: 0.8760 Reward: 5 Score: 59 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:32,725 | INFO | >> [oracle|random] Run 0 Episode 29 Gap: 0.8760 Reward: 5 Score: 64 Action: Betweenness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:32,763 | INFO | >> [oracle|random] Run 0 Episode 30 Gap: 0.8841 Reward: -2 Score: 62 Action: Degree Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:33,009 | INFO | Plot salvo: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\can_838\can_838_oracle_bandwidth_120_oracle=Closeness.png
+2026-11-14 15:41:33,010 | INFO | Melhor configuração [oracle|random] rodada 0: bandwidth=120; persistida=True
+2026-11-14 15:41:33,046 | INFO | >> [oracle|random] Run 1 Episode 1 Gap: 0.8881 Reward: 10 Score: 10 Action: Eigenvector Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:33,046 | INFO | Melhor solução atualizada: bandwidth=143 (oracle=Eigenvector)
+2026-11-14 15:41:33,088 | INFO | >> [oracle|random] Run 1 Episode 2 Gap: 0.8881 Reward: 10 Score: 20 Action: Closeness Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:33,135 | INFO | >> [oracle|random] Run 1 Episode 3 Gap: 0.8806 Reward: 10 Score: 30 Action: Closeness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:33,136 | INFO | Melhor solução atualizada: bandwidth=134 (oracle=Closeness)
+2026-11-14 15:41:33,163 | INFO | >> [oracle|random] Run 1 Episode 4 Gap: 0.9000 Reward: -2 Score: 28 Action: Betweenness Bandwidth: 160 Epsilon: -
+2026-11-14 15:41:33,206 | INFO | >> [oracle|random] Run 1 Episode 5 Gap: 0.8788 Reward: 10 Score: 38 Action: Closeness Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:33,207 | INFO | Melhor solução atualizada: bandwidth=132 (oracle=Closeness)
+2026-11-14 15:41:33,232 | INFO | >> [oracle|random] Run 1 Episode 6 Gap: 0.8788 Reward: 10 Score: 48 Action: Degree Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:33,271 | INFO | >> [oracle|random] Run 1 Episode 7 Gap: 0.8926 Reward: -2 Score: 46 Action: Betweenness Bandwidth: 149 Epsilon: -
+2026-11-14 15:41:33,296 | INFO | >> [oracle|random] Run 1 Episode 8 Gap: 0.8889 Reward: 5 Score: 51 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:33,342 | INFO | >> [oracle|random] Run 1 Episode 9 Gap: 0.8769 Reward: 10 Score: 61 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:33,342 | INFO | Melhor solução atualizada: bandwidth=130 (oracle=Eigenvector)
+2026-11-14 15:41:33,385 | INFO | >> [oracle|random] Run 1 Episode 10 Gap: 0.8933 Reward: -2 Score: 59 Action: Betweenness Bandwidth: 150 Epsilon: -
+2026-11-14 15:41:33,418 | INFO | >> [oracle|random] Run 1 Episode 11 Gap: 0.8788 Reward: 5 Score: 64 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:33,448 | INFO | >> [oracle|random] Run 1 Episode 12 Gap: 0.8760 Reward: 10 Score: 74 Action: Closeness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:33,448 | INFO | Melhor solução atualizada: bandwidth=129 (oracle=Closeness)
+2026-11-14 15:41:33,474 | INFO | >> [oracle|random] Run 1 Episode 13 Gap: 0.8865 Reward: -2 Score: 72 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:33,502 | INFO | >> [oracle|random] Run 1 Episode 14 Gap: 0.8769 Reward: 5 Score: 77 Action: Betweenness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:33,542 | INFO | >> [oracle|random] Run 1 Episode 15 Gap: 0.8865 Reward: -2 Score: 75 Action: Eigenvector Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:33,575 | INFO | >> [oracle|random] Run 1 Episode 16 Gap: 0.8881 Reward: -2 Score: 73 Action: Degree Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:33,601 | INFO | >> [oracle|random] Run 1 Episode 17 Gap: 0.8769 Reward: 5 Score: 78 Action: Closeness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:33,633 | INFO | >> [oracle|random] Run 1 Episode 18 Gap: 0.8806 Reward: -2 Score: 76 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:33,681 | INFO | >> [oracle|random] Run 1 Episode 19 Gap: 0.8857 Reward: -2 Score: 74 Action: Betweenness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:33,715 | INFO | >> [oracle|random] Run 1 Episode 20 Gap: 0.8779 Reward: 5 Score: 79 Action: Closeness Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:33,748 | INFO | >> [oracle|random] Run 1 Episode 21 Gap: 0.8889 Reward: -2 Score: 77 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:33,773 | INFO | >> [oracle|random] Run 1 Episode 22 Gap: 0.8769 Reward: 5 Score: 82 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:33,802 | INFO | >> [oracle|random] Run 1 Episode 23 Gap: 0.8750 Reward: 10 Score: 92 Action: Degree Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:33,803 | INFO | Melhor solução atualizada: bandwidth=128 (oracle=Degree)
+2026-11-14 15:41:33,828 | INFO | >> [oracle|random] Run 1 Episode 24 Gap: 0.8849 Reward: -2 Score: 90 Action: Betweenness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:33,865 | INFO | >> [oracle|random] Run 1 Episode 25 Gap: 0.8797 Reward: 5 Score: 95 Action: Eigenvector Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:33,912 | INFO | >> [oracle|random] Run 1 Episode 26 Gap: 0.8678 Reward: 10 Score: 105 Action: Closeness Bandwidth: 121 Epsilon: -
+2026-11-14 15:41:33,912 | INFO | Melhor solução atualizada: bandwidth=121 (oracle=Closeness)
+2026-11-14 15:41:33,950 | INFO | >> [oracle|random] Run 1 Episode 27 Gap: 0.8769 Reward: -2 Score: 103 Action: Closeness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:33,984 | INFO | >> [oracle|random] Run 1 Episode 28 Gap: 0.8779 Reward: -2 Score: 101 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:34,011 | INFO | >> [oracle|random] Run 1 Episode 29 Gap: 0.8824 Reward: -2 Score: 99 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:34,058 | INFO | >> [oracle|random] Run 1 Episode 30 Gap: 0.8769 Reward: 5 Score: 104 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:34,061 | INFO | Melhor configuração [oracle|random] rodada 1: bandwidth=121; persistida=False
+2026-11-14 15:41:34,117 | INFO | >> [oracle|random] Run 2 Episode 1 Gap: 0.8841 Reward: 10 Score: 10 Action: Betweenness Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:34,117 | INFO | Melhor solução atualizada: bandwidth=138 (oracle=Betweenness)
+2026-11-14 15:41:34,145 | INFO | >> [oracle|random] Run 2 Episode 2 Gap: 0.8779 Reward: 10 Score: 20 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:34,145 | INFO | Melhor solução atualizada: bandwidth=131 (oracle=Degree)
+2026-11-14 15:41:34,171 | INFO | >> [oracle|random] Run 2 Episode 3 Gap: 0.8889 Reward: -2 Score: 18 Action: Degree Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:34,197 | INFO | >> [oracle|random] Run 2 Episode 4 Gap: 0.8824 Reward: 5 Score: 23 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:34,239 | INFO | >> [oracle|random] Run 2 Episode 5 Gap: 0.8806 Reward: 5 Score: 28 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:34,284 | INFO | >> [oracle|random] Run 2 Episode 6 Gap: 0.8815 Reward: -2 Score: 26 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:34,329 | INFO | >> [oracle|random] Run 2 Episode 7 Gap: 0.8961 Reward: -2 Score: 24 Action: Betweenness Bandwidth: 154 Epsilon: -
+2026-11-14 15:41:34,365 | INFO | >> [oracle|random] Run 2 Episode 8 Gap: 0.8806 Reward: 5 Score: 29 Action: Betweenness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:34,411 | INFO | >> [oracle|random] Run 2 Episode 9 Gap: 0.8689 Reward: 10 Score: 39 Action: Degree Bandwidth: 122 Epsilon: -
+2026-11-14 15:41:34,411 | INFO | Melhor solução atualizada: bandwidth=122 (oracle=Degree)
+2026-11-14 15:41:34,441 | INFO | >> [oracle|random] Run 2 Episode 10 Gap: 0.8769 Reward: -2 Score: 37 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:34,467 | INFO | >> [oracle|random] Run 2 Episode 11 Gap: 0.8815 Reward: -2 Score: 35 Action: Closeness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:34,492 | INFO | >> [oracle|random] Run 2 Episode 12 Gap: 0.8815 Reward: 5 Score: 40 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:34,524 | INFO | >> [oracle|random] Run 2 Episode 13 Gap: 0.8824 Reward: -2 Score: 38 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:34,570 | INFO | >> [oracle|random] Run 2 Episode 14 Gap: 0.8750 Reward: 5 Score: 43 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:34,622 | INFO | >> [oracle|random] Run 2 Episode 15 Gap: 0.8740 Reward: 5 Score: 48 Action: Degree Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:34,667 | INFO | >> [oracle|random] Run 2 Episode 16 Gap: 0.8740 Reward: 5 Score: 53 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:34,700 | INFO | >> [oracle|random] Run 2 Episode 17 Gap: 0.8788 Reward: -2 Score: 51 Action: Degree Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:34,747 | INFO | >> [oracle|random] Run 2 Episode 18 Gap: 0.8815 Reward: -2 Score: 49 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:34,777 | INFO | >> [oracle|random] Run 2 Episode 19 Gap: 0.8797 Reward: 5 Score: 54 Action: Betweenness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:34,824 | INFO | >> [oracle|random] Run 2 Episode 20 Gap: 0.8806 Reward: -2 Score: 52 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:34,869 | INFO | >> [oracle|random] Run 2 Episode 21 Gap: 0.8832 Reward: -2 Score: 50 Action: Closeness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:34,898 | INFO | >> [oracle|random] Run 2 Episode 22 Gap: 0.8760 Reward: 5 Score: 55 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:34,924 | INFO | >> [oracle|random] Run 2 Episode 23 Gap: 0.8904 Reward: -2 Score: 53 Action: Closeness Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:34,951 | INFO | >> [oracle|random] Run 2 Episode 24 Gap: 0.8815 Reward: 5 Score: 58 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:34,978 | INFO | >> [oracle|random] Run 2 Episode 25 Gap: 0.8769 Reward: 5 Score: 63 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:35,004 | INFO | >> [oracle|random] Run 2 Episode 26 Gap: 0.8815 Reward: -2 Score: 61 Action: Closeness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:35,046 | INFO | >> [oracle|random] Run 2 Episode 27 Gap: 0.8769 Reward: 5 Score: 66 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:35,094 | INFO | >> [oracle|random] Run 2 Episode 28 Gap: 0.8750 Reward: 5 Score: 71 Action: Degree Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:35,132 | INFO | >> [oracle|random] Run 2 Episode 29 Gap: 0.8933 Reward: -2 Score: 69 Action: Eigenvector Bandwidth: 150 Epsilon: -
+2026-11-14 15:41:35,160 | INFO | >> [oracle|random] Run 2 Episode 30 Gap: 0.8824 Reward: 5 Score: 74 Action: Closeness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:35,162 | INFO | Melhor configuração [oracle|random] rodada 2: bandwidth=122; persistida=False
+2026-11-14 15:41:35,203 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 1 Gap: 0.8897 Reward: 10 Score: 10 Action: Degree Bandwidth: 145 Epsilon: -
+2026-11-14 15:41:35,203 | INFO | Melhor solução atualizada: bandwidth=145 (oracle=Degree)
+2026-11-14 15:41:35,243 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 2 Gap: 0.8769 Reward: 10 Score: 20 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:35,244 | INFO | Melhor solução atualizada: bandwidth=130 (oracle=Degree)
+2026-11-14 15:41:35,291 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 3 Gap: 0.8897 Reward: -2 Score: 18 Action: Degree Bandwidth: 145 Epsilon: -
+2026-11-14 15:41:35,328 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 4 Gap: 0.8779 Reward: 5 Score: 23 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:35,374 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 5 Gap: 0.8881 Reward: -2 Score: 21 Action: Degree Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:35,413 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 6 Gap: 0.8832 Reward: 5 Score: 26 Action: Degree Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:35,442 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 7 Gap: 0.8769 Reward: 10 Score: 36 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:35,470 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 8 Gap: 0.8730 Reward: 10 Score: 46 Action: Degree Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:35,470 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Degree)
+2026-11-14 15:41:35,519 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 9 Gap: 0.8779 Reward: -2 Score: 44 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:35,561 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 10 Gap: 0.8797 Reward: -2 Score: 42 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:35,596 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 11 Gap: 0.8769 Reward: 5 Score: 47 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:35,631 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 12 Gap: 0.8779 Reward: -2 Score: 45 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:35,678 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 13 Gap: 0.8824 Reward: -2 Score: 43 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:35,711 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 14 Gap: 0.8815 Reward: 5 Score: 48 Action: Degree Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:35,738 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 15 Gap: 0.8815 Reward: 5 Score: 53 Action: Degree Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:35,778 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 16 Gap: 0.8710 Reward: 10 Score: 63 Action: Degree Bandwidth: 124 Epsilon: -
+2026-11-14 15:41:35,778 | INFO | Melhor solução atualizada: bandwidth=124 (oracle=Degree)
+2026-11-14 15:41:35,826 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 17 Gap: 0.8769 Reward: -2 Score: 61 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:35,859 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 18 Gap: 0.8841 Reward: -2 Score: 59 Action: Degree Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:35,909 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 19 Gap: 0.8815 Reward: 5 Score: 64 Action: Degree Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:35,950 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 20 Gap: 0.8720 Reward: 5 Score: 69 Action: Degree Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:36,002 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 21 Gap: 0.8841 Reward: -2 Score: 67 Action: Degree Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:36,050 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 22 Gap: 0.8730 Reward: 5 Score: 72 Action: Degree Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:36,087 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 23 Gap: 0.8689 Reward: 10 Score: 82 Action: Degree Bandwidth: 122 Epsilon: -
+2026-11-14 15:41:36,087 | INFO | Melhor solução atualizada: bandwidth=122 (oracle=Degree)
+2026-11-14 15:41:36,114 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 24 Gap: 0.8769 Reward: -2 Score: 80 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:36,142 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 25 Gap: 0.8849 Reward: -2 Score: 78 Action: Degree Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:36,170 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 26 Gap: 0.8750 Reward: 5 Score: 83 Action: Degree Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:36,220 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 27 Gap: 0.8865 Reward: -2 Score: 81 Action: Degree Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:36,268 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 28 Gap: 0.8769 Reward: 5 Score: 86 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:36,320 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 29 Gap: 0.8769 Reward: 5 Score: 91 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:36,368 | INFO | >> [oracle|fixed:Degree] Run 0 Episode 30 Gap: 0.8849 Reward: -2 Score: 89 Action: Degree Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:36,370 | INFO | Melhor configuração [oracle|fixed:Degree] rodada 0: bandwidth=122; persistida=False
+2026-11-14 15:41:36,434 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 1 Gap: 0.8797 Reward: 10 Score: 10 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:36,435 | INFO | Melhor solução atualizada: bandwidth=133 (oracle=Degree)
+2026-11-14 15:41:36,473 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 2 Gap: 0.8968 Reward: -2 Score: 8 Action: Degree Bandwidth: 155 Epsilon: -
+2026-11-14 15:41:36,509 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 3 Gap: 0.8740 Reward: 10 Score: 18 Action: Degree Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:36,509 | INFO | Melhor solução atualizada: bandwidth=127 (oracle=Degree)
+2026-11-14 15:41:36,543 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 4 Gap: 0.8919 Reward: -2 Score: 16 Action: Degree Bandwidth: 148 Epsilon: -
+2026-11-14 15:41:36,580 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 5 Gap: 0.8720 Reward: 10 Score: 26 Action: Degree Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:36,580 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=Degree)
+2026-11-14 15:41:36,626 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 6 Gap: 0.8769 Reward: -2 Score: 24 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:36,671 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 7 Gap: 0.8841 Reward: -2 Score: 22 Action: Degree Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:36,699 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 8 Gap: 0.8824 Reward: 5 Score: 27 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:36,727 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 9 Gap: 0.8857 Reward: -2 Score: 25 Action: Degree Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:36,774 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 10 Gap: 0.8824 Reward: 5 Score: 30 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:36,825 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 11 Gap: 0.8730 Reward: 5 Score: 35 Action: Degree Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:36,855 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 12 Gap: 0.8933 Reward: -2 Score: 33 Action: Degree Bandwidth: 150 Epsilon: -
+2026-11-14 15:41:36,887 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 13 Gap: 0.8881 Reward: 5 Score: 38 Action: Degree Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:36,937 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 14 Gap: 0.8806 Reward: 5 Score: 43 Action: Degree Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:36,966 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 15 Gap: 0.8797 Reward: 5 Score: 48 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:37,001 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 16 Gap: 0.8750 Reward: 5 Score: 53 Action: Degree Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:37,036 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 17 Gap: 0.8824 Reward: -2 Score: 51 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:37,064 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 18 Gap: 0.8750 Reward: 5 Score: 56 Action: Degree Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:37,096 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 19 Gap: 0.8806 Reward: -2 Score: 54 Action: Degree Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:37,133 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 20 Gap: 0.8832 Reward: -2 Score: 52 Action: Degree Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:37,183 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 21 Gap: 0.8779 Reward: 5 Score: 57 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:37,223 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 22 Gap: 0.8841 Reward: -2 Score: 55 Action: Degree Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:37,252 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 23 Gap: 0.8824 Reward: 5 Score: 60 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:37,284 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 24 Gap: 0.8750 Reward: 5 Score: 65 Action: Degree Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:37,337 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 25 Gap: 0.8779 Reward: -2 Score: 63 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:37,372 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 26 Gap: 0.8797 Reward: -2 Score: 61 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:37,413 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 27 Gap: 0.8824 Reward: -2 Score: 59 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:37,466 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 28 Gap: 0.8797 Reward: 5 Score: 64 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:37,546 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 29 Gap: 0.8806 Reward: -2 Score: 62 Action: Degree Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:37,580 | INFO | >> [oracle|fixed:Degree] Run 1 Episode 30 Gap: 0.8849 Reward: -2 Score: 60 Action: Degree Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:37,582 | INFO | Melhor configuração [oracle|fixed:Degree] rodada 1: bandwidth=125; persistida=False
+2026-11-14 15:41:37,626 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 1 Gap: 0.8720 Reward: 10 Score: 10 Action: Degree Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:37,626 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=Degree)
+2026-11-14 15:41:37,657 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 2 Gap: 0.8806 Reward: -2 Score: 8 Action: Degree Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:37,689 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 3 Gap: 0.8779 Reward: 5 Score: 13 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:37,720 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 4 Gap: 0.8760 Reward: 5 Score: 18 Action: Degree Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:37,774 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 5 Gap: 0.8779 Reward: -2 Score: 16 Action: Degree Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:37,821 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 6 Gap: 0.8904 Reward: -2 Score: 14 Action: Degree Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:37,875 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 7 Gap: 0.8815 Reward: 5 Score: 19 Action: Degree Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:37,907 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 8 Gap: 0.8769 Reward: 5 Score: 24 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:37,940 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 9 Gap: 0.8797 Reward: -2 Score: 22 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:37,994 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 10 Gap: 0.8824 Reward: -2 Score: 20 Action: Degree Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:38,044 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 11 Gap: 0.8832 Reward: -2 Score: 18 Action: Degree Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:38,077 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 12 Gap: 0.8760 Reward: 5 Score: 23 Action: Degree Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:38,126 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 13 Gap: 0.8841 Reward: -2 Score: 21 Action: Degree Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:38,175 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 14 Gap: 0.8815 Reward: 5 Score: 26 Action: Degree Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:38,222 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 15 Gap: 0.8740 Reward: 5 Score: 31 Action: Degree Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:38,274 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 16 Gap: 0.8806 Reward: -2 Score: 29 Action: Degree Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:38,308 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 17 Gap: 0.8865 Reward: -2 Score: 27 Action: Degree Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:38,339 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 18 Gap: 0.8730 Reward: 5 Score: 32 Action: Degree Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:38,386 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 19 Gap: 0.8797 Reward: -2 Score: 30 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:38,432 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 20 Gap: 0.8788 Reward: 5 Score: 35 Action: Degree Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:38,479 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 21 Gap: 0.8815 Reward: -2 Score: 33 Action: Degree Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:38,514 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 22 Gap: 0.8769 Reward: 5 Score: 38 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:38,558 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 23 Gap: 0.8815 Reward: -2 Score: 36 Action: Degree Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:38,605 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 24 Gap: 0.8730 Reward: 5 Score: 41 Action: Degree Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:38,632 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 25 Gap: 0.8720 Reward: 10 Score: 51 Action: Degree Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:38,658 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 26 Gap: 0.8987 Reward: -2 Score: 49 Action: Degree Bandwidth: 158 Epsilon: -
+2026-11-14 15:41:38,684 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 27 Gap: 0.8750 Reward: 5 Score: 54 Action: Degree Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:38,714 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 28 Gap: 0.8849 Reward: -2 Score: 52 Action: Degree Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:38,743 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 29 Gap: 0.8769 Reward: 5 Score: 57 Action: Degree Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:38,783 | INFO | >> [oracle|fixed:Degree] Run 2 Episode 30 Gap: 0.8797 Reward: -2 Score: 55 Action: Degree Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:38,785 | INFO | Melhor configuração [oracle|fixed:Degree] rodada 2: bandwidth=125; persistida=False
+2026-11-14 15:41:38,833 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 1 Gap: 0.8760 Reward: 10 Score: 10 Action: Closeness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:38,834 | INFO | Melhor solução atualizada: bandwidth=129 (oracle=Closeness)
+2026-11-14 15:41:38,880 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 2 Gap: 0.8779 Reward: -2 Score: 8 Action: Closeness Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:38,916 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 3 Gap: 0.8815 Reward: -2 Score: 6 Action: Closeness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:38,943 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 4 Gap: 0.8857 Reward: -2 Score: 4 Action: Closeness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:38,974 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 5 Gap: 0.8832 Reward: 5 Score: 9 Action: Closeness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:39,000 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 6 Gap: 0.8689 Reward: 10 Score: 19 Action: Closeness Bandwidth: 122 Epsilon: -
+2026-11-14 15:41:39,000 | INFO | Melhor solução atualizada: bandwidth=122 (oracle=Closeness)
+2026-11-14 15:41:39,027 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 7 Gap: 0.8832 Reward: -2 Score: 17 Action: Closeness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:39,054 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 8 Gap: 0.8730 Reward: 5 Score: 22 Action: Closeness Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:39,102 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 9 Gap: 0.8841 Reward: -2 Score: 20 Action: Closeness Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:39,129 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 10 Gap: 0.8788 Reward: 5 Score: 25 Action: Closeness Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:39,154 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 11 Gap: 0.8740 Reward: 5 Score: 30 Action: Closeness Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:39,183 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 12 Gap: 0.8788 Reward: -2 Score: 28 Action: Closeness Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:39,231 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 13 Gap: 0.8824 Reward: -2 Score: 26 Action: Closeness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:39,264 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 14 Gap: 0.8689 Reward: 10 Score: 36 Action: Closeness Bandwidth: 122 Epsilon: -
+2026-11-14 15:41:39,288 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 15 Gap: 0.8881 Reward: -2 Score: 34 Action: Closeness Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:39,313 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 16 Gap: 0.8689 Reward: 10 Score: 44 Action: Closeness Bandwidth: 122 Epsilon: -
+2026-11-14 15:41:39,340 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 17 Gap: 0.8849 Reward: -2 Score: 42 Action: Closeness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:39,380 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 18 Gap: 0.8779 Reward: 5 Score: 47 Action: Closeness Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:39,426 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 19 Gap: 0.8919 Reward: -2 Score: 45 Action: Closeness Bandwidth: 148 Epsilon: -
+2026-11-14 15:41:39,469 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 20 Gap: 0.8865 Reward: 5 Score: 50 Action: Closeness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:39,515 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 21 Gap: 0.8750 Reward: 5 Score: 55 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:39,551 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 22 Gap: 0.8912 Reward: -2 Score: 53 Action: Closeness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:39,586 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 23 Gap: 0.8797 Reward: 5 Score: 58 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:39,636 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 24 Gap: 0.8961 Reward: -2 Score: 56 Action: Closeness Bandwidth: 154 Epsilon: -
+2026-11-14 15:41:39,685 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 25 Gap: 0.8750 Reward: 5 Score: 61 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:39,732 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 26 Gap: 0.8824 Reward: -2 Score: 59 Action: Closeness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:39,763 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 27 Gap: 0.8720 Reward: 5 Score: 64 Action: Closeness Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:39,803 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 28 Gap: 0.8797 Reward: -2 Score: 62 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:39,831 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 29 Gap: 0.8832 Reward: -2 Score: 60 Action: Closeness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:39,881 | INFO | >> [oracle|fixed:Closeness] Run 0 Episode 30 Gap: 0.8750 Reward: 5 Score: 65 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:39,884 | INFO | Melhor configuração [oracle|fixed:Closeness] rodada 0: bandwidth=122; persistida=False
+2026-11-14 15:41:39,941 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 1 Gap: 0.8912 Reward: 10 Score: 10 Action: Closeness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:39,941 | INFO | Melhor solução atualizada: bandwidth=147 (oracle=Closeness)
+2026-11-14 15:41:39,994 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 2 Gap: 0.8873 Reward: 10 Score: 20 Action: Closeness Bandwidth: 142 Epsilon: -
+2026-11-14 15:41:39,994 | INFO | Melhor solução atualizada: bandwidth=142 (oracle=Closeness)
+2026-11-14 15:41:40,044 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 3 Gap: 0.8797 Reward: 10 Score: 30 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:40,044 | INFO | Melhor solução atualizada: bandwidth=133 (oracle=Closeness)
+2026-11-14 15:41:40,095 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 4 Gap: 0.8730 Reward: 10 Score: 40 Action: Closeness Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:40,095 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Closeness)
+2026-11-14 15:41:40,124 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 5 Gap: 0.8760 Reward: -2 Score: 38 Action: Closeness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:40,158 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 6 Gap: 0.8806 Reward: -2 Score: 36 Action: Closeness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:40,208 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 7 Gap: 0.8797 Reward: 5 Score: 41 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:40,256 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 8 Gap: 0.8841 Reward: -2 Score: 39 Action: Closeness Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:40,283 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 9 Gap: 0.8797 Reward: 5 Score: 44 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:40,310 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 10 Gap: 0.8730 Reward: 10 Score: 54 Action: Closeness Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:40,355 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 11 Gap: 0.8824 Reward: -2 Score: 52 Action: Closeness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:40,387 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 12 Gap: 0.8797 Reward: 5 Score: 57 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:40,425 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 13 Gap: 0.8710 Reward: 10 Score: 67 Action: Closeness Bandwidth: 124 Epsilon: -
+2026-11-14 15:41:40,426 | INFO | Melhor solução atualizada: bandwidth=124 (oracle=Closeness)
+2026-11-14 15:41:40,453 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 14 Gap: 0.8849 Reward: -2 Score: 65 Action: Closeness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:40,500 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 15 Gap: 0.8857 Reward: -2 Score: 63 Action: Closeness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:40,554 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 16 Gap: 0.8769 Reward: 5 Score: 68 Action: Closeness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:40,597 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 17 Gap: 0.8832 Reward: -2 Score: 66 Action: Closeness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:40,633 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 18 Gap: 0.8750 Reward: 5 Score: 71 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:40,692 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 19 Gap: 0.8806 Reward: -2 Score: 69 Action: Closeness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:40,744 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 20 Gap: 0.8740 Reward: 5 Score: 74 Action: Closeness Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:40,790 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 21 Gap: 0.8904 Reward: -2 Score: 72 Action: Closeness Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:40,828 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 22 Gap: 0.8797 Reward: 5 Score: 77 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:40,860 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 23 Gap: 0.8881 Reward: -2 Score: 75 Action: Closeness Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:40,899 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 24 Gap: 0.8760 Reward: 5 Score: 80 Action: Closeness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:40,930 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 25 Gap: 0.8760 Reward: 5 Score: 85 Action: Closeness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:40,982 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 26 Gap: 0.8797 Reward: -2 Score: 83 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:41,026 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 27 Gap: 0.8750 Reward: 5 Score: 88 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:41,070 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 28 Gap: 0.8968 Reward: -2 Score: 86 Action: Closeness Bandwidth: 155 Epsilon: -
+2026-11-14 15:41:41,103 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 29 Gap: 0.8815 Reward: 5 Score: 91 Action: Closeness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:41,143 | INFO | >> [oracle|fixed:Closeness] Run 1 Episode 30 Gap: 0.8797 Reward: 5 Score: 96 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:41,145 | INFO | Melhor configuração [oracle|fixed:Closeness] rodada 1: bandwidth=124; persistida=False
+2026-11-14 15:41:41,203 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 1 Gap: 0.8769 Reward: 10 Score: 10 Action: Closeness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:41,203 | INFO | Melhor solução atualizada: bandwidth=130 (oracle=Closeness)
+2026-11-14 15:41:41,247 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 2 Gap: 0.8849 Reward: -2 Score: 8 Action: Closeness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:41,276 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 3 Gap: 0.8912 Reward: -2 Score: 6 Action: Closeness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:41,318 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 4 Gap: 0.8824 Reward: 5 Score: 11 Action: Closeness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:41,371 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 5 Gap: 0.8760 Reward: 10 Score: 21 Action: Closeness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:41,371 | INFO | Melhor solução atualizada: bandwidth=129 (oracle=Closeness)
+2026-11-14 15:41:41,422 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 6 Gap: 0.8832 Reward: -2 Score: 19 Action: Closeness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:41,464 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 7 Gap: 0.8769 Reward: 5 Score: 24 Action: Closeness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:41,516 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 8 Gap: 0.8750 Reward: 10 Score: 34 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:41,516 | INFO | Melhor solução atualizada: bandwidth=128 (oracle=Closeness)
+2026-11-14 15:41:41,558 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 9 Gap: 0.8881 Reward: -2 Score: 32 Action: Closeness Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:41,605 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 10 Gap: 0.8730 Reward: 10 Score: 42 Action: Closeness Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:41,605 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Closeness)
+2026-11-14 15:41:41,646 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 11 Gap: 0.8815 Reward: -2 Score: 40 Action: Closeness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:41,680 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 12 Gap: 0.8857 Reward: -2 Score: 38 Action: Closeness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:41,731 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 13 Gap: 0.8797 Reward: 5 Score: 43 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:41,784 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 14 Gap: 0.8926 Reward: -2 Score: 41 Action: Closeness Bandwidth: 149 Epsilon: -
+2026-11-14 15:41:41,822 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 15 Gap: 0.8857 Reward: 5 Score: 46 Action: Closeness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:41,851 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 16 Gap: 0.8815 Reward: 5 Score: 51 Action: Closeness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:41,880 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 17 Gap: 0.8849 Reward: -2 Score: 49 Action: Closeness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:41,909 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 18 Gap: 0.8797 Reward: 5 Score: 54 Action: Closeness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:41,943 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 19 Gap: 0.8678 Reward: 10 Score: 64 Action: Closeness Bandwidth: 121 Epsilon: -
+2026-11-14 15:41:41,944 | INFO | Melhor solução atualizada: bandwidth=121 (oracle=Closeness)
+2026-11-14 15:41:41,994 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 20 Gap: 0.8849 Reward: -2 Score: 62 Action: Closeness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:42,042 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 21 Gap: 0.8865 Reward: -2 Score: 60 Action: Closeness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:42,072 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 22 Gap: 0.8865 Reward: 5 Score: 65 Action: Closeness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:42,116 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 23 Gap: 0.8699 Reward: 5 Score: 70 Action: Closeness Bandwidth: 123 Epsilon: -
+2026-11-14 15:41:42,146 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 24 Gap: 0.8788 Reward: -2 Score: 68 Action: Closeness Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:42,189 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 25 Gap: 0.8750 Reward: 5 Score: 73 Action: Closeness Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:42,241 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 26 Gap: 0.8815 Reward: -2 Score: 71 Action: Closeness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:42,277 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 27 Gap: 0.8824 Reward: -2 Score: 69 Action: Closeness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:42,308 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 28 Gap: 0.8881 Reward: -2 Score: 67 Action: Closeness Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:42,361 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 29 Gap: 0.8841 Reward: 5 Score: 72 Action: Closeness Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:42,407 | INFO | >> [oracle|fixed:Closeness] Run 2 Episode 30 Gap: 0.8760 Reward: 5 Score: 77 Action: Closeness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:42,409 | INFO | Melhor configuração [oracle|fixed:Closeness] rodada 2: bandwidth=121; persistida=False
+2026-11-14 15:41:42,450 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 1 Gap: 0.8974 Reward: 10 Score: 10 Action: Betweenness Bandwidth: 156 Epsilon: -
+2026-11-14 15:41:42,450 | INFO | Melhor solução atualizada: bandwidth=156 (oracle=Betweenness)
+2026-11-14 15:41:42,491 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 2 Gap: 0.8824 Reward: 10 Score: 20 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:42,491 | INFO | Melhor solução atualizada: bandwidth=136 (oracle=Betweenness)
+2026-11-14 15:41:42,528 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 3 Gap: 0.8730 Reward: 10 Score: 30 Action: Betweenness Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:42,528 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Betweenness)
+2026-11-14 15:41:42,571 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 4 Gap: 0.8740 Reward: -2 Score: 28 Action: Betweenness Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:42,601 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 5 Gap: 0.8865 Reward: -2 Score: 26 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:42,629 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 6 Gap: 0.8760 Reward: 5 Score: 31 Action: Betweenness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:42,660 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 7 Gap: 0.8730 Reward: 10 Score: 41 Action: Betweenness Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:42,690 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 8 Gap: 0.8779 Reward: -2 Score: 39 Action: Betweenness Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:42,734 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 9 Gap: 0.8865 Reward: -2 Score: 37 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:42,784 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 10 Gap: 0.8806 Reward: 5 Score: 42 Action: Betweenness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:42,829 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 11 Gap: 0.8889 Reward: -2 Score: 40 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:42,878 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 12 Gap: 0.8832 Reward: 5 Score: 45 Action: Betweenness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:42,913 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 13 Gap: 0.8797 Reward: 5 Score: 50 Action: Betweenness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:42,960 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 14 Gap: 0.8926 Reward: -2 Score: 48 Action: Betweenness Bandwidth: 149 Epsilon: -
+2026-11-14 15:41:43,008 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 15 Gap: 0.8779 Reward: 5 Score: 53 Action: Betweenness Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:43,055 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 16 Gap: 0.8849 Reward: -2 Score: 51 Action: Betweenness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:43,090 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 17 Gap: 0.8824 Reward: 5 Score: 56 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:43,140 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 18 Gap: 0.9012 Reward: -2 Score: 54 Action: Betweenness Bandwidth: 162 Epsilon: -
+2026-11-14 15:41:43,167 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 19 Gap: 0.8933 Reward: 5 Score: 59 Action: Betweenness Bandwidth: 150 Epsilon: -
+2026-11-14 15:41:43,210 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 20 Gap: 0.8824 Reward: 5 Score: 64 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:43,243 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 21 Gap: 0.8797 Reward: 5 Score: 69 Action: Betweenness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:43,289 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 22 Gap: 0.8968 Reward: -2 Score: 67 Action: Betweenness Bandwidth: 155 Epsilon: -
+2026-11-14 15:41:43,340 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 23 Gap: 0.8889 Reward: 5 Score: 72 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:43,389 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 24 Gap: 0.8873 Reward: 5 Score: 77 Action: Betweenness Bandwidth: 142 Epsilon: -
+2026-11-14 15:41:43,437 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 25 Gap: 0.8933 Reward: -2 Score: 75 Action: Betweenness Bandwidth: 150 Epsilon: -
+2026-11-14 15:41:43,477 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 26 Gap: 0.8889 Reward: 5 Score: 80 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:43,517 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 27 Gap: 0.8865 Reward: 5 Score: 85 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:43,550 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 28 Gap: 0.8849 Reward: 5 Score: 90 Action: Betweenness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:43,595 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 29 Gap: 0.8806 Reward: 5 Score: 95 Action: Betweenness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:43,638 | INFO | >> [oracle|fixed:Betweenness] Run 0 Episode 30 Gap: 0.8974 Reward: -2 Score: 93 Action: Betweenness Bandwidth: 156 Epsilon: -
+2026-11-14 15:41:43,639 | INFO | Melhor configuração [oracle|fixed:Betweenness] rodada 0: bandwidth=126; persistida=False
+2026-11-14 15:41:43,683 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 1 Gap: 0.8806 Reward: 10 Score: 10 Action: Betweenness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:43,683 | INFO | Melhor solução atualizada: bandwidth=134 (oracle=Betweenness)
+2026-11-14 15:41:43,733 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 2 Gap: 0.8824 Reward: -2 Score: 8 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:43,775 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 3 Gap: 0.8815 Reward: 5 Score: 13 Action: Betweenness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:43,813 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 4 Gap: 0.8981 Reward: -2 Score: 11 Action: Betweenness Bandwidth: 157 Epsilon: -
+2026-11-14 15:41:43,846 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 5 Gap: 0.8740 Reward: 10 Score: 21 Action: Betweenness Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:43,846 | INFO | Melhor solução atualizada: bandwidth=127 (oracle=Betweenness)
+2026-11-14 15:41:43,878 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 6 Gap: 0.8873 Reward: -2 Score: 19 Action: Betweenness Bandwidth: 142 Epsilon: -
+2026-11-14 15:41:43,908 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 7 Gap: 0.8904 Reward: -2 Score: 17 Action: Betweenness Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:43,935 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 8 Gap: 0.8865 Reward: 5 Score: 22 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:43,962 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 9 Gap: 0.8824 Reward: 5 Score: 27 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:43,999 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 10 Gap: 0.8769 Reward: 5 Score: 32 Action: Betweenness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:44,049 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 11 Gap: 0.8730 Reward: 10 Score: 42 Action: Betweenness Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:44,049 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Betweenness)
+2026-11-14 15:41:44,099 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 12 Gap: 0.8769 Reward: -2 Score: 40 Action: Betweenness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:44,140 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 13 Gap: 0.8710 Reward: 10 Score: 50 Action: Betweenness Bandwidth: 124 Epsilon: -
+2026-11-14 15:41:44,141 | INFO | Melhor solução atualizada: bandwidth=124 (oracle=Betweenness)
+2026-11-14 15:41:44,176 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 14 Gap: 0.8897 Reward: -2 Score: 48 Action: Betweenness Bandwidth: 145 Epsilon: -
+2026-11-14 15:41:44,219 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 15 Gap: 0.8904 Reward: -2 Score: 46 Action: Betweenness Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:44,265 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 16 Gap: 0.9012 Reward: -2 Score: 44 Action: Betweenness Bandwidth: 162 Epsilon: -
+2026-11-14 15:41:44,294 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 17 Gap: 0.8769 Reward: 5 Score: 49 Action: Betweenness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:44,319 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 18 Gap: 0.8832 Reward: -2 Score: 47 Action: Betweenness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:44,365 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 19 Gap: 0.8788 Reward: 5 Score: 52 Action: Betweenness Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:44,410 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 20 Gap: 0.8865 Reward: -2 Score: 50 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:44,435 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 21 Gap: 0.8904 Reward: -2 Score: 48 Action: Betweenness Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:44,461 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 22 Gap: 0.8815 Reward: 5 Score: 53 Action: Betweenness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:44,490 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 23 Gap: 0.8865 Reward: -2 Score: 51 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:44,530 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 24 Gap: 0.8873 Reward: -2 Score: 49 Action: Betweenness Bandwidth: 142 Epsilon: -
+2026-11-14 15:41:44,558 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 25 Gap: 0.8806 Reward: 5 Score: 54 Action: Betweenness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:44,591 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 26 Gap: 0.8865 Reward: -2 Score: 52 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:44,634 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 27 Gap: 0.8849 Reward: 5 Score: 57 Action: Betweenness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:44,680 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 28 Gap: 0.8779 Reward: 5 Score: 62 Action: Betweenness Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:44,709 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 29 Gap: 0.8797 Reward: -2 Score: 60 Action: Betweenness Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:44,735 | INFO | >> [oracle|fixed:Betweenness] Run 1 Episode 30 Gap: 0.8769 Reward: 5 Score: 65 Action: Betweenness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:44,737 | INFO | Melhor configuração [oracle|fixed:Betweenness] rodada 1: bandwidth=124; persistida=False
+2026-11-14 15:41:44,777 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 1 Gap: 0.8841 Reward: 10 Score: 10 Action: Betweenness Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:44,777 | INFO | Melhor solução atualizada: bandwidth=138 (oracle=Betweenness)
+2026-11-14 15:41:44,812 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 2 Gap: 0.8857 Reward: -2 Score: 8 Action: Betweenness Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:44,855 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 3 Gap: 0.8904 Reward: -2 Score: 6 Action: Betweenness Bandwidth: 146 Epsilon: -
+2026-11-14 15:41:44,902 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 4 Gap: 0.8889 Reward: 5 Score: 11 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:44,932 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 5 Gap: 0.8760 Reward: 10 Score: 21 Action: Betweenness Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:44,932 | INFO | Melhor solução atualizada: bandwidth=129 (oracle=Betweenness)
+2026-11-14 15:41:44,966 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 6 Gap: 0.8740 Reward: 10 Score: 31 Action: Betweenness Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:44,967 | INFO | Melhor solução atualizada: bandwidth=127 (oracle=Betweenness)
+2026-11-14 15:41:45,014 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 7 Gap: 0.8881 Reward: -2 Score: 29 Action: Betweenness Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:45,060 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 8 Gap: 0.8806 Reward: 5 Score: 34 Action: Betweenness Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:45,097 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 9 Gap: 0.8897 Reward: -2 Score: 32 Action: Betweenness Bandwidth: 145 Epsilon: -
+2026-11-14 15:41:45,122 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 10 Gap: 0.8865 Reward: 5 Score: 37 Action: Betweenness Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:45,149 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 11 Gap: 0.8769 Reward: 5 Score: 42 Action: Betweenness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:45,177 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 12 Gap: 0.8832 Reward: -2 Score: 40 Action: Betweenness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:45,208 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 13 Gap: 0.8873 Reward: -2 Score: 38 Action: Betweenness Bandwidth: 142 Epsilon: -
+2026-11-14 15:41:45,256 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 14 Gap: 0.8889 Reward: -2 Score: 36 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:45,294 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 15 Gap: 0.8912 Reward: -2 Score: 34 Action: Betweenness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:45,322 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 16 Gap: 0.8769 Reward: 5 Score: 39 Action: Betweenness Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:45,350 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 17 Gap: 0.8815 Reward: -2 Score: 37 Action: Betweenness Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:45,394 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 18 Gap: 0.8919 Reward: -2 Score: 35 Action: Betweenness Bandwidth: 148 Epsilon: -
+2026-11-14 15:41:45,421 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 19 Gap: 0.8912 Reward: 5 Score: 40 Action: Betweenness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:45,447 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 20 Gap: 0.8779 Reward: 5 Score: 45 Action: Betweenness Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:45,473 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 21 Gap: 0.8824 Reward: -2 Score: 43 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:45,506 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 22 Gap: 0.8954 Reward: -2 Score: 41 Action: Betweenness Bandwidth: 153 Epsilon: -
+2026-11-14 15:41:45,554 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 23 Gap: 0.8912 Reward: 5 Score: 46 Action: Betweenness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:45,594 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 24 Gap: 0.8933 Reward: -2 Score: 44 Action: Betweenness Bandwidth: 150 Epsilon: -
+2026-11-14 15:41:45,672 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 25 Gap: 0.8824 Reward: 5 Score: 49 Action: Betweenness Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:45,722 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 26 Gap: 0.8912 Reward: -2 Score: 47 Action: Betweenness Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:45,761 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 27 Gap: 0.8889 Reward: 5 Score: 52 Action: Betweenness Bandwidth: 144 Epsilon: -
+2026-11-14 15:41:45,792 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 28 Gap: 0.8849 Reward: 5 Score: 57 Action: Betweenness Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:45,845 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 29 Gap: 0.8832 Reward: 5 Score: 62 Action: Betweenness Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:45,891 | INFO | >> [oracle|fixed:Betweenness] Run 2 Episode 30 Gap: 0.8919 Reward: -2 Score: 60 Action: Betweenness Bandwidth: 148 Epsilon: -
+2026-11-14 15:41:45,893 | INFO | Melhor configuração [oracle|fixed:Betweenness] rodada 2: bandwidth=127; persistida=False
+2026-11-14 15:41:45,935 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 1 Gap: 0.8720 Reward: 10 Score: 10 Action: Eigenvector Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:45,936 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=Eigenvector)
+2026-11-14 15:41:45,973 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 2 Gap: 0.8806 Reward: -2 Score: 8 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:46,024 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 3 Gap: 0.8769 Reward: 5 Score: 13 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:46,058 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 4 Gap: 0.8841 Reward: -2 Score: 11 Action: Eigenvector Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:46,103 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 5 Gap: 0.8740 Reward: 5 Score: 16 Action: Eigenvector Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:46,151 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 6 Gap: 0.8788 Reward: -2 Score: 14 Action: Eigenvector Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:46,192 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 7 Gap: 0.8740 Reward: 5 Score: 19 Action: Eigenvector Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:46,234 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 8 Gap: 0.8750 Reward: -2 Score: 17 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:46,261 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 9 Gap: 0.8750 Reward: 5 Score: 22 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:46,290 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 10 Gap: 0.8806 Reward: -2 Score: 20 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:46,326 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 11 Gap: 0.8750 Reward: 5 Score: 25 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:46,366 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 12 Gap: 0.8841 Reward: -2 Score: 23 Action: Eigenvector Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:46,415 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 13 Gap: 0.8769 Reward: 5 Score: 28 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:46,448 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 14 Gap: 0.8720 Reward: 10 Score: 38 Action: Eigenvector Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:46,474 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 15 Gap: 0.8797 Reward: -2 Score: 36 Action: Eigenvector Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:46,505 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 16 Gap: 0.8797 Reward: 5 Score: 41 Action: Eigenvector Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:46,554 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 17 Gap: 0.8806 Reward: -2 Score: 39 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:46,594 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 18 Gap: 0.8760 Reward: 5 Score: 44 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:46,633 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 19 Gap: 0.8740 Reward: 5 Score: 49 Action: Eigenvector Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:46,663 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 20 Gap: 0.8815 Reward: -2 Score: 47 Action: Eigenvector Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:46,691 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 21 Gap: 0.8788 Reward: 5 Score: 52 Action: Eigenvector Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:46,733 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 22 Gap: 0.8769 Reward: 5 Score: 57 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:46,769 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 23 Gap: 0.8824 Reward: -2 Score: 55 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:46,807 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 24 Gap: 0.8832 Reward: -2 Score: 53 Action: Eigenvector Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:46,844 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 25 Gap: 0.8824 Reward: 5 Score: 58 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:46,890 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 26 Gap: 0.8797 Reward: 5 Score: 63 Action: Eigenvector Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:46,929 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 27 Gap: 0.8841 Reward: -2 Score: 61 Action: Eigenvector Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:46,957 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 28 Gap: 0.8857 Reward: -2 Score: 59 Action: Eigenvector Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:47,004 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 29 Gap: 0.8760 Reward: 5 Score: 64 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:47,056 | INFO | >> [oracle|fixed:Eigenvector] Run 0 Episode 30 Gap: 0.8769 Reward: -2 Score: 62 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:47,058 | INFO | Melhor configuração [oracle|fixed:Eigenvector] rodada 0: bandwidth=125; persistida=False
+2026-11-14 15:41:47,094 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 1 Gap: 0.8881 Reward: 10 Score: 10 Action: Eigenvector Bandwidth: 143 Epsilon: -
+2026-11-14 15:41:47,094 | INFO | Melhor solução atualizada: bandwidth=143 (oracle=Eigenvector)
+2026-11-14 15:41:47,138 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 2 Gap: 0.8779 Reward: 10 Score: 20 Action: Eigenvector Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:47,138 | INFO | Melhor solução atualizada: bandwidth=131 (oracle=Eigenvector)
+2026-11-14 15:41:47,165 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 3 Gap: 0.8769 Reward: 10 Score: 30 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:47,165 | INFO | Melhor solução atualizada: bandwidth=130 (oracle=Eigenvector)
+2026-11-14 15:41:47,192 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 4 Gap: 0.8841 Reward: -2 Score: 28 Action: Eigenvector Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:47,220 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 5 Gap: 0.8760 Reward: 10 Score: 38 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:47,220 | INFO | Melhor solução atualizada: bandwidth=129 (oracle=Eigenvector)
+2026-11-14 15:41:47,245 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 6 Gap: 0.8779 Reward: -2 Score: 36 Action: Eigenvector Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:47,288 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 7 Gap: 0.8769 Reward: 5 Score: 41 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:47,322 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 8 Gap: 0.8824 Reward: -2 Score: 39 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:47,370 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 9 Gap: 0.8769 Reward: 5 Score: 44 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:47,410 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 10 Gap: 0.8750 Reward: 10 Score: 54 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:47,410 | INFO | Melhor solução atualizada: bandwidth=128 (oracle=Eigenvector)
+2026-11-14 15:41:47,454 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 11 Gap: 0.8788 Reward: -2 Score: 52 Action: Eigenvector Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:47,484 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 12 Gap: 0.8968 Reward: -2 Score: 50 Action: Eigenvector Bandwidth: 155 Epsilon: -
+2026-11-14 15:41:47,531 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 13 Gap: 0.8841 Reward: 5 Score: 55 Action: Eigenvector Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:47,579 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 14 Gap: 0.8730 Reward: 10 Score: 65 Action: Eigenvector Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:47,580 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Eigenvector)
+2026-11-14 15:41:47,622 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 15 Gap: 0.8815 Reward: -2 Score: 63 Action: Eigenvector Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:47,659 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 16 Gap: 0.8750 Reward: 5 Score: 68 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:47,707 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 17 Gap: 0.8832 Reward: -2 Score: 66 Action: Eigenvector Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:47,740 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 18 Gap: 0.8806 Reward: 5 Score: 71 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:47,767 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 19 Gap: 0.8769 Reward: 5 Score: 76 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:47,810 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 20 Gap: 0.8760 Reward: 5 Score: 81 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:47,847 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 21 Gap: 0.8897 Reward: -2 Score: 79 Action: Eigenvector Bandwidth: 145 Epsilon: -
+2026-11-14 15:41:47,897 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 22 Gap: 0.8740 Reward: 5 Score: 84 Action: Eigenvector Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:47,941 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 23 Gap: 0.8865 Reward: -2 Score: 82 Action: Eigenvector Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:47,972 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 24 Gap: 0.8760 Reward: 5 Score: 87 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:48,014 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 25 Gap: 0.8720 Reward: 10 Score: 97 Action: Eigenvector Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:48,014 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=Eigenvector)
+2026-11-14 15:41:48,040 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 26 Gap: 0.8815 Reward: -2 Score: 95 Action: Eigenvector Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:48,067 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 27 Gap: 0.8750 Reward: 5 Score: 100 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:48,112 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 28 Gap: 0.8865 Reward: -2 Score: 98 Action: Eigenvector Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:48,156 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 29 Gap: 0.8815 Reward: 5 Score: 103 Action: Eigenvector Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:48,182 | INFO | >> [oracle|fixed:Eigenvector] Run 1 Episode 30 Gap: 0.8824 Reward: -2 Score: 101 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:48,184 | INFO | Melhor configuração [oracle|fixed:Eigenvector] rodada 1: bandwidth=125; persistida=False
+2026-11-14 15:41:48,231 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 1 Gap: 0.8815 Reward: 10 Score: 10 Action: Eigenvector Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:48,231 | INFO | Melhor solução atualizada: bandwidth=135 (oracle=Eigenvector)
+2026-11-14 15:41:48,270 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 2 Gap: 0.8760 Reward: 10 Score: 20 Action: Eigenvector Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:48,270 | INFO | Melhor solução atualizada: bandwidth=129 (oracle=Eigenvector)
+2026-11-14 15:41:48,317 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 3 Gap: 0.8797 Reward: -2 Score: 18 Action: Eigenvector Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:48,354 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 4 Gap: 0.8779 Reward: 5 Score: 23 Action: Eigenvector Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:48,404 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 5 Gap: 0.8769 Reward: 5 Score: 28 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:48,448 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 6 Gap: 0.8750 Reward: 10 Score: 38 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:48,448 | INFO | Melhor solução atualizada: bandwidth=128 (oracle=Eigenvector)
+2026-11-14 15:41:48,476 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 7 Gap: 0.8824 Reward: -2 Score: 36 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:48,509 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 8 Gap: 0.8897 Reward: -2 Score: 34 Action: Eigenvector Bandwidth: 145 Epsilon: -
+2026-11-14 15:41:48,560 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 9 Gap: 0.8832 Reward: 5 Score: 39 Action: Eigenvector Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:48,605 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 10 Gap: 0.8788 Reward: 5 Score: 44 Action: Eigenvector Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:48,655 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 11 Gap: 0.8740 Reward: 10 Score: 54 Action: Eigenvector Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:48,655 | INFO | Melhor solução atualizada: bandwidth=127 (oracle=Eigenvector)
+2026-11-14 15:41:48,698 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 12 Gap: 0.8919 Reward: -2 Score: 52 Action: Eigenvector Bandwidth: 148 Epsilon: -
+2026-11-14 15:41:48,746 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 13 Gap: 0.8797 Reward: 5 Score: 57 Action: Eigenvector Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:48,786 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 14 Gap: 0.8933 Reward: -2 Score: 55 Action: Eigenvector Bandwidth: 150 Epsilon: -
+2026-11-14 15:41:48,816 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 15 Gap: 0.8806 Reward: 5 Score: 60 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:48,842 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 16 Gap: 0.8730 Reward: 10 Score: 70 Action: Eigenvector Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:48,842 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=Eigenvector)
+2026-11-14 15:41:48,873 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 17 Gap: 0.8740 Reward: -2 Score: 68 Action: Eigenvector Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:48,920 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 18 Gap: 0.8689 Reward: 10 Score: 78 Action: Eigenvector Bandwidth: 122 Epsilon: -
+2026-11-14 15:41:48,920 | INFO | Melhor solução atualizada: bandwidth=122 (oracle=Eigenvector)
+2026-11-14 15:41:48,957 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 19 Gap: 0.8981 Reward: -2 Score: 76 Action: Eigenvector Bandwidth: 157 Epsilon: -
+2026-11-14 15:41:48,998 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 20 Gap: 0.8769 Reward: 5 Score: 81 Action: Eigenvector Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:49,034 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 21 Gap: 0.8865 Reward: -2 Score: 79 Action: Eigenvector Bandwidth: 141 Epsilon: -
+2026-11-14 15:41:49,071 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 22 Gap: 0.8806 Reward: 5 Score: 84 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:49,096 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 23 Gap: 0.8824 Reward: -2 Score: 82 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:49,121 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 24 Gap: 0.8841 Reward: -2 Score: 80 Action: Eigenvector Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:49,147 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 25 Gap: 0.8740 Reward: 5 Score: 85 Action: Eigenvector Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:49,174 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 26 Gap: 0.8750 Reward: -2 Score: 83 Action: Eigenvector Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:49,213 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 27 Gap: 0.8824 Reward: -2 Score: 81 Action: Eigenvector Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:49,244 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 28 Gap: 0.8689 Reward: 10 Score: 91 Action: Eigenvector Bandwidth: 122 Epsilon: -
+2026-11-14 15:41:49,290 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 29 Gap: 0.8857 Reward: -2 Score: 89 Action: Eigenvector Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:49,324 | INFO | >> [oracle|fixed:Eigenvector] Run 2 Episode 30 Gap: 0.8806 Reward: 5 Score: 94 Action: Eigenvector Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:49,326 | INFO | Melhor configuração [oracle|fixed:Eigenvector] rodada 2: bandwidth=122; persistida=False
+2026-11-14 15:41:49,361 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 1 Gap: 0.8730 Reward: 10 Score: 10 Action: PageRank Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:49,361 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=PageRank)
+2026-11-14 15:41:49,408 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 2 Gap: 0.8769 Reward: -2 Score: 8 Action: PageRank Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:49,445 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 3 Gap: 0.8954 Reward: -2 Score: 6 Action: PageRank Bandwidth: 153 Epsilon: -
+2026-11-14 15:41:49,473 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 4 Gap: 0.8779 Reward: 5 Score: 11 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:49,503 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 5 Gap: 0.8815 Reward: -2 Score: 9 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:49,535 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 6 Gap: 0.8806 Reward: 5 Score: 14 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:49,575 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 7 Gap: 0.8740 Reward: 5 Score: 19 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:49,611 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 8 Gap: 0.8769 Reward: -2 Score: 17 Action: PageRank Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:49,655 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 9 Gap: 0.8832 Reward: -2 Score: 15 Action: PageRank Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:49,702 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 10 Gap: 0.8788 Reward: 5 Score: 20 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:49,749 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 11 Gap: 0.8740 Reward: 5 Score: 25 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:49,787 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 12 Gap: 0.8841 Reward: -2 Score: 23 Action: PageRank Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:49,838 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 13 Gap: 0.8788 Reward: 5 Score: 28 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:49,885 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 14 Gap: 0.8760 Reward: 5 Score: 33 Action: PageRank Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:49,921 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 15 Gap: 0.8947 Reward: -2 Score: 31 Action: PageRank Bandwidth: 152 Epsilon: -
+2026-11-14 15:41:49,971 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 16 Gap: 0.8730 Reward: 10 Score: 41 Action: PageRank Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:50,007 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 17 Gap: 0.8797 Reward: -2 Score: 39 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:50,047 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 18 Gap: 0.8824 Reward: -2 Score: 37 Action: PageRank Bandwidth: 136 Epsilon: -
+2026-11-14 15:41:50,078 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 19 Gap: 0.8815 Reward: 5 Score: 42 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:50,107 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 20 Gap: 0.8779 Reward: 5 Score: 47 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:50,136 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 21 Gap: 0.8797 Reward: -2 Score: 45 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:50,164 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 22 Gap: 0.8760 Reward: 5 Score: 50 Action: PageRank Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:50,195 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 23 Gap: 0.8760 Reward: 5 Score: 55 Action: PageRank Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:50,241 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 24 Gap: 0.8857 Reward: -2 Score: 53 Action: PageRank Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:50,290 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 25 Gap: 0.8720 Reward: 10 Score: 63 Action: PageRank Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:50,291 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=PageRank)
+2026-11-14 15:41:50,318 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 26 Gap: 0.8760 Reward: -2 Score: 61 Action: PageRank Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:50,348 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 27 Gap: 0.8779 Reward: -2 Score: 59 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:50,375 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 28 Gap: 0.8710 Reward: 10 Score: 69 Action: PageRank Bandwidth: 124 Epsilon: -
+2026-11-14 15:41:50,375 | INFO | Melhor solução atualizada: bandwidth=124 (oracle=PageRank)
+2026-11-14 15:41:50,404 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 29 Gap: 0.8926 Reward: -2 Score: 67 Action: PageRank Bandwidth: 149 Epsilon: -
+2026-11-14 15:41:50,430 | INFO | >> [oracle|fixed:PageRank] Run 0 Episode 30 Gap: 0.8740 Reward: 5 Score: 72 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:50,432 | INFO | Melhor configuração [oracle|fixed:PageRank] rodada 0: bandwidth=124; persistida=False
+2026-11-14 15:41:50,486 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 1 Gap: 0.8797 Reward: 10 Score: 10 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:50,486 | INFO | Melhor solução atualizada: bandwidth=133 (oracle=PageRank)
+2026-11-14 15:41:50,530 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 2 Gap: 0.8740 Reward: 10 Score: 20 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:50,531 | INFO | Melhor solução atualizada: bandwidth=127 (oracle=PageRank)
+2026-11-14 15:41:50,580 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 3 Gap: 0.8832 Reward: -2 Score: 18 Action: PageRank Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:50,632 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 4 Gap: 0.8788 Reward: 5 Score: 23 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:50,678 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 5 Gap: 0.8815 Reward: -2 Score: 21 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:50,718 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 6 Gap: 0.8797 Reward: 5 Score: 26 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:50,765 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 7 Gap: 0.8806 Reward: -2 Score: 24 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:50,794 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 8 Gap: 0.8750 Reward: 5 Score: 29 Action: PageRank Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:50,826 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 9 Gap: 0.8841 Reward: -2 Score: 27 Action: PageRank Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:50,871 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 10 Gap: 0.8797 Reward: 5 Score: 32 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:50,899 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 11 Gap: 0.8857 Reward: -2 Score: 30 Action: PageRank Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:50,927 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 12 Gap: 0.8806 Reward: 5 Score: 35 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:50,953 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 13 Gap: 0.8769 Reward: 5 Score: 40 Action: PageRank Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:50,997 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 14 Gap: 0.8832 Reward: -2 Score: 38 Action: PageRank Bandwidth: 137 Epsilon: -
+2026-11-14 15:41:51,046 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 15 Gap: 0.8730 Reward: 10 Score: 48 Action: PageRank Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:51,046 | INFO | Melhor solução atualizada: bandwidth=126 (oracle=PageRank)
+2026-11-14 15:41:51,094 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 16 Gap: 0.8849 Reward: -2 Score: 46 Action: PageRank Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:51,120 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 17 Gap: 0.8730 Reward: 10 Score: 56 Action: PageRank Bandwidth: 126 Epsilon: -
+2026-11-14 15:41:51,153 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 18 Gap: 0.8806 Reward: -2 Score: 54 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:51,179 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 19 Gap: 0.8740 Reward: 5 Score: 59 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:51,206 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 20 Gap: 0.8750 Reward: -2 Score: 57 Action: PageRank Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:51,234 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 21 Gap: 0.8797 Reward: -2 Score: 55 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:51,268 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 22 Gap: 0.8912 Reward: -2 Score: 53 Action: PageRank Bandwidth: 147 Epsilon: -
+2026-11-14 15:41:51,300 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 23 Gap: 0.8779 Reward: 5 Score: 58 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:51,347 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 24 Gap: 0.8788 Reward: -2 Score: 56 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:51,397 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 25 Gap: 0.8788 Reward: 5 Score: 61 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:51,430 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 26 Gap: 0.8797 Reward: -2 Score: 59 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:51,469 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 27 Gap: 0.8750 Reward: 5 Score: 64 Action: PageRank Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:51,505 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 28 Gap: 0.8720 Reward: 10 Score: 74 Action: PageRank Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:51,506 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=PageRank)
+2026-11-14 15:41:51,555 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 29 Gap: 0.8720 Reward: 10 Score: 84 Action: PageRank Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:51,601 | INFO | >> [oracle|fixed:PageRank] Run 1 Episode 30 Gap: 0.8769 Reward: -2 Score: 82 Action: PageRank Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:51,603 | INFO | Melhor configuração [oracle|fixed:PageRank] rodada 1: bandwidth=125; persistida=False
+2026-11-14 15:41:51,638 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 1 Gap: 0.8815 Reward: 10 Score: 10 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:51,639 | INFO | Melhor solução atualizada: bandwidth=135 (oracle=PageRank)
+2026-11-14 15:41:51,665 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 2 Gap: 0.8961 Reward: -2 Score: 8 Action: PageRank Bandwidth: 154 Epsilon: -
+2026-11-14 15:41:51,709 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 3 Gap: 0.8806 Reward: 10 Score: 18 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:51,710 | INFO | Melhor solução atualizada: bandwidth=134 (oracle=PageRank)
+2026-11-14 15:41:51,751 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 4 Gap: 0.8750 Reward: 10 Score: 28 Action: PageRank Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:51,752 | INFO | Melhor solução atualizada: bandwidth=128 (oracle=PageRank)
+2026-11-14 15:41:51,778 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 5 Gap: 0.8779 Reward: -2 Score: 26 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:51,805 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 6 Gap: 0.8760 Reward: 5 Score: 31 Action: PageRank Bandwidth: 129 Epsilon: -
+2026-11-14 15:41:51,832 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 7 Gap: 0.8797 Reward: -2 Score: 29 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:51,859 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 8 Gap: 0.8841 Reward: -2 Score: 27 Action: PageRank Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:51,889 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 9 Gap: 0.8750 Reward: 10 Score: 37 Action: PageRank Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:51,916 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 10 Gap: 0.8815 Reward: -2 Score: 35 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:51,943 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 11 Gap: 0.8797 Reward: 5 Score: 40 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:51,968 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 12 Gap: 0.8788 Reward: 5 Score: 45 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:52,010 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 13 Gap: 0.8806 Reward: -2 Score: 43 Action: PageRank Bandwidth: 134 Epsilon: -
+2026-11-14 15:41:52,051 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 14 Gap: 0.8779 Reward: 5 Score: 48 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:52,077 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 15 Gap: 0.8720 Reward: 10 Score: 58 Action: PageRank Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:52,077 | INFO | Melhor solução atualizada: bandwidth=125 (oracle=PageRank)
+2026-11-14 15:41:52,104 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 16 Gap: 0.8750 Reward: -2 Score: 56 Action: PageRank Bandwidth: 128 Epsilon: -
+2026-11-14 15:41:52,139 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 17 Gap: 0.8769 Reward: -2 Score: 54 Action: PageRank Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:52,186 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 18 Gap: 0.8849 Reward: -2 Score: 52 Action: PageRank Bandwidth: 139 Epsilon: -
+2026-11-14 15:41:52,232 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 19 Gap: 0.8740 Reward: 5 Score: 57 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:52,276 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 20 Gap: 0.8788 Reward: -2 Score: 55 Action: PageRank Bandwidth: 132 Epsilon: -
+2026-11-14 15:41:52,311 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 21 Gap: 0.8769 Reward: 5 Score: 60 Action: PageRank Bandwidth: 130 Epsilon: -
+2026-11-14 15:41:52,344 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 22 Gap: 0.8740 Reward: 5 Score: 65 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:52,377 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 23 Gap: 0.8815 Reward: -2 Score: 63 Action: PageRank Bandwidth: 135 Epsilon: -
+2026-11-14 15:41:52,403 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 24 Gap: 0.8857 Reward: -2 Score: 61 Action: PageRank Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:52,438 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 25 Gap: 0.8740 Reward: 5 Score: 66 Action: PageRank Bandwidth: 127 Epsilon: -
+2026-11-14 15:41:52,470 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 26 Gap: 0.8720 Reward: 10 Score: 76 Action: PageRank Bandwidth: 125 Epsilon: -
+2026-11-14 15:41:52,498 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 27 Gap: 0.8857 Reward: -2 Score: 74 Action: PageRank Bandwidth: 140 Epsilon: -
+2026-11-14 15:41:52,543 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 28 Gap: 0.8841 Reward: 5 Score: 79 Action: PageRank Bandwidth: 138 Epsilon: -
+2026-11-14 15:41:52,587 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 29 Gap: 0.8779 Reward: 5 Score: 84 Action: PageRank Bandwidth: 131 Epsilon: -
+2026-11-14 15:41:52,633 | INFO | >> [oracle|fixed:PageRank] Run 2 Episode 30 Gap: 0.8797 Reward: -2 Score: 82 Action: PageRank Bandwidth: 133 Epsilon: -
+2026-11-14 15:41:52,636 | INFO | Melhor configuração [oracle|fixed:PageRank] rodada 2: bandwidth=125; persistida=False
+2026-11-14 15:41:53,493 | INFO | Analise por instancia salva em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\can_838\analysis_inputs_can_838_oracle.json
+2026-11-14 15:41:53,497 | INFO | Modelo salvo em: C:\Users\SS7B2647\OneDrive - Subsea7\Area de Trabalho\CEFET\Mestrado\Repo\Estudos\BandWidths\article_code\data\newdata\plots\can_838\trained_model_can_838_oracle.pth

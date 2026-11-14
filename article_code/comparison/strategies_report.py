@@ -19,7 +19,7 @@ from plotly.subplots import make_subplots
 from scipy.stats import friedmanchisquare
 
 from build_report import (HERE, BASE_DIR, OUT_TABLES, FOLDER_CLASS, SLOTS, INK, INK2, MUTED, AXIS, SURFACE,
-                          GOOD, BAD, NEUTRAL, CSS, style, table_html, tile, section)
+                          GOOD, BAD, NEUTRAL, CSS, style, table_html, tile, section, explainer)
 
 CONDITION_LABEL = {"centrality": "Centralidade", "alpha": "α da LCR", "start": "Estratégia de início"}
 CONDITION_COLOR = {"centrality": SLOTS[0], "alpha": SLOTS[1], "start": SLOTS[2]}
@@ -50,9 +50,11 @@ def bar_style(condition, local_search):
 # ---------------------------------------------------------------------------
 def load(dataset, base_dir=BASE_DIR):
     summaries, outputs = [], []
-    for f in sorted(glob.glob(os.path.join(base_dir, f"result_summary_{dataset}_*.csv"))):
+    # so as condicoes de estrategia (o oraculo tem relatorio proprio: oracle_report.py)
+    is_strategy = lambda f: "_oracle" not in os.path.basename(f)
+    for f in filter(is_strategy, sorted(glob.glob(os.path.join(base_dir, f"result_summary_{dataset}_*.csv")))):
         summaries.append(pd.read_csv(f))
-    for f in sorted(glob.glob(os.path.join(base_dir, f"result_output_{dataset}_*.csv"))):
+    for f in filter(is_strategy, sorted(glob.glob(os.path.join(base_dir, f"result_output_{dataset}_*.csv")))):
         outputs.append(pd.read_csv(f, usecols=lambda c: c in {
             "bandwidth", "construction_bandwidth", "Episode", "Run", "condition", "action", "local_search",
             "Instance", "local_time"}))
@@ -60,6 +62,8 @@ def load(dataset, base_dir=BASE_DIR):
         raise SystemExit(f"Nenhum result_summary_{dataset}_*.csv encontrado em {base_dir}")
     summ = pd.concat(summaries, ignore_index=True)
     out = pd.concat(outputs, ignore_index=True)
+    summ = summ[summ["Condition"].isin(CONDITION_ORDER)].reset_index(drop=True)
+    out = out[out["condition"].isin(CONDITION_ORDER)].reset_index(drop=True)
     summ["Local Search"] = summ["Local Search"].astype(bool)
     out["local_search"] = out["local_search"].astype(bool)
     summ["estrategia"] = [strategy_label(c, ls) for c, ls in zip(summ["Condition"], summ["Local Search"])]
@@ -279,17 +283,41 @@ def main():
     agg.to_csv(os.path.join(OUT_TABLES, f"estrategias_{args.dataset}_resumo.csv"), index=False)
 
     top = agg.sort_values("rank_medio").iloc[0]
+    # ganho e custo da busca local: so faz sentido nas estrategias com busca local
+    ls_rows = agg[[strategy_parts(e)[1] for e in agg["estrategia"]]]
+    no_ls_rows = agg[[not strategy_parts(e)[1] for e in agg["estrategia"]]]
+    ls_med = ls_rows["ganho_busca_local"].median() if len(ls_rows) else np.nan
+    t_ratio = (ls_rows["tempo_medio_s"].mean() / no_ls_rows["tempo_medio_s"].mean()
+               if len(ls_rows) and len(no_ls_rows) else np.nan)
+    runs = summ.groupby(["Instance", "estrategia"]).size()
+    n_multi = int((runs > 1).sum())
+    # alpha = 0 e alpha = 1 sao equivalentes no codigo atual (get_LCR embaralha a LCR e o complemento)
+    inst_best_all = out.groupby("Instance")["bandwidth"].transform("min")
+    ratio_all = out["bandwidth"] / inst_best_all
+    act = out["action"].astype(str)
+    is_alpha = out["condition"] == "alpha"
+    med_a0 = ratio_all[is_alpha & (act == "0.0")].median()
+    med_a1 = ratio_all[is_alpha & (act == "1.0")].median()
+    n_a0, n_a1 = int((is_alpha & (act == "0.0")).sum()), int((is_alpha & (act == "1.0")).sum())
+    # comparacao pareada (mesma instancia e mesma busca local), antes da busca local
+    pair = (out[is_alpha & act.isin(["0.0", "1.0"])].assign(a=act)
+               .groupby(["Instance", "local_search", "a"])["construction_bandwidth"].median()
+               .unstack("a").dropna())
+    n_pairs = len(pair)
+    pair_ratio = (pair["1.0"] / pair["0.0"]).median() if n_pairs else np.nan
+    centralities_used = sorted(out.loc[out["condition"] == "centrality", "action"].astype(str).unique())
     tiles = "".join([
         tile(f"{best['Instance'].nunique()}", f"instâncias ({args.dataset})"),
         tile(f"{len(strategies)}", "estratégias (condição × busca local)"),
         tile(top["estrategia"].replace(" · ", "<br>"), f"melhor rank médio ({top['rank_medio']:.2f})"),
         tile(f"{top['vence_rcm']}/{top['instancias']}", "instâncias em que a melhor estratégia vence o RCM"),
-        tile(f"{agg['ganho_busca_local'].dropna().median():.1f}%", "ganho mediano da busca local"),
+        tile(f"{ls_med:.1f}%", "ganho mediano da busca local (estratégias com busca local)"),
     ])
 
     best_action_tab = (best.groupby(["estrategia", "best_action"]).size().rename("instâncias").reset_index()
                            .sort_values(["estrategia", "instâncias"], ascending=[True, False]))
 
+    n_inst = best["Instance"].nunique()
     parts = [f"<!doctype html><html lang='pt-br'><head><meta charset='utf-8'><title>Estratégias Q-MCH — {args.dataset}</title>"
              f"<style>{CSS}</style><script src='https://cdn.plot.ly/plotly-2.35.2.min.js'></script></head><body><main>",
              f"<h1>Comparação das estratégias do Q-MCH ({args.dataset})</h1>",
@@ -299,44 +327,212 @@ def main():
              "<b>preenchimento</b> = busca local do VNS-band (sólido = com, hachurado/tracejado = sem). "
              "Gerado a partir de <code>result_summary_*</code>/<code>result_output_*</code> do main_survey.py.</p>",
              f'<div class="tiles">{tiles}</div>',
+             "<h2>Como ler este relatório</h2>",
+             f"<p>Este relatório compara {len(strategies)} estratégias do Q-MCH: três <b>condições</b> (o que o agente "
+             "DQN escolhe a cada episódio) combinadas com a <b>busca local</b> do VNS-band (com ou sem). Todas rodam "
+             f"nas mesmas {n_inst} instâncias, no mesmo grafo (maior componente conexa) e com o mesmo orçamento "
+             "(30 episódios × 15 construções = 450 construções), e são comparadas com o RCM recalculado em cada "
+             "instância. Cada seção traz a pergunta, a resposta curta, como ler o gráfico e as considerações: "
+             "hipóteses, limitações e o que o resultado permite ou não concluir.</p>",
+             explainer("As três condições", [
+                 "<b>Centralidade</b> (Q-MCH original): o agente escolhe entre as centralidades "
+                 f"({', '.join(centralities_used)}), com α = 0,3 e vértice inicial sorteado com probabilidade "
+                 "proporcional à centralidade.",
+                 "<b>α da LCR</b>: o agente escolhe α ∈ {0; 0,1; 0,3; 0,5; 1}, com centralidade fixa (Degree). α é a "
+                 "fração dos filhos de cada vértice que forma a lista restrita de candidatos (os mais centrais), "
+                 "rotulados antes dos demais.",
+                 "<b>Estratégia de início</b>: o agente escolhe como sortear o vértice inicial. As opções são "
+                 "<code>centrality</code> (proporcional à centralidade), <code>inverse_centrality</code> "
+                 "(proporcional a 1/centralidade, que favorece vértices periféricos), <code>uniform</code> (sorteio "
+                 "uniforme, como no VNS-band) e <code>peripheral</code> (vértice pseudo-periférico de George–Liu, "
+                 "como no RCM e no GPS). Centralidade e α ficam fixos em Degree e 0,3.",
+                 "O número de ações difere entre as condições (centralidades, 5 valores de α, 4 inícios). Em 30 "
+                 "episódios, quanto mais ações, menos vezes o agente experimenta cada uma, o que dificulta o "
+                 "aprendizado.",
+             ]),
+             explainer("Busca local do VNS-band", [
+                 "É aplicada depois de cada construção. Para cada vértice crítico (extremo de uma aresta de tamanho "
+                 "β), tenta trocar o rótulo dele com o de um vértice cujo rótulo esteja mais perto do ponto médio "
+                 "dos rótulos vizinhos. A troca é aceita se nenhuma aresta passar de β e o número de arestas "
+                 "críticas diminuir (Mladenović et al., 2010, baseada em Lim et al., 2006).",
+                 "É uma intensificação local: nunca piora a construção, mas o ganho é limitado quando a construção "
+                 "já é boa, e o custo por construção sobe bastante (ver E5).",
+             ]),
+             explainer("Métricas usadas", [
+                 "<b>best</b>: melhor β final da estratégia na instância (depois da busca local, quando houver). "
+                 "<b>construction_best</b>: melhor β das construções antes da busca local.",
+                 "<b>vs_rcm_pct</b> = (best − β<sub>RCM</sub>) / β<sub>RCM</sub>. Negativo significa melhor que o "
+                 "RCM.",
+                 "<b>vs_best_pct</b>: quanto a estratégia fica acima do melhor β encontrado na instância por "
+                 "qualquer uma das estratégias (0% = foi a melhor).",
+                 "<b>ls_gain_pct</b> = (construction_best − best) / construction_best: redução obtida pela busca "
+                 "local. É 0 por definição nas estratégias sem busca local.",
+                 "<b>rank</b>: posição da estratégia em cada instância (1 = menor β; empates recebem a média das "
+                 "posições).",
+             ]),
+             explainer("Cuidados gerais", [
+                 (f"<b>Número de execuções.</b> {n_multi} combinações instância × estratégia têm mais de uma "
+                  "execução nos CSVs (reexecuções acumuladas). Como 'best' é o mínimo entre execuções, essas "
+                  "combinações levam vantagem. Para a dissertação, regenere os CSVs com o mesmo N_RUNS para todas."
+                  if n_multi else
+                  "<b>Número de execuções.</b> Todas as combinações instância × estratégia têm o mesmo número de "
+                  "execuções. Com uma execução, diferenças pequenas podem estar dentro da variação entre sementes."),
+                 "<b>α = 0 e α = 1 são equivalentes no código atual.</b> <code>get_LCR</code> embaralha tanto a "
+                 "lista restrita quanto o complemento. Com α = 0 todos os filhos vão para o complemento, e com α = 1 "
+                 "todos vão para a lista restrita: nos dois casos a ordem dos filhos é aleatória. O comentário de "
+                 "<code>CONDITIONS</code> em <code>main_survey.py</code> ('1 = ordena todos pela centralidade') "
+                 "não corresponde ao código. Na prática, a condição α tem 4 ações distintas, não 5. Nos dados, "
+                 f"comparando as mesmas instâncias ({n_pairs} pares instância × busca local), a mediana de "
+                 f"β(α = 1) / β(α = 0) é {pair_ratio:.3f}. As medianas agregadas diferem ({med_a0:.3f} contra "
+                 f"{med_a1:.3f}) principalmente porque o agente escolheu α = 1 raramente ({n_a1} construções, contra {n_a0} com "
+                 "α = 0) e em outras instâncias.",
+                 "<b>Orçamento por construções, não por tempo.</b> Com busca local, cada execução leva em média "
+                 f"{t_ratio:.1f}× mais tempo. As comparações de qualidade abaixo não descontam esse custo.",
+             ]),
              section("E1 · Qual estratégia supera o RCM em cada classe?",
                      "O RCM (estado da prática segundo o survey) é a referência. Qual combinação condição × busca local "
                      "fica mais abaixo dele?",
                      "Barras abaixo de zero: a estratégia é melhor que o RCM na mediana da classe.",
                      fig_vs_rcm_by_class(best, strategies),
                      table_html(agg, {"mediana_vs_rcm": "{:+.1f}", "ganho_busca_local": "{:.1f}",
-                                      "tempo_medio_s": "{:.1f}", "rank_medio": "{:.2f}"})),
+                                      "tempo_medio_s": "{:.1f}", "rank_medio": "{:.2f}"}),
+                     how="As classes estão no eixo x, ordenadas pela mediana geral. Há uma barra por estratégia em "
+                         "cada classe (cor = condição; sólida = com busca local; hachurada = sem). A altura é a "
+                         "mediana, entre as instâncias da classe, da diferença percentual para o RCM. O tooltip "
+                         "mostra quantas instâncias a classe tem.",
+                     notes=[
+                         "Comparar barras da mesma cor (sólida × hachurada) mostra o efeito da busca local. Comparar "
+                         "cores com o mesmo preenchimento mostra o efeito da condição.",
+                         "A mediana por classe esconde a dispersão. Em classes com poucas instâncias (ver o tooltip), "
+                         "uma única instância pode mudar a barra.",
+                         "A tabela agregada ('Ver tabela de dados') traz, por estratégia: vitórias, empates e derrotas "
+                         "contra o RCM, ganho mediano da busca local, tempo médio, rank médio e em quantas "
+                         "instâncias a estratégia atinge o melhor β.",
+                     ]),
              section("E2 · Ranking geral",
                      "Ordenando as estratégias em cada instância (1 = menor β), qual tem o melhor rank médio? "
                      "A diferença é estatisticamente significativa (Friedman, α = 0,05)?",
                      f"Friedman p = {p_friedman:.2e} "
                      f"({'há' if p_friedman < 0.05 else 'não há'} diferença significativa entre as estratégias).",
-                     f_rank),
+                     f_rank,
+                     how="À esquerda, o rank médio de cada estratégia (1 = seria sempre a melhor; "
+                         f"{len(strategies)} = sempre a pior). À direita, em quantas instâncias a estratégia "
+                         "atinge o melhor β entre todas (empates contam para todas as empatadas). O título traz o "
+                         "p-valor do teste de Friedman.",
+                     notes=[
+                         "<b>O Friedman só diz que existe diferença.</b> Ele testa se pelo menos uma estratégia "
+                         "difere das outras, mas não diz quais pares diferem. Para isso, aplique um teste post-hoc "
+                         "(Nemenyi, ou Wilcoxon pareado com correção de Holm) e apresente um diagrama de diferença "
+                         "crítica, que é o padrão na literatura de heurísticas.",
+                         "O rank é ordinal: ficar em 1º por 1 unidade de β conta igual a ficar em 1º por 20%. Leia "
+                         "junto com E3, que mostra a distância.",
+                         "Em instâncias pequenas, várias estratégias costumam empatar no melhor β, e cada empate "
+                         "conta para todas. Por isso a coluna da direita pode somar mais que o número de "
+                         "instâncias.",
+                     ]),
              section("E3 · Onde cada estratégia vence",
                      "Em quais instâncias cada estratégia encontra o melhor β, e quão longe fica nas demais?",
                      "Células claras = melhor β da instância; o tooltip mostra o β absoluto.",
-                     fig_heatmap(best, strategies)),
+                     fig_heatmap(best, strategies),
+                     how="As linhas são instâncias, agrupadas por classe, e as colunas, estratégias. A cor indica "
+                         "quanto o β da estratégia fica acima do melhor β encontrado na instância por qualquer "
+                         "estratégia: claro significa que atingiu o melhor, e escuro, que ficou longe. A escala "
+                         "satura no percentil 95, para que poucos valores extremos não apaguem o resto.",
+                     notes=[
+                         "Procure padrões por classe (blocos de linhas). Uma estratégia que só vence numa classe "
+                         "sugere que a escolha deveria depender da classe, que é exatamente a premissa do Q-MCH.",
+                         "Uma coluna clara quase inteira indica uma estratégia robusta. Uma coluna com poucas "
+                         "células escuras, mas muito escuras, indica falhas ocasionais, o que importa quando o "
+                         "método precisa funcionar bem em qualquer instância.",
+                     ]),
              section("E4 · Escolhas do agente",
                      "Em cada condição, o agente concentra as escolhas em algum valor da ação? Esse valor é de fato "
                      "o que produz construções melhores?",
                      "À esquerda, a evolução das escolhas (linha pontilhada = escolha uniforme). À direita, a qualidade "
                      "de todas as construções feitas com cada valor da ação.",
                      fig_actions(out, best),
-                     table_html(best_action_tab)),
+                     table_html(best_action_tab),
+                     how="Há uma linha de painéis por condição. À esquerda está a porcentagem das escolhas do agente "
+                         "em cada valor da ação, por bloco de 5 episódios, com todas as instâncias e execuções "
+                         "juntas; a linha pontilhada é a escolha uniforme. À direita está a distribuição de β da "
+                         "construção dividido pelo melhor β da instância, para todas as construções feitas com cada "
+                         "valor (eixo cortado entre 0,95 e 2). A tabela mostra em quantas instâncias cada valor "
+                         "estava em uso quando o melhor β apareceu.",
+                     notes=[
+                         "<b>Concentrar não é aprender.</b> A concentração das escolhas só indica aprendizado se o "
+                         "valor escolhido também produz construções melhores (caixa mais baixa à direita). Se o "
+                         "agente concentra num valor cuja caixa é igual às outras, a preferência é arbitrária.",
+                         "<b>Teste de sanidade com α.</b> α = 0 e α = 1 fazem o mesmo no código atual (razão pareada "
+                         f"{pair_ratio:.3f}; ver 'Cuidados gerais'). Qualquer preferência do agente entre os dois é "
+                         "ruído e dá uma ideia do tamanho das diferenças que podem surgir por acaso. Note também que "
+                         "as caixas da direita misturam instâncias diferentes para cada valor, conforme o agente "
+                         "escolheu: compare valores na mesma instância antes de concluir que um é melhor.",
+                         "A agregação entre instâncias pode esconder convergência individual: agentes que convergem "
+                         "para valores diferentes somam algo parecido com uniforme.",
+                         "Com busca local, o melhor β pode ter vindo mais da busca local que da ação escolhida. A "
+                         "tabela de 'best_action' deve ser lida com isso em mente.",
+                     ]),
              section("E5 · Busca local",
                      "Quanto a busca local do VNS-band reduz β em cada condição, e qual é o custo em tempo?",
                      "Ganho = redução do melhor β final em relação à melhor construção sem a busca local, na mesma execução.",
-                     fig_local_search(best)),
+                     fig_local_search(best),
+                     how="À esquerda, para cada condição com busca local, há um ponto por instância com a redução de "
+                         "β obtida pela busca local em relação à melhor construção da mesma execução. À direita "
+                         "está o tempo total por execução, com e sem busca local (eixo log).",
+                     notes=[
+                         f"<b>Custo-benefício.</b> Ganho mediano de {ls_med:.1f}% com um tempo médio "
+                         f"{t_ratio:.1f}× maior. Para saber se compensa, compare com gastar o mesmo tempo extra em "
+                         "mais construções sem busca local (orçamento por tempo).",
+                         "<b>O ganho é medido dentro da execução com busca local.</b> Como a busca local muda o β que "
+                         "o agente observa (e, portanto, as recompensas e as escolhas), a trajetória não é a mesma "
+                         "da execução sem busca local. A comparação justa entre 'com' e 'sem' é a de E1 e E2 (melhor "
+                         "β final de cada estratégia).",
+                         "Pontos em 0% são instâncias em que a busca local não conseguiu melhorar a melhor "
+                         "construção, por exemplo porque ela já estava no limite inferior ou num ótimo local da "
+                         "vizinhança de trocas.",
+                     ]),
              section("E6 · Convergência",
                      "Quantas construções cada estratégia precisa para chegar perto do melhor β?",
                      "Mediana entre instâncias do melhor β acumulado dividido pelo melhor β da instância.",
-                     fig_convergence(out, strategies)),
+                     fig_convergence(out, strategies),
+                     how="O eixo x é o número de construções já feitas. O eixo y é a mediana, entre instâncias, do "
+                         "melhor β até ali dividido pelo melhor β da instância entre todas as estratégias (1 = já "
+                         "atingiu o melhor de todas). Linha cheia = com busca local; tracejada = sem; cor = "
+                         "condição. O eixo y está cortado em 1,4.",
+                     notes=[
+                         "O eixo x conta construções, não tempo. Com busca local, cada construção custa várias vezes "
+                         "mais (E5); numa comparação por tempo, as curvas tracejadas avançariam muito mais para a "
+                         "direita no mesmo intervalo.",
+                         "A referência é o melhor β entre todas as estratégias. Uma curva que estabiliza acima de 1 "
+                         "indica que a estratégia converge para um resultado pior, não que lhe falta orçamento.",
+                     ]),
              section("Tabela completa", "Melhor resultado por instância e estratégia.", "",
                      None, table_html(best[["Instance", "classe", "estrategia", "best", "construction_best", "mean", "std",
                                             "best_action", "rcm", "lb", "vs_rcm_pct", "ls_gain_pct", "time"]]
                                       .sort_values(["classe", "Instance", "estrategia"]),
                                       {"mean": "{:.1f}", "std": "{:.1f}", "vs_rcm_pct": "{:+.1f}",
-                                       "ls_gain_pct": "{:.1f}", "time": "{:.1f}"}, max_rows=5000)),
+                                       "ls_gain_pct": "{:.1f}", "time": "{:.1f}"}, max_rows=5000),
+                     how="Uma linha por instância × estratégia. As colunas estão descritas em 'Métricas usadas'; "
+                         "mean e std são a média e o desvio do β das construções, rcm e lb são o β do RCM e o "
+                         "limite inferior, e time é o tempo médio por execução, em segundos. O arquivo também é "
+                         f"gravado em <code>comparison/tabelas/estrategias_{args.dataset}_melhor_por_instancia.csv</code>."),
+             "<h2>Síntese e considerações finais</h2>",
+             explainer("O que os dados sustentam", [
+                 f"<b>Melhor estratégia no conjunto.</b> {top['estrategia']} tem o melhor rank médio "
+                 f"({top['rank_medio']:.2f}) e vence o RCM em {top['vence_rcm']} de {top['instancias']} instâncias. "
+                 f"Friedman p = {p_friedman:.1e}.",
+                 f"<b>Busca local.</b> Reduz o melhor β em {ls_med:.1f}% na mediana, ao custo de ~{t_ratio:.1f}× o tempo.",
+                 "<b>Condição.</b> Compare em E1 e E2 as três cores com o mesmo preenchimento. Se a ordem das "
+                 "condições muda entre classes (E3), a escolha da condição deveria depender da classe.",
+             ]),
+             explainer("O que ainda falta para concluir", [
+                 "Um teste post-hoc par a par (Nemenyi ou Wilcoxon com correção de Holm) para dizer quais "
+                 "estratégias diferem de fato.",
+                 "Mesmo número de execuções (N_RUNS ≥ 3) para todas as combinações, reportando média ± desvio.",
+                 "Uma comparação com o mesmo limite de tempo, já que a busca local muda bastante o custo por "
+                 "construção.",
+                 "Corrigir ou documentar a equivalência α = 0 / α = 1 antes de interpretar a condição α.",
+             ]),
              "</main></body></html>"]
     out_html = os.path.join(HERE, f"report_estrategias_{args.dataset}.html")
     with open(out_html, "w", encoding="utf-8") as f:
