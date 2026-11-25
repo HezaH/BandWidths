@@ -1,0 +1,23 @@
+# Dependências do main_survey.py, dos relatórios de comparison/ e dos scripts de análise de article_code/.
+# O pipeline do artigo ICITS (icits2026/) usa estas mais as de icits2026/requirements.txt.
+#
+# Instalação numa máquina virtual Linux (a partir da pasta article_code):
+#   python3 -m venv venv
+#   source venv/bin/activate
+#   pip install --upgrade pip
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu   # torch só para CPU (~200 MB);
+#                                                                        # sem isso o pip baixa a versão com CUDA (~2 GB)
+#   pip install -r requirements.txt
+#
+# Testado com Python 3.11 em dois conjuntos de versões, com resultados idênticos:
+#   - numpy 1.24.3, scipy 1.14.1, networkx 3.6.1, pandas 2.2.2, torch 2.13.0
+#   - numpy 2.4.6, scipy 1.17.1, networkx 3.6.1, pandas 3.1.1, torch 2.15.0 (as mais novas em 11/2026)
+
+numpy>=1.24,<3
+scipy>=1.10,<2
+networkx>=3.2,<4
+pandas>=2.0,<4
+matplotlib>=3.7,<4
+torch>=2.0
+plotly>=5.15,<7          # relatórios HTML (comparison/ e icits2026/report_icits.py)
+seaborn>=0.12,<1         # analysis_data.py e statistical_analysis.py

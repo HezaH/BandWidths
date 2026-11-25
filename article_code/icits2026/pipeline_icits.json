@@ -1,0 +1,46 @@
+{
+  "description": "Reprodução do artigo ICITS 2026 e extensões da conclusão (E2, E3, E1), na ordem recomendada",
+  "defaults": {
+    "dataset": null,
+    "seeds": 30,
+    "train": 300,
+    "greedy": 60,
+    "workers": "auto",
+    "reserve_cores": 2
+  },
+  "stages": [
+    {
+      "name": "reproducao",
+      "description": "Artigo: DQN, Random e 7 fixas (principal) + DQN-PP e Random-PP (ablação), construção do artigo",
+      "enabled": true,
+      "args": {"construction": "paper", "experiment": "all"}
+    },
+    {
+      "name": "e2_recompensa",
+      "description": "E2: DQN com empate = 0,5/B0 (reaproveita Random e fixas da reprodução)",
+      "enabled": true,
+      "args": {"construction": "paper", "experiment": "main", "selectors": ["DQN"], "reward": ["half_unit_tie"]}
+    },
+    {
+      "name": "e3_bandits",
+      "description": "E3: UCB1 e adaptive pursuit, com a recompensa do artigo e com a reescalada",
+      "enabled": true,
+      "args": {"construction": "paper", "experiment": "main", "selectors": ["UCB1", "AP"],
+               "reward": ["paper", "half_unit_tie"]}
+    },
+    {
+      "name": "e1_ordem_do_pai",
+      "description": "E1: protocolo completo do artigo com a ordenação que preserva o pai",
+      "enabled": true,
+      "args": {"construction": "parent", "experiment": "all"}
+    },
+    {
+      "name": "e1_com_e2_e3",
+      "description": "E2 e E3 sobre a construção E1 (o DQN do artigo já foi rodado na etapa anterior)",
+      "enabled": true,
+      "args": {"construction": "parent", "experiment": "main", "selectors": ["DQN", "UCB1", "AP"],
+               "reward": ["paper", "half_unit_tie"]}
+    }
+  ],
+  "reports": true
+}

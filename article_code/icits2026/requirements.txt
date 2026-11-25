@@ -1,0 +1,21 @@
+# Dependências do pipeline do artigo ICITS 2026 (main_icits.py, pipeline_icits.py, report_icits.py).
+# Inclui as dependências de article_code/requirements.txt (o pipeline reaproveita módulos do main_survey.py).
+#
+# Requer Python 3.11 ou mais novo (o networkx 3.6.1 exige).
+#
+# Instalação numa máquina virtual Linux (a partir da pasta article_code):
+#   python3 -m venv venv
+#   source venv/bin/activate
+#   pip install --upgrade pip
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu   # torch só para CPU (~200 MB)
+#   pip install -r icits2026/requirements.txt
+#   python icits2026/pipeline_icits.py --dry-run
+#
+# Versões da Tabela 2 do artigo: numpy 2.4.6, scipy 1.17.1, networkx 3.6.1, pandas 3.0.6, torch 2.14.1.
+# Os resultados foram idênticos com numpy 1.24.3 / pandas 2.2.2 / torch 2.13.0 e com
+# numpy 2.4.6 / pandas 3.1.1 / torch 2.15.0, por isso as faixas abaixo não fixam versões exatas.
+
+-r ../requirements.txt
+
+networkx==3.6.1          # versão em que o RCM reproduz os valores da Tabela 3 do artigo
+psutil>=5.9,<8           # núcleos livres (--workers auto) e vigilância dos processos paralelos

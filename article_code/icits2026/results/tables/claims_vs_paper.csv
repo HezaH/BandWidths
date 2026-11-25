@@ -1,0 +1,13 @@
+Afirmação do artigo,Artigo,Reprodução,Situação
+Mesmas instâncias (B0 e RCM),Tabela 3,B0 13/13; RCM 13/13,✅ reproduzido
+"Médias de DQN, Random, SBS e VBS",Tabela 3,diferença mediana 0.15%,✅ reproduzido
+SBS = Katz,"rank médio 2,50",Katz (rank médio 2.46),✅ reproduzido
+"No Friedman, Degree, Katz e Random ficam à frente do DQN","3,27; 3,31; 3,35 vs 4,08",Degree 3.46; Katz 3.31; Random 3.62; DQN 3.92,✅ reproduzido
+O DQN não é melhor que a seleção aleatória em nenhuma instância,"pior em 2, igual em 8","melhor em 0, pior em 1, igual em 9",✅ reproduzido
+Nenhum seletor captura parte relevante do gap SBS–VBS,"DQN 2,2%; Random ≈ −19%",DQN 8.1%; Random 6.3% (sem uma instância: DQN -14% a 16%),✅ reproduzido
+A fase gulosa quase nunca melhora o resultado,20 de 390,23 de 390,✅ reproduzido
+"O início PP melhora todas as malhas, sob os dois seletores","−2,5 a −4,4%",-4.2 a -2.2%,✅ reproduzido
+O início PP piora as outras famílias,"+5,3 a +10,0%",+3.1 a +8.3%,✅ reproduzido
+"Com início PP, DQN e Random não diferem","p_H ≥ 0,317",menor p_H = 1.000,✅ reproduzido
+O início PP não fecha a distância para o RCM nas maiores malhas,"fator 1,45 a 1,50",fator 1.45 a 1.50,✅ reproduzido
+Aprender custa pouco em tempo,"+5,4% e +6,2%",DQN -0.3%; DQN-PP +14.2%,⚠️ ver nota
